@@ -4,10 +4,10 @@ import dsx.bcv.data.models.Transaction;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class MockTransactionsTest {
 
@@ -16,7 +16,7 @@ public class MockTransactionsTest {
 
         var mockTransactions = new MockTransactions();
         var transaction = new Transaction(LocalDateTime.now(), "Deposit", "BTC", new BigDecimal("0.0052036"),
-                new BigDecimal("0"), "Complete", new BigInteger("3692143"));
+                new BigDecimal("0"), "Complete", 3692143);
 
         assertFalse(mockTransactions.contains(transaction));
 

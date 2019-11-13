@@ -1,6 +1,6 @@
 package dsx.bcv.services;
 
-import dsx.bcv.data.models.Deal;
+import dsx.bcv.data.models.Trade;
 import dsx.bcv.data.models.Transaction;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -8,30 +8,29 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.IOException;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CSVParserService {
 
-    public List<Deal> parseDeals(Reader in) throws IOException {
-        return parseDeals(in, ',');
+    public List<Trade> parseTrades(Reader in) throws IOException {
+        return parseTrades(in, ',');
     }
 
-    public List<Deal> parseDeals(Reader in, char separator) throws IOException {
+    public List<Trade> parseTrades(Reader in, char separator) throws IOException {
 
-        List<Deal> deals = new ArrayList<>();
+        List<Trade> trades = new ArrayList<>();
 
         Iterable<CSVRecord> records = CSVFormat.newFormat(separator).parse(in);
         for (CSVRecord record : records) {
-            deals.add(getDealFromCSVRecord(record));
+            trades.add(getTradeFromCSVRecord(record));
         }
 
-        return deals;
+        return trades;
     }
 
-    private Deal getDealFromCSVRecord(CSVRecord record) {
+    private Trade getTradeFromCSVRecord(CSVRecord record) {
 
         final LocalDateTime dateTime = getDateTimeFromString(record.get(0));
         final String instrument = record.get(1);
@@ -42,9 +41,9 @@ public class CSVParserService {
         final String tradedPriceCurrency = record.get(6);
         final BigDecimal commission = new BigDecimal(record.get(7));
         final String commissionCurrency = record.get(8);
-        final BigInteger tradeValueId = new BigInteger(record.get(9));
+        final long tradeValueId = Long.parseLong(record.get(9));
 
-        return new Deal(dateTime, instrument, dealType, tradedQuantity, tradedQuantityCurrency,
+        return new Trade(dateTime, instrument, dealType, tradedQuantity, tradedQuantityCurrency,
                 tradedPrice, tradedPriceCurrency, commission, commissionCurrency, tradeValueId);
     }
 
@@ -72,7 +71,7 @@ public class CSVParserService {
         final BigDecimal amount = new BigDecimal(record.get(3));
         final BigDecimal commission = new BigDecimal(record.get(4));
         final String transactionStatus = record.get(5);
-        final BigInteger transactionValueId = new BigInteger(record.get(6));
+        final long transactionValueId = Long.parseLong(record.get(6));
 
         return new Transaction(dateTime, transactionType, currency, amount, commission,
                 transactionStatus, transactionValueId);
