@@ -4,9 +4,8 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 public class CurrencyPair {
-    public CurrencyPair(byte amount_decimal_places, String base_currency, BigDecimal max_price,
-                        BigDecimal min_price, int hidden, BigDecimal min_amount, int fee, String quoted_currency,
-                        byte decimal_places) {
+    public CurrencyPair(byte amount_decimal_places, String base_currency, BigDecimal max_price, BigDecimal min_price,
+                        int hidden, BigDecimal min_amount, int fee, String quoted_currency, byte decimal_places) {
         this.amount_decimal_places = amount_decimal_places;
         this.base_currency = base_currency;
         this.max_price = max_price;
@@ -18,23 +17,23 @@ public class CurrencyPair {
         this.decimal_places = decimal_places;
     }
 
-    public byte getAmount_decimal_places() { return amount_decimal_places; }
+    public byte getAmountDecimalPlaces() { return amount_decimal_places; }
 
-    public String getBase_currency() { return base_currency; }
+    public String getBaseCurrency() { return base_currency; }
 
-    public BigDecimal getMax_price() { return max_price; }
+    public BigDecimal getMaxPrice() { return max_price; }
 
-    public BigDecimal getMin_price() { return min_price; }
+    public BigDecimal getMinPrice() { return min_price; }
 
     public int getHidden() { return hidden; }
 
-    public BigDecimal getMin_amount() { return min_amount; }
+    public BigDecimal getMinAmount() { return min_amount; }
 
     public int getFee() { return fee; }
 
-    public String getQuoted_currency() { return quoted_currency; }
+    public String getQuotedCurrency() { return quoted_currency; }
 
-    public byte getDecimal_places() { return decimal_places; }
+    public byte getDecimalPlaces() { return decimal_places; }
 
     @Override
     public boolean equals(Object o) {
