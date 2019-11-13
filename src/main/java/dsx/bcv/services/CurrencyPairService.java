@@ -15,27 +15,40 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class CurrencyPairService {
-    private ArrayList<Pair<String,ArrayList<Bar>>>  getHistoricalData(int numberOfBars) throws IOException, ParseException {
-        var result =  getHistoricalData(numberOfBars, "btgeur-btcusdt-btcrub-eosbtc-bcceurs-eurtry-btctry-btcgbp-" +
+    public CurrencyPairService() throws IOException, ParseException {
+        this.actualData = receiveActualData();
+    }
+
+    public ArrayList<Pair<String, CurrencyPair>> getActualData(){
+        synchronized(actualData){
+            return actualData;
+        }
+    }
+
+    private ArrayList<Pair<String, ArrayList<Bar>>> getHistoricalData(int numberOfBars) throws IOException, ParseException {
+        var result = getHistoricalData(numberOfBars, "btgeur-btcusdt-btcrub-eosbtc-bcceurs-eurtry-btctry-btcgbp-" +
                 "eurseur-ltcbtc-bccusdt-btggbp-eursusd-ethgbp-btgbtc-usdrub-bccbtc-ltcusd-bccusd-btcusd-ltceur-eoseth-bsveur");
-        result.addAll(getHistoricalData(numberOfBars,"bcceur-ltctry-btceur-btgusd-usdtry-ethusd-etheur-ltcgbp-bsvusd-" +
+        result.addAll(getHistoricalData(numberOfBars, "bcceur-ltctry-btceur-btgusd-usdtry-ethusd-etheur-ltcgbp-bsvusd-" +
                 "bsvbtc-gbpusd-bccgbp-ethtry-eoseur-bsveth-ethbtc-ltcusdt-btceurs-usdtusd-eosusd-ltceurs-usdteur-etheurs-eurusd-ethusdt"));
-    return result;
+        return result;
     }
 
     private ArrayList<Pair<String, ArrayList<Bar>>> getHistoricalData(int numberOfBars, String currencyPairs) throws IOException, ParseException {
-        String response = getResponse("https://dsx.uk/mapi/lastBars/" + currencyPairs +"/h/" + numberOfBars + "?mode=LIVE").toString();
+        String response = getResponse("https://dsx.uk/mapi/lastBars/" + currencyPairs + "/h/" + numberOfBars + "?mode=LIVE").toString();
         JSONParser parser = new JSONParser();
         JSONObject parseResult = (JSONObject) parser.parse(response);
         var keySet = parseResult.keySet();
         ArrayList<Pair<String, ArrayList<Bar>>> results = new ArrayList<Pair<String, ArrayList<Bar>>>();
         Gson g = new Gson();
-        for (var key: keySet) {
+        for (var key : keySet) {
             ArrayList<Bar> bars = new ArrayList<Bar>();
-            for (var json: (JSONArray) parseResult.get(key)) {
-                bars.add(g.fromJson(json.toString(),Bar.class));
+            for (var json : (JSONArray) parseResult.get(key)) {
+                bars.add(g.fromJson(json.toString(), Bar.class));
             }
             results.add(new Pair<>(key.toString(), bars));
         }
@@ -43,17 +56,16 @@ public class CurrencyPairService {
     }
 
     public void printHistoricalData(int numberOfBars, String outputPath) throws IOException, ParseException {
-        printHistoricalData(numberOfBars,outputPath,',');
+        printHistoricalData(numberOfBars, outputPath, ',');
     }
 
-    private void printHistoricalData(int numberOfBars, String outputPath,char separator) throws IOException, ParseException {
-        ArrayList<Pair<String, ArrayList<Bar>>> historicalData =  getHistoricalData(numberOfBars);
+    private void printHistoricalData(int numberOfBars, String outputPath, char separator) throws IOException, ParseException {
+        ArrayList<Pair<String, ArrayList<Bar>>> historicalData = getHistoricalData(numberOfBars);
         FileOutputStream out = new FileOutputStream(outputPath);
         OutputStreamWriter writer = new OutputStreamWriter(out);
         CSVPrinter printer = new CSVPrinter(writer, CSVFormat.newFormat(separator));
-        for (var pair: historicalData){
-            for (var bar: pair.getValue())
-            {
+        for (var pair : historicalData) {
+            for (var bar : pair.getValue()) {
                 printer.printRecord(pair.getKey() + ',' + bar.toString() + '\n');
             }
         }
@@ -62,20 +74,35 @@ public class CurrencyPairService {
         out.close();
     }
 
-    public ArrayList<Pair<String, CurrencyPair>> getActualData() throws IOException, ParseException {
+    private ArrayList<Pair<String, CurrencyPair>> receiveActualData() throws IOException, ParseException {
         String response = getResponse("https://dsx.uk/mapi/info?mode=LIVE").toString();
         JSONParser parser = new JSONParser();
         JSONObject parseResult = (JSONObject) parser.parse(response);
-        long serverTime = (long)parseResult.get("server_time");
-        parseResult = (JSONObject)parseResult.get("pairs");
+        long serverTime = (long) parseResult.get("server_time");
+        parseResult = (JSONObject) parseResult.get("pairs");
         var keySet = parseResult.keySet();
         ArrayList<Pair<String, CurrencyPair>> results = new ArrayList<Pair<String, CurrencyPair>>();
         Gson g = new Gson();
-        for (var key: keySet) {
-            JSONObject json = (JSONObject)parseResult.get(key);
-            results.add(new Pair<>(key.toString(),g.fromJson(json.toString(),CurrencyPair.class)));
+        for (var key : keySet) {
+            JSONObject json = (JSONObject) parseResult.get(key);
+            results.add(new Pair<>(key.toString(), g.fromJson(json.toString(), CurrencyPair.class)));
         }
         return results;
+    }
+
+    public void startReceivingActualData() {
+        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        service.scheduleAtFixedRate(() -> {
+            synchronized(actualData){
+                try {
+                    actualData.clear();
+                    actualData.addAll(receiveActualData());
+                } catch (IOException | ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 0, 60, TimeUnit.SECONDS);
+
     }
 
     private StringBuffer getResponse(String url) throws IOException {
@@ -91,4 +118,6 @@ public class CurrencyPairService {
         in.close();
         return response;
     }
+
+    private final ArrayList<Pair<String, CurrencyPair>> actualData;
 }
