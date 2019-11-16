@@ -47,6 +47,12 @@ public class MockTrades implements ITradeRepository {
         return trade;
     }
 
+    @Override
+    public void delete(long id) {
+        val tradeInList = getById(id);
+        trades.remove(tradeInList);
+    }
+
     private List<Trade> trades = new ArrayList<>(Arrays.asList(
             new Trade(LocalDateTime.now(), "BTCUSD", "Sell", new BigDecimal("0.00097134"), "BTC",
                     new BigDecimal("10142.28001"), "USD", new BigDecimal("0.02"), "USD", "37387684"),

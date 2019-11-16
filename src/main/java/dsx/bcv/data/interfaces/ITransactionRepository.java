@@ -13,5 +13,5 @@ public interface ITransactionRepository {
     List<Transaction> getAllTransactions();
     Transaction getById(long id);
     Transaction update(long id, Transaction transaction);
-
+    void delete(long id);
 }

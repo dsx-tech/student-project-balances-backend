@@ -48,6 +48,12 @@ public class MockTransactions implements ITransactionRepository {
         return transaction;
     }
 
+    @Override
+    public void delete(long id) {
+        var transactionInList = getById(id);
+        transactions.remove(transactionInList);
+    }
+
     private List<Transaction> transactions = new ArrayList<>(Arrays.asList(
             new Transaction(LocalDateTime.now(), "Deposit", "BTC", new BigDecimal("0.0052036"),
                     new BigDecimal("0"), "Complete", "3662143"),

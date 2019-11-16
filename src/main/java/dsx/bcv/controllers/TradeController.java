@@ -35,4 +35,9 @@ public class TradeController {
     public Trade update(@PathVariable long id, @RequestBody Trade trade) {
         return tradeRepository.update(id, trade);
     }
+
+    @DeleteMapping("{id}")
+    public void delete(@PathVariable long id){
+        tradeRepository.delete(id);
+    }
 }

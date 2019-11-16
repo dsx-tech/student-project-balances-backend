@@ -13,5 +13,5 @@ public interface ITradeRepository {
     List<Trade> getAllTrades();
     Trade getById(long id);
     Trade update(long id, Trade trade);
-
+    void delete(long id);
 }
