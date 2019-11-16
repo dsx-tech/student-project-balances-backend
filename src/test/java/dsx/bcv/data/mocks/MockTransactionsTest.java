@@ -16,7 +16,7 @@ public class MockTransactionsTest {
 
         var mockTransactions = new MockTransactions();
         var transaction = new Transaction(LocalDateTime.now(), "Deposit", "BTC", new BigDecimal("0.0052036"),
-                new BigDecimal("0"), "Complete", 3692143);
+                new BigDecimal("0"), "Complete", "3692143");
 
         assertFalse(mockTransactions.contains(transaction));
 

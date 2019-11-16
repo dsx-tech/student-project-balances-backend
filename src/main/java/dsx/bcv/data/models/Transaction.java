@@ -1,18 +1,17 @@
 package dsx.bcv.data.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
-@Builder
+@RequiredArgsConstructor
 public class Transaction {
 
+    private long id;
     @NonNull
     private LocalDateTime dateTime;
     @NonNull
@@ -25,6 +24,6 @@ public class Transaction {
     private BigDecimal commission;
     @NonNull
     private String transactionStatus;
-
-    private long transactionValueId;
+    @NonNull
+    private String transactionValueId;
 }

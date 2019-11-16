@@ -41,7 +41,7 @@ public class CSVParserService {
         final String tradedPriceCurrency = record.get(6);
         final BigDecimal commission = new BigDecimal(record.get(7));
         final String commissionCurrency = record.get(8);
-        final long tradeValueId = Long.parseLong(record.get(9));
+        final String tradeValueId = record.get(9);
 
         return new Trade(dateTime, instrument, dealType, tradedQuantity, tradedQuantityCurrency,
                 tradedPrice, tradedPriceCurrency, commission, commissionCurrency, tradeValueId);
@@ -71,7 +71,7 @@ public class CSVParserService {
         final BigDecimal amount = new BigDecimal(record.get(3));
         final BigDecimal commission = new BigDecimal(record.get(4));
         final String transactionStatus = record.get(5);
-        final long transactionValueId = Long.parseLong(record.get(6));
+        final String transactionValueId = record.get(6);
 
         return new Transaction(dateTime, transactionType, currency, amount, commission,
                 transactionStatus, transactionValueId);

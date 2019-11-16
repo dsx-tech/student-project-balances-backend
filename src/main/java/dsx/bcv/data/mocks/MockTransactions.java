@@ -28,7 +28,7 @@ public class MockTransactions implements ITransactionRepository {
 
     private List<Transaction> transactions = new ArrayList<>(Arrays.asList(
             new Transaction(LocalDateTime.now(), "Deposit", "BTC", new BigDecimal("0.0052036"),
-                    new BigDecimal("0"), "Complete", 3662143),
+                    new BigDecimal("0"), "Complete", "3662143"),
             new Transaction(LocalDateTime.now(), "Withdraw", "USD", new BigDecimal("48.22"),
-                    new BigDecimal("0"), "Complete", 3662142)));
+                    new BigDecimal("0"), "Complete", "3662142")));
 }

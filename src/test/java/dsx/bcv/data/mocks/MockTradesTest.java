@@ -15,13 +15,13 @@ public class MockTradesTest {
     public void add() {
 
         var mockTrades = new MockTrades();
-        var deal = new Trade(LocalDateTime.now(), "BTCUSD", "Sell", new BigDecimal("0.00097134"), "BTC",
-                new BigDecimal("10142.28001"), "USD", new BigDecimal("0.02"), "USD", 17387684);
+        var trade = new Trade(LocalDateTime.now(), "BTCUSD", "Sell", new BigDecimal("0.00097134"), "BTC",
+                new BigDecimal("10142.28001"), "USD", new BigDecimal("0.02"), "USD", "17387684");
 
-        assertFalse(mockTrades.contains(deal));
+        assertFalse(mockTrades.contains(trade));
 
-        mockTrades.add(deal);
+        mockTrades.add(trade);
 
-        assertTrue(mockTrades.contains(deal));
+        assertTrue(mockTrades.contains(trade));
     }
 }
