@@ -2,6 +2,7 @@ package dsx.bcv.data.mocks;
 
 import dsx.bcv.data.interfaces.ITradeRepository;
 import dsx.bcv.data.models.Trade;
+import dsx.bcv.exceptions.NotFoundException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,6 +25,14 @@ public class MockTrades implements ITradeRepository {
     @Override
     public List<Trade> getAllTrades() {
         return trades;
+    }
+
+    @Override
+    public Trade getById(long id) {
+        return trades.stream()
+                .filter(trade -> trade.getId() == id)
+                .findFirst()
+                .orElseThrow(NotFoundException::new);
     }
 
     private List<Trade> trades = new ArrayList<>(Arrays.asList(

@@ -2,8 +2,7 @@ package dsx.bcv.controllers;
 
 import dsx.bcv.data.mocks.MockTrades;
 import dsx.bcv.data.models.Trade;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,5 +19,10 @@ public class TradeController {
     @RequestMapping("list")
     public List<Trade> getAllTrades(){
         return tradeRepository.getAllTrades();
+    }
+
+    @GetMapping("{id}")
+    public Trade getByID(@PathVariable long id){
+        return tradeRepository.getById(id);
     }
 }
