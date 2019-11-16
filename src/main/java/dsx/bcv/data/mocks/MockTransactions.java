@@ -2,6 +2,7 @@ package dsx.bcv.data.mocks;
 
 import dsx.bcv.data.interfaces.ITransactionRepository;
 import dsx.bcv.data.models.Transaction;
+import dsx.bcv.exceptions.NotFoundException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,6 +25,14 @@ public class MockTransactions implements ITransactionRepository {
     @Override
     public List<Transaction> getAllTransactions() {
         return transactions;
+    }
+
+    @Override
+    public Transaction getById(long id) {
+        return transactions.stream()
+                .filter(transaction -> transaction.getId() == id)
+                .findFirst()
+                .orElseThrow(NotFoundException::new);
     }
 
     private List<Transaction> transactions = new ArrayList<>(Arrays.asList(

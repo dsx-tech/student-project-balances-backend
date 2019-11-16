@@ -11,5 +11,6 @@ public interface ITransactionRepository {
     void add(Transaction transaction);
     boolean contains(Transaction transaction);
     List<Transaction> getAllTransactions();
-    
+    Transaction getById(long id);
+
 }
