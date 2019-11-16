@@ -1,6 +1,8 @@
 package dsx.bcv.data.models;
 
+import dsx.bcv.services.TmpIdGeneratorService;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -9,9 +11,10 @@ import java.time.LocalDateTime;
 
 @Data
 @RequiredArgsConstructor
+@EqualsAndHashCode(exclude = "id")
 public class Trade {
 
-    private long id;
+    private long id = TmpIdGeneratorService.createID();
     @NonNull
     private LocalDateTime dateTime;
     @NonNull
