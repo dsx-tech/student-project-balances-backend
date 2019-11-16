@@ -4,6 +4,7 @@ import dsx.bcv.data.interfaces.ITradeRepository;
 import dsx.bcv.data.models.Trade;
 import dsx.bcv.exceptions.NotFoundException;
 import dsx.bcv.services.TmpIdGeneratorService;
+import lombok.val;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -36,6 +37,14 @@ public class MockTrades implements ITradeRepository {
                 .filter(trade -> trade.getId() == id)
                 .findFirst()
                 .orElseThrow(NotFoundException::new);
+    }
+
+    public Trade update(long id, Trade trade) {
+        trade.setId(id);
+        val tradeInList = getById(id);
+        val index = trades.indexOf(tradeInList);
+        trades.set(index, trade);
+        return trade;
     }
 
     private List<Trade> trades = new ArrayList<>(Arrays.asList(

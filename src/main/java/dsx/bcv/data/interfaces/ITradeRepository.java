@@ -12,5 +12,6 @@ public interface ITradeRepository {
     boolean contains(Trade trade);
     List<Trade> getAllTrades();
     Trade getById(long id);
+    Trade update(long id, Trade trade);
 
 }

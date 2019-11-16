@@ -30,4 +30,9 @@ public class TransactionController {
     public Transaction add(@RequestBody Transaction transaction){
         return transactionRepository.add(transaction);
     }
+
+    @PutMapping
+    public Transaction update(@PathVariable long id, @RequestBody Transaction transaction) {
+        return transactionRepository.update(id, transaction);
+    }
 }

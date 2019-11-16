@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Data
 @RequiredArgsConstructor
-@EqualsAndHashCode(exclude = "id")
+@EqualsAndHashCode
 public class Transaction {
 
     private long id = TmpIdGeneratorService.createID();

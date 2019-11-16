@@ -4,6 +4,7 @@ import dsx.bcv.data.interfaces.ITransactionRepository;
 import dsx.bcv.data.models.Transaction;
 import dsx.bcv.exceptions.NotFoundException;
 import dsx.bcv.services.TmpIdGeneratorService;
+import lombok.val;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -36,6 +37,15 @@ public class MockTransactions implements ITransactionRepository {
                 .filter(transaction -> transaction.getId() == id)
                 .findFirst()
                 .orElseThrow(NotFoundException::new);
+    }
+
+    @Override
+    public Transaction update(long id, Transaction transaction) {
+        transaction.setId(id);
+        val transactionInList = getById(id);
+        val index = transactions.indexOf(transactionInList);
+        transactions.set(index, transaction);
+        return transaction;
     }
 
     private List<Transaction> transactions = new ArrayList<>(Arrays.asList(

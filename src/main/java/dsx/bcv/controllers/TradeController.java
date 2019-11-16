@@ -30,4 +30,9 @@ public class TradeController {
     public Trade add(@RequestBody Trade trade){
         return tradeRepository.add(trade);
     }
+
+    @PutMapping
+    public Trade update(@PathVariable long id, @RequestBody Trade trade) {
+        return tradeRepository.update(id, trade);
+    }
 }
