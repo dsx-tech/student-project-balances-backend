@@ -25,4 +25,9 @@ public class TradeController {
     public Trade getByID(@PathVariable long id){
         return tradeRepository.getById(id);
     }
+
+    @PostMapping
+    public Trade add(@RequestBody Trade trade){
+        return tradeRepository.add(trade);
+    }
 }

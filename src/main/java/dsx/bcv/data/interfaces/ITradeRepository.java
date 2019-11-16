@@ -8,7 +8,7 @@ import java.util.List;
 @Repository
 public interface ITradeRepository {
 
-    void add(Trade trade);
+    Trade add(Trade trade);
     boolean contains(Trade trade);
     List<Trade> getAllTrades();
     Trade getById(long id);

@@ -8,7 +8,7 @@ import java.util.List;
 @Repository
 public interface ITransactionRepository {
 
-    void add(Transaction transaction);
+    Transaction add(Transaction transaction);
     boolean contains(Transaction transaction);
     List<Transaction> getAllTransactions();
     Transaction getById(long id);
