@@ -26,6 +26,8 @@ public class CSVParserServiceTest {
                 new BigDecimal("10142.28001"), "USD",
                 new BigDecimal("0.02"), "USD", "37387684");
 
+        expected.setId(result.getId());
+
         assertEquals(expected, result);
     }
 
@@ -48,6 +50,10 @@ public class CSVParserServiceTest {
                         new BigDecimal("0.0000025"), "ETH", "37381155")
         );
 
+        for (var i = 0; i < expected.size(); i++){
+            expected.get(i).setId(result.get(i).getId());
+        }
+
         assertEquals(expected, result);
     }
 
@@ -60,6 +66,8 @@ public class CSVParserServiceTest {
 
         var expected = new Transaction(LocalDateTime.parse("2019-10-26T15:30:34"), "Deposit", "BTC",
                         new BigDecimal("0.0052036"), new BigDecimal("0"),"Complete", "3662143");
+
+        expected.setId(result.getId());
 
         assertEquals(expected, result);
     }
@@ -78,6 +86,10 @@ public class CSVParserServiceTest {
                 new Transaction(LocalDateTime.parse("2019-10-26T15:30:34"), "Withdraw", "USD",
                         new BigDecimal("48.22"), new BigDecimal("0"), "Complete", "3662142")
         );
+
+        for (var i = 0; i < expected.size(); i++){
+            expected.get(i).setId(result.get(i).getId());
+        }
 
         assertEquals(expected, result);
     }
