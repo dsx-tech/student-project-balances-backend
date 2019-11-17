@@ -17,8 +17,8 @@ public class TransactionController {
     }
 
     @RequestMapping("list")
-    public List<Transaction> getAllTransactions(){
-        return transactionRepository.getAllTransactions();
+    public List<Transaction> getAll(){
+        return transactionRepository.getAll();
     }
 
     @GetMapping("{id}")

@@ -10,7 +10,7 @@ public interface ITradeRepository {
 
     Trade add(Trade trade);
     boolean contains(Trade trade);
-    List<Trade> getAllTrades();
+    List<Trade> getAll();
     Trade getById(long id);
     Trade update(long id, Trade trade);
     void delete(long id);

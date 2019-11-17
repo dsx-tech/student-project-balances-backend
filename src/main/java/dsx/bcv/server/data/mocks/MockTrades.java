@@ -27,7 +27,7 @@ public class MockTrades implements ITradeRepository {
     }
 
     @Override
-    public List<Trade> getAllTrades() {
+    public List<Trade> getAll() {
         return trades;
     }
 

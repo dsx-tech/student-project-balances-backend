@@ -10,7 +10,7 @@ public interface ITransactionRepository {
 
     Transaction add(Transaction transaction);
     boolean contains(Transaction transaction);
-    List<Transaction> getAllTransactions();
+    List<Transaction> getAll();
     Transaction getById(long id);
     Transaction update(long id, Transaction transaction);
     void delete(long id);

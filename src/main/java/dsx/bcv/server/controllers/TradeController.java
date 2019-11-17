@@ -17,8 +17,8 @@ public class TradeController {
     }
 
     @RequestMapping("list")
-    public List<Trade> getAllTrades(){
-        return tradeRepository.getAllTrades();
+    public List<Trade> getAll(){
+        return tradeRepository.getAll();
     }
 
     @GetMapping("{id}")

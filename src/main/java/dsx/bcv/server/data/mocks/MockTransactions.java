@@ -27,7 +27,7 @@ public class MockTransactions implements ITransactionRepository {
     }
 
     @Override
-    public List<Transaction> getAllTransactions() {
+    public List<Transaction> getAll() {
         return transactions;
     }
 
