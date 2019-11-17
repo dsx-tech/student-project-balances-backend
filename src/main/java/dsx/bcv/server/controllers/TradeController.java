@@ -10,7 +10,7 @@ import java.util.List;
 @RequestMapping("trades")
 public class TradeController {
 
-    private final MockTrades tradeRepository;
+    private MockTrades tradeRepository;
 
     public TradeController() {
         this.tradeRepository = new MockTrades();
