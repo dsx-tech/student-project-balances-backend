@@ -1,4 +1,4 @@
-package dsx.bcv.data.models;
+package dsx.bcv.utils.data.models;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;

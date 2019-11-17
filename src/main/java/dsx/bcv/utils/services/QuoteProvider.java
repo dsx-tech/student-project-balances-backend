@@ -1,11 +1,11 @@
-package dsx.bcv.services;
+package dsx.bcv.utils.services;
 
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dsx.bcv.data.models.Bar;
-import dsx.bcv.data.models.Instrument;
-import dsx.bcv.data.models.Tiker;
+import dsx.bcv.utils.data.models.Bar;
+import dsx.bcv.utils.data.models.Instrument;
+import dsx.bcv.utils.data.models.Tiker;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -60,7 +60,7 @@ public class QuoteProvider {
         String response = fetcher.getDsxLastBars(amount);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readValue(response, JsonNode.class);
-        ArrayList<Bar> results =  new ArrayList<Bar>();
+        ArrayList<Bar> results =  new ArrayList<>();
         var iterator = rootNode.fieldNames();
         while (iterator.hasNext()){
             String id = iterator.next();

@@ -1,21 +1,14 @@
-package dsx.bcv.app;
+package dsx.bcv.utils.app;
 
-import dsx.bcv.data.models.CurrencyPair;
-import dsx.bcv.services.CurrencyPairService;
-import javafx.util.Pair;
-import org.json.simple.parser.ParseException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-@ComponentScan(value = "dsx/bcv")
+@ComponentScan(value = "dsx/bcv/utils")
 @SpringBootApplication
 public class Application {
 
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void mainX(String[] args) {
         init();
         SpringApplication.run(Application.class, args);
     }
