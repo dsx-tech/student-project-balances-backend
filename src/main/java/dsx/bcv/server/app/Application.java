@@ -1,10 +1,10 @@
-package dsx.bcv.app;
+package dsx.bcv.server.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-@ComponentScan(value = "dsx/bcv")
+@ComponentScan(value = "dsx/bcv/server")
 @SpringBootApplication
 public class Application {
 

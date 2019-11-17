@@ -1,7 +1,7 @@
-package dsx.bcv.controllers;
+package dsx.bcv.server.controllers;
 
-import dsx.bcv.data.mocks.MockTrades;
-import dsx.bcv.data.models.Trade;
+import dsx.bcv.server.data.mocks.MockTrades;
+import dsx.bcv.server.data.models.Trade;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

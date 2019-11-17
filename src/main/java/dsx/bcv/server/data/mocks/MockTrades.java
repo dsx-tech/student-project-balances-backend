@@ -1,9 +1,9 @@
-package dsx.bcv.data.mocks;
+package dsx.bcv.server.data.mocks;
 
-import dsx.bcv.data.interfaces.ITradeRepository;
-import dsx.bcv.data.models.Trade;
-import dsx.bcv.exceptions.NotFoundException;
-import dsx.bcv.services.TmpIdGeneratorService;
+import dsx.bcv.server.data.interfaces.ITradeRepository;
+import dsx.bcv.server.data.models.Trade;
+import dsx.bcv.server.exceptions.NotFoundException;
+import dsx.bcv.server.services.TmpIdGeneratorService;
 import lombok.val;
 
 import java.math.BigDecimal;

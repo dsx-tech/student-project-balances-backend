@@ -1,6 +1,6 @@
-package dsx.bcv.data.interfaces;
+package dsx.bcv.server.data.interfaces;
 
-import dsx.bcv.data.models.Trade;
+import dsx.bcv.server.data.models.Trade;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

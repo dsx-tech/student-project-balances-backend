@@ -1,6 +1,6 @@
-package dsx.bcv.data.mocks;
+package dsx.bcv.server.data.mocks;
 
-import dsx.bcv.data.models.Transaction;
+import dsx.bcv.server.data.models.Transaction;
 import org.junit.Test;
 
 import java.math.BigDecimal;

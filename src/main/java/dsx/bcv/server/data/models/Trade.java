@@ -1,6 +1,6 @@
-package dsx.bcv.data.models;
+package dsx.bcv.server.data.models;
 
-import dsx.bcv.services.TmpIdGeneratorService;
+import dsx.bcv.server.services.TmpIdGeneratorService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -12,21 +12,27 @@ import java.time.LocalDateTime;
 @Data
 @RequiredArgsConstructor
 @EqualsAndHashCode
-public class Transaction {
+public class Trade {
 
     private long id = TmpIdGeneratorService.createID();
     @NonNull
     private LocalDateTime dateTime;
     @NonNull
-    private String transactionType;
+    private String instrument;
     @NonNull
-    private String currency;
+    private String tradeType;
     @NonNull
-    private BigDecimal amount;
+    private BigDecimal tradedQuantity;
+    @NonNull
+    private String tradedQuantityCurrency;
+    @NonNull
+    private BigDecimal tradedPrice;
+    @NonNull
+    private String tradedPriceCurrency;
     @NonNull
     private BigDecimal commission;
     @NonNull
-    private String transactionStatus;
+    private String commissionCurrency;
     @NonNull
-    private String transactionValueId;
+    private String tradeValueId;
 }

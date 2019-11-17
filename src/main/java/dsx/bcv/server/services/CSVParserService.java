@@ -1,7 +1,7 @@
-package dsx.bcv.services;
+package dsx.bcv.server.services;
 
-import dsx.bcv.data.models.Trade;
-import dsx.bcv.data.models.Transaction;
+import dsx.bcv.server.data.models.Trade;
+import dsx.bcv.server.data.models.Transaction;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
