@@ -10,7 +10,7 @@ import java.util.List;
 @RequestMapping("transactions")
 public class TransactionController {
 
-    private final MockTransactions transactionRepository;
+    private MockTransactions transactionRepository;
 
     public TransactionController() {
         transactionRepository = new MockTransactions();
