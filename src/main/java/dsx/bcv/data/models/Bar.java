@@ -1,62 +1,48 @@
 package dsx.bcv.data.models;
 
-import java.lang.reflect.Array;
+import com.fasterxml.jackson.annotation.JacksonInject;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Objects;
 
+@Data
+@EqualsAndHashCode
 public class Bar {
-    public Bar(BigDecimal high, BigDecimal amount, BigDecimal low,
-               BigDecimal close, BigDecimal open, long timestamp) {
+    @JsonCreator
+    public Bar(@JacksonInject String id,
+               @JsonProperty("high") BigDecimal high,
+               @JsonProperty("open") BigDecimal open,
+               @JsonProperty("low") BigDecimal low,
+               @JsonProperty("close") BigDecimal close,
+               @JsonProperty("amount") BigDecimal amount,
+               @JsonProperty("timestamp") long timestamp) {
+        this.id = id;
         this.high = high;
-        this.amount = amount;
+        this.open = open;
         this.low = low;
         this.close = close;
-        this.open = open;
+        this.amount = amount;
         this.timestamp = timestamp;
     }
 
-    public BigDecimal getHigh() { return high; }
-
-    public BigDecimal getAmount() { return amount; }
-
-    public BigDecimal getLow() { return low; }
-
-    public BigDecimal getClose() { return close; }
-
-    public BigDecimal getOpen() { return open; }
-
-    public long getTimestamp() { return timestamp; }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Bar bar = (Bar) o;
-        return high.equals(bar.high) &&
-                amount.equals(bar.amount) &&
-                low.equals(bar.low) &&
-                close.equals(bar.close) &&
-                open.equals(bar.open) &&
-                (timestamp == bar.timestamp);
+    public String toCsvRecord(){
+        StringBuilder record = new StringBuilder(this.toString());
+        record.delete(0,record.indexOf("=") + 1);
+        for (int i = 0; i < 6; ++i){
+            record.delete(record.indexOf(" "),record.indexOf("=") + 1);
+        }
+        record.delete(record.length() - 1,record.length());
+        record.append('\n');
+        return record.toString();
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(high.toString(),amount.toString(), low.toString(), close.toString(), open.toString(), timestamp);
-    }
-
-    @Override
-    public String toString(){
-        return high.toString() + "," + amount.toString() + "," +
-                low.toString() + "," + close.toString() + "," +
-                open.toString() + "," + timestamp;
-    }
-
+    private final String id;
     private final BigDecimal high;
-    private final BigDecimal amount;
+    private final BigDecimal open;
     private final BigDecimal low;
     private final BigDecimal close;
-    private final BigDecimal open;
+    private final BigDecimal amount;
     private final long timestamp;
 }
