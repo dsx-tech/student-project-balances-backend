@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Properties;
 
 class URLFetcher {
+    private final Properties properties;
+
     URLFetcher() throws IOException {
         properties = new Properties();
         properties.load(new FileInputStream("src/main/resources/config.properties"));
@@ -83,6 +85,4 @@ class URLFetcher {
         String result = idsList.toString().substring(1, idsList.toString().length() - 1) ;
         return result.replaceAll(", ","-");
     }
-
-    private final Properties properties;
 }

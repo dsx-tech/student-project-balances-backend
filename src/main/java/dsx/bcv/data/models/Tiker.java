@@ -8,6 +8,17 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode
 public class Tiker {
+    private final BigDecimal high;
+    private final BigDecimal low;
+    private final BigDecimal avg;
+    private final BigDecimal vol;
+    private final BigDecimal volCur;
+    private final BigDecimal last;
+    private final BigDecimal buy;
+    private final BigDecimal sell;
+    private final long updated;
+    private final String pair;
+
     public Tiker(@JsonProperty("high") BigDecimal high,
                  @JsonProperty("low") BigDecimal low,
                  @JsonProperty("avg") BigDecimal avg,
@@ -29,17 +40,6 @@ public class Tiker {
         this.updated = updated;
         this.pair = pair;
     }
-
-    private final BigDecimal high;
-    private final BigDecimal low;
-    private final BigDecimal avg;
-    private final BigDecimal vol;
-    private final BigDecimal volCur;
-    private final BigDecimal last;
-    private final BigDecimal buy;
-    private final BigDecimal sell;
-    private final long updated;
-    private final String pair;
 }
 
 

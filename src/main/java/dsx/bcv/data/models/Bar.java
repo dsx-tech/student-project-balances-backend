@@ -10,6 +10,14 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode
 public class Bar {
+    private final String id;
+    private final BigDecimal high;
+    private final BigDecimal open;
+    private final BigDecimal low;
+    private final BigDecimal close;
+    private final BigDecimal amount;
+    private final long timestamp;
+
     @JsonCreator
     public Bar(@JacksonInject String id,
                @JsonProperty("high") BigDecimal high,
@@ -37,12 +45,4 @@ public class Bar {
         record.append('\n');
         return record.toString();
     }
-
-    private final String id;
-    private final BigDecimal high;
-    private final BigDecimal open;
-    private final BigDecimal low;
-    private final BigDecimal close;
-    private final BigDecimal amount;
-    private final long timestamp;
 }

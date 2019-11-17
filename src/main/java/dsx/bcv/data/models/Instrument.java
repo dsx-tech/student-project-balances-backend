@@ -10,6 +10,17 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode
 public class Instrument {
+    private final String id;
+    private final byte decimalPlaces;
+    private final BigDecimal minPrice;
+    private final BigDecimal maxPrice;
+    private final BigDecimal minAmount;
+    private final int hidden;
+    private final int fee;
+    private final byte amountDecimalPlaces;
+    private final String quotedCurrency;
+    private final String baseCurrency;
+
     @JsonCreator
     public Instrument(@JacksonInject String id,
                       @JsonProperty("decimal_places") byte decimalPlaces,
@@ -32,15 +43,4 @@ public class Instrument {
         this.quotedCurrency = quotedCurrency;
         this.baseCurrency = baseCurrency;
     }
-
-    private final String id;
-    private final byte decimalPlaces;
-    private final BigDecimal minPrice;
-    private final BigDecimal maxPrice;
-    private final BigDecimal minAmount;
-    private final int hidden;
-    private final int fee;
-    private final byte amountDecimalPlaces;
-    private final String quotedCurrency;
-    private final String baseCurrency;
 }

@@ -12,13 +12,19 @@ import org.apache.commons.csv.CSVPrinter;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class QuoteProvider {
+    private final URLFetcher fetcher;
+    private final List<Tiker> actualData;
+    private final ObjectMapper mapper;
+
     public QuoteProvider() throws IOException {
+        this.mapper = new ObjectMapper();
         this.fetcher = new URLFetcher();
         this.actualData = receiveActualData();
     }
@@ -31,7 +37,6 @@ public class QuoteProvider {
 
     private List<Tiker> receiveActualData() throws IOException {
         String response = fetcher.getDsxTikers();
-        ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readValue(response, JsonNode.class);
         List<Tiker> result = new ArrayList<>();
         var iterator = rootNode.fieldNames();
@@ -58,7 +63,6 @@ public class QuoteProvider {
 
     private List<Bar> getHistoricalData(int amount) throws IOException {
         String response = fetcher.getDsxLastBars(amount);
-        ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readValue(response, JsonNode.class);
         ArrayList<Bar> results =  new ArrayList<Bar>();
         var iterator = rootNode.fieldNames();
@@ -67,20 +71,7 @@ public class QuoteProvider {
             InjectableValues inject = new InjectableValues.Std().addValue(String.class, id);
             results.addAll(Arrays.asList(mapper.reader(inject).forType(Bar[].class).readValue(rootNode.get(id))));
         }
-        results.sort((fisrtBar, secondBar) -> {
-            long fBarTime = fisrtBar.getTimestamp();
-            long sBarTime = secondBar.getTimestamp();
-            if (fBarTime < sBarTime){
-                return -1;
-            }
-            if (fBarTime > sBarTime){
-                return 1;
-            }
-            if (fBarTime == sBarTime){
-                return fisrtBar.getId().compareTo(secondBar.getId());
-            }
-            return 0;
-        });
+        results.sort(Comparator.comparingLong(bar -> ((Bar)bar).getTimestamp()).thenComparing(bar -> ((Bar)bar).getId()));
         return results;
     }
 
@@ -104,7 +95,6 @@ public class QuoteProvider {
 
     public List<Instrument> receiveInfo() throws IOException {
         String response = fetcher.getDsxInfo();
-        ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readValue(response, JsonNode.class);
         JsonNode pairsNode = rootNode.get("pairs");
         ArrayList<Instrument> results = new ArrayList<>();
@@ -116,7 +106,4 @@ public class QuoteProvider {
         }
         return results;
     }
-
-    private final URLFetcher fetcher;
-    private final List<Tiker> actualData;
 }
