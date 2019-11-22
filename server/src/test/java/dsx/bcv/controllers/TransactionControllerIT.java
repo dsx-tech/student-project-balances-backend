@@ -1,7 +1,7 @@
 package dsx.bcv.controllers;
 
 import dsx.bcv.app.Application;
-import dsx.bcv.data.models.Trade;
+import dsx.bcv.data.models.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,64 +24,52 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
-public class TradeControllerIT {
+public class TransactionControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
 
-    private final String controllerUrl = "/trades/";
+    private final String controllerUrl = "/transactions/";
 
-    private Trade trade1;
-    private Trade trade2;
-    private Trade trade3;
+    private Transaction transaction1;
+    private Transaction transaction2;
+    private Transaction transaction3;
 
     @Before
     public void setUp() throws Exception {
 
-        trade1 = new Trade(
+        transaction1 = new Transaction(
                 LocalDateTime.now(),
-                "BTCUSD",
-                "Sell",
-                new BigDecimal("0.00097134"),
-                "BTC",
-                new BigDecimal("10142.28001"),
-                "USD",
-                new BigDecimal("0.02"),
-                "USD",
-                "37387684");
+                "Deposit",
+                "BTC", new BigDecimal("0.21043"),
+                new BigDecimal("0"),
+                "Complete",
+                "3669993");
 
-        trade2 = new Trade(
+        transaction2 = new Transaction(
                 LocalDateTime.now(),
-                "ETHBTC",
-                "Buy",
-                new BigDecimal("0.001"),
-                "ETH",
-                new BigDecimal("0.021"),
-                "BTC",
-                new BigDecimal("0.0000025"),
-                "USD",
-                "37381155");
+                "Withdraw",
+                "EUR", new BigDecimal("32.1104"),
+                new BigDecimal("0"),
+                "Complete",
+                "3621995");
 
-        trade3 = new Trade(
+        transaction3 = new Transaction(
                 LocalDateTime.now(),
-                "RUBEUR",
-                "Sell",
-                new BigDecimal("500"),
-                "RUB",
-                new BigDecimal("71.22"),
-                "EUR",
-                new BigDecimal("100"),
-                "RUB",
-                "37381155");
+                "Deposit",
+                "RUB", new BigDecimal("24674.11"),
+                new BigDecimal("0"),
+                "Complete",
+                "1528613");
 
         mockMvc.perform(post(controllerUrl)
-                .content(toJson(trade1))
+                .content(toJson(transaction1))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
         );
 
         mockMvc.perform(post(controllerUrl)
-                .content(toJson(trade2))
+                .content(toJson(transaction2))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
         );
@@ -94,7 +82,7 @@ public class TradeControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[*].instrument").isNotEmpty())    //?
+                .andExpect(jsonPath("$[*].transactionType").isNotEmpty())    //?
                 .andDo(print())
                 .andReturn();
     }
@@ -102,11 +90,11 @@ public class TradeControllerIT {
     @Test
     public void getByID() throws Exception {
 
-        mockMvc.perform(get(controllerUrl + "1"))
+        mockMvc.perform(get(controllerUrl + "3"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.instrument").isNotEmpty())
+                .andExpect(jsonPath("$.id").value(3))
+                .andExpect(jsonPath("$.transactionType").isNotEmpty())
                 .andDo(print())
                 .andReturn();
     }
@@ -115,39 +103,39 @@ public class TradeControllerIT {
     public void add() throws Exception {
 
         mockMvc.perform(post(controllerUrl)
-                .content(toJson(trade3))
+                .content(toJson(transaction3))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
         )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.instrument").value(trade3.getInstrument()));
+                .andExpect(jsonPath("$.transactionType").value(transaction3.getTransactionType()));
     }
 
     @Test
     public void update() throws Exception {
 
         mockMvc.perform(
-                put(controllerUrl + "1")
-                .content(toJson(trade1))
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .accept(MediaType.APPLICATION_JSON_UTF8)
-                )
+                put(controllerUrl + "3")
+                        .content(toJson(transaction1))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8)
+        )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.instrument").value(trade1.getInstrument()))
+                .andExpect(jsonPath("$.transactionType").value(transaction1.getTransactionType()))
                 .andReturn();
     }
 
     @Test
     public void delete() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.delete(controllerUrl + "0"))
+        mockMvc.perform(MockMvcRequestBuilders.delete(controllerUrl + "2"))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andReturn();
 
-        mockMvc.perform(MockMvcRequestBuilders.delete(controllerUrl + "0"))
+        mockMvc.perform(MockMvcRequestBuilders.delete(controllerUrl + "2"))
                 .andExpect(status().isNotFound())
                 .andDo(print())
                 .andReturn();

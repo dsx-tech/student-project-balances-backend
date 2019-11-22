@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import dsx.bcv.services.TmpIdGeneratorService;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -13,7 +12,6 @@ import java.time.LocalDateTime;
 
 @Data
 @RequiredArgsConstructor
-@EqualsAndHashCode
 public class Trade {
 
     private long id = TmpIdGeneratorService.createID();
