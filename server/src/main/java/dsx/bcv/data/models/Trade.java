@@ -1,5 +1,7 @@
 package dsx.bcv.data.models;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import dsx.bcv.services.TmpIdGeneratorService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,6 +18,7 @@ public class Trade {
 
     private long id = TmpIdGeneratorService.createID();
     @NonNull
+    @JsonSerialize(using = ToStringSerializer.class)
     private LocalDateTime dateTime;
     @NonNull
     private String instrument;
