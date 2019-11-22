@@ -2,3 +2,5 @@
 /.gradle/
 /build/
 /target/
+/server/build/
+/gradle/
