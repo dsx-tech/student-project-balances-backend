@@ -2,7 +2,7 @@ package dsx.bcv.data.models;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import dsx.bcv.services.TmpIdGeneratorService;
+import dsx.bcv.services.TmpTransactionIdGeneratorService;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class Transaction {
 
-    private long id = TmpIdGeneratorService.createID();
+    private long id = TmpTransactionIdGeneratorService.createID();
     @NonNull
     @JsonSerialize(using = ToStringSerializer.class)
     private LocalDateTime dateTime;

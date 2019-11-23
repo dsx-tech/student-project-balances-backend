@@ -3,7 +3,7 @@ package dsx.bcv.data.mocks;
 import dsx.bcv.data.interfaces.ITransactionRepository;
 import dsx.bcv.data.models.Transaction;
 import dsx.bcv.exceptions.NotFoundException;
-import dsx.bcv.services.TmpIdGeneratorService;
+import dsx.bcv.services.TmpTradeIdGeneratorService;
 import lombok.val;
 
 import java.math.BigDecimal;
@@ -16,7 +16,7 @@ public class MockTransactions implements ITransactionRepository {
 
     @Override
     public Transaction add(Transaction transaction) {
-        transaction.setId(TmpIdGeneratorService.createID());
+        transaction.setId(TmpTradeIdGeneratorService.createID());
         transactions.add(transaction);
         return transaction;
     }
