@@ -94,7 +94,7 @@ public class TradeControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[*].instrument").isNotEmpty())    //?
+                .andExpect(jsonPath("$[*].instrument").isNotEmpty())
                 .andDo(print())
                 .andReturn();
     }
