@@ -1,7 +1,9 @@
 package dsx.bcv.controllers;
 
 import dsx.bcv.app.Application;
+import dsx.bcv.data.mocks.MockTransactions;
 import dsx.bcv.data.models.Transaction;
+import dsx.bcv.exceptions.NotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -90,7 +92,7 @@ public class TransactionControllerIT {
     @Test
     public void getByID() throws Exception {
 
-        long id = 2;
+        final var id = getAnyId();
 
         mockMvc.perform(get(controllerUrl + id))
                 .andExpect(status().isOk())
@@ -117,7 +119,7 @@ public class TransactionControllerIT {
     @Test
     public void update() throws Exception {
 
-        long id = 1;
+        final var id = getAnyId();
 
         mockMvc.perform(
                 put(controllerUrl + id)
@@ -134,7 +136,7 @@ public class TransactionControllerIT {
     @Test
     public void delete() throws Exception {
 
-        long id = 0;
+        final var id = getAnyId();
 
         mockMvc.perform(MockMvcRequestBuilders.delete(controllerUrl + id))
                 .andExpect(status().isOk())
@@ -145,5 +147,12 @@ public class TransactionControllerIT {
                 .andExpect(status().isNotFound())
                 .andDo(print())
                 .andReturn();
+    }
+
+    private long getAnyId() {
+        return MockTransactions.instance.getAll().stream()
+                .map(Transaction::getId)
+                .findAny()
+                .orElseThrow(NotFoundException::new);
     }
 }
