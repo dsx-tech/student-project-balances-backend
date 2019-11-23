@@ -37,8 +37,7 @@ public class TransactionControllerIT {
     private Transaction transaction2;
     private Transaction transaction3;
 
-    @Before
-    public void setUp() throws Exception {
+    public TransactionControllerIT() {
 
         transaction1 = new Transaction(
                 LocalDateTime.now(),
@@ -63,6 +62,10 @@ public class TransactionControllerIT {
                 new BigDecimal("0"),
                 "Complete",
                 "1528613");
+    }
+
+    @Before
+    public void setUp() throws Exception {
 
         mockMvc.perform(post(controllerUrl)
                 .content(toJson(transaction1))

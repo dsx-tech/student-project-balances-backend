@@ -37,8 +37,7 @@ public class TradeControllerIT {
     private Trade trade2;
     private Trade trade3;
 
-    @Before
-    public void setUp() throws Exception {
+    public TradeControllerIT() {
 
         trade1 = new Trade(
                 LocalDateTime.now(),
@@ -75,6 +74,10 @@ public class TradeControllerIT {
                 new BigDecimal("100"),
                 "RUB",
                 "37381155");
+    }
+
+    @Before
+    public void setUp() throws Exception {
 
         mockMvc.perform(post(controllerUrl)
                 .content(toJson(trade1))
