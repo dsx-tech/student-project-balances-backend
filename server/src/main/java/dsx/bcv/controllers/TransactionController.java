@@ -13,7 +13,7 @@ public class TransactionController {
     private MockTransactions transactionRepository;
 
     public TransactionController() {
-        transactionRepository = new MockTransactions();
+        transactionRepository = MockTransactions.instance;
     }
 
     @GetMapping

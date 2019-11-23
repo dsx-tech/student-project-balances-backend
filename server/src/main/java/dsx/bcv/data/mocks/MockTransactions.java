@@ -7,11 +7,15 @@ import lombok.val;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MockTransactions implements ITransactionRepository {
+
+    public static final MockTransactions instance = new MockTransactions();
+
+    private MockTransactions(){}
 
     @Override
     public Transaction add(Transaction transaction) {
@@ -52,7 +56,7 @@ public class MockTransactions implements ITransactionRepository {
         transactions.remove(transactionInList);
     }
 
-    private List<Transaction> transactions = new ArrayList<>(Arrays.asList(
+    private List<Transaction> transactions = new CopyOnWriteArrayList<>(Arrays.asList(
             new Transaction(LocalDateTime.now(), "Deposit", "BTC", new BigDecimal("0.0052036"),
                     new BigDecimal("0"), "Complete", "3662143"),
             new Transaction(LocalDateTime.now(), "Withdraw", "USD", new BigDecimal("48.22"),

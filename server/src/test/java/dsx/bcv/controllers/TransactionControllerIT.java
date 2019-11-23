@@ -117,7 +117,7 @@ public class TransactionControllerIT {
     @Test
     public void update() throws Exception {
 
-        long id = 2;
+        long id = 1;
 
         mockMvc.perform(
                 put(controllerUrl + id)
@@ -134,7 +134,7 @@ public class TransactionControllerIT {
     @Test
     public void delete() throws Exception {
 
-        long id = 3;
+        long id = 0;
 
         mockMvc.perform(MockMvcRequestBuilders.delete(controllerUrl + id))
                 .andExpect(status().isOk())

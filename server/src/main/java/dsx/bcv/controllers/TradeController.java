@@ -13,7 +13,7 @@ public class TradeController {
     private MockTrades tradeRepository;
 
     public TradeController() {
-        this.tradeRepository = new MockTrades();
+        this.tradeRepository = MockTrades.instance;
     }
 
     @GetMapping
