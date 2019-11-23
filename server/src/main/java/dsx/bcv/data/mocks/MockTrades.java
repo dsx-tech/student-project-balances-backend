@@ -3,7 +3,6 @@ package dsx.bcv.data.mocks;
 import dsx.bcv.data.interfaces.ITradeRepository;
 import dsx.bcv.data.models.Trade;
 import dsx.bcv.exceptions.NotFoundException;
-import dsx.bcv.services.TmpTradeIdGeneratorService;
 import lombok.val;
 
 import java.math.BigDecimal;
@@ -16,7 +15,6 @@ public class MockTrades implements ITradeRepository {
 
     @Override
     public Trade add(Trade trade) {
-        trade.setId(TmpTradeIdGeneratorService.createID());
         trades.add(trade);
         return trade;
     }
