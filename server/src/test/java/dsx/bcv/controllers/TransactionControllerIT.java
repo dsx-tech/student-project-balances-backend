@@ -90,10 +90,12 @@ public class TransactionControllerIT {
     @Test
     public void getByID() throws Exception {
 
-        mockMvc.perform(get(controllerUrl + "1"))
+        long id = 2;
+
+        mockMvc.perform(get(controllerUrl + id))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.transactionType").isNotEmpty())
                 .andDo(print())
                 .andReturn();
@@ -115,8 +117,10 @@ public class TransactionControllerIT {
     @Test
     public void update() throws Exception {
 
+        long id = 2;
+
         mockMvc.perform(
-                put(controllerUrl + "1")
+                put(controllerUrl + id)
                         .content(toJson(transaction1))
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept(MediaType.APPLICATION_JSON_UTF8)
@@ -130,12 +134,14 @@ public class TransactionControllerIT {
     @Test
     public void delete() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.delete(controllerUrl + "0"))
+        long id = 3;
+
+        mockMvc.perform(MockMvcRequestBuilders.delete(controllerUrl + id))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andReturn();
 
-        mockMvc.perform(MockMvcRequestBuilders.delete(controllerUrl + "0"))
+        mockMvc.perform(MockMvcRequestBuilders.delete(controllerUrl + id))
                 .andExpect(status().isNotFound())
                 .andDo(print())
                 .andReturn();
