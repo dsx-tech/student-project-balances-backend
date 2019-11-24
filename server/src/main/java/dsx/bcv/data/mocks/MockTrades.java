@@ -3,20 +3,22 @@ package dsx.bcv.data.mocks;
 import dsx.bcv.data.interfaces.ITradeRepository;
 import dsx.bcv.data.models.Trade;
 import dsx.bcv.exceptions.NotFoundException;
-import dsx.bcv.services.TmpIdGeneratorService;
 import lombok.val;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MockTrades implements ITradeRepository {
 
+    public static final MockTrades instance = new MockTrades();
+
+    private MockTrades(){}
+
     @Override
     public Trade add(Trade trade) {
-        trade.setId(TmpIdGeneratorService.createID());
         trades.add(trade);
         return trade;
     }
@@ -53,7 +55,7 @@ public class MockTrades implements ITradeRepository {
         trades.remove(tradeInList);
     }
 
-    private List<Trade> trades = new ArrayList<>(Arrays.asList(
+    private List<Trade> trades = new CopyOnWriteArrayList<>(Arrays.asList(
             new Trade(LocalDateTime.now(), "BTCUSD", "Sell", new BigDecimal("0.00097134"), "BTC",
                     new BigDecimal("10142.28001"), "USD", new BigDecimal("0.02"), "USD", "37387684"),
             new Trade(LocalDateTime.now(), "ETHBTC", "Buy", new BigDecimal("0.001"), "ETH",

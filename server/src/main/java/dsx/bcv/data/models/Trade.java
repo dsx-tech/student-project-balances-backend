@@ -1,8 +1,9 @@
 package dsx.bcv.data.models;
 
-import dsx.bcv.services.TmpIdGeneratorService;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import dsx.bcv.services.TmpTradeIdGeneratorService;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -11,11 +12,11 @@ import java.time.LocalDateTime;
 
 @Data
 @RequiredArgsConstructor
-@EqualsAndHashCode
 public class Trade {
 
-    private long id = TmpIdGeneratorService.createID();
+    private long id = TmpTradeIdGeneratorService.createID();
     @NonNull
+    @JsonSerialize(using = ToStringSerializer.class)
     private LocalDateTime dateTime;
     @NonNull
     private String instrument;

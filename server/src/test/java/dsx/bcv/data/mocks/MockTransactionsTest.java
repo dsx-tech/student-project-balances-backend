@@ -14,7 +14,7 @@ public class MockTransactionsTest {
     @Test
     public void add() {
 
-        var mockTransactions = new MockTransactions();
+        var mockTransactions = MockTransactions.instance;
         var transaction = new Transaction(LocalDateTime.now(), "Deposit", "BTC", new BigDecimal("0.0052036"),
                 new BigDecimal("0"), "Complete", "3692143");
 

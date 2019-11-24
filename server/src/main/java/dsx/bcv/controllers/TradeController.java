@@ -13,10 +13,10 @@ public class TradeController {
     private MockTrades tradeRepository;
 
     public TradeController() {
-        this.tradeRepository = new MockTrades();
+        this.tradeRepository = MockTrades.instance;
     }
 
-    @RequestMapping("list")
+    @GetMapping
     public List<Trade> getAll(){
         return tradeRepository.getAll();
     }
@@ -31,7 +31,7 @@ public class TradeController {
         return tradeRepository.add(trade);
     }
 
-    @PutMapping
+    @PutMapping("{id}")
     public Trade update(@PathVariable long id, @RequestBody Trade trade) {
         return tradeRepository.update(id, trade);
     }

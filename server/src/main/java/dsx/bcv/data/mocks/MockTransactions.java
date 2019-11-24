@@ -3,20 +3,22 @@ package dsx.bcv.data.mocks;
 import dsx.bcv.data.interfaces.ITransactionRepository;
 import dsx.bcv.data.models.Transaction;
 import dsx.bcv.exceptions.NotFoundException;
-import dsx.bcv.services.TmpIdGeneratorService;
 import lombok.val;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MockTransactions implements ITransactionRepository {
 
+    public static final MockTransactions instance = new MockTransactions();
+
+    private MockTransactions(){}
+
     @Override
     public Transaction add(Transaction transaction) {
-        transaction.setId(TmpIdGeneratorService.createID());
         transactions.add(transaction);
         return transaction;
     }
@@ -54,7 +56,7 @@ public class MockTransactions implements ITransactionRepository {
         transactions.remove(transactionInList);
     }
 
-    private List<Transaction> transactions = new ArrayList<>(Arrays.asList(
+    private List<Transaction> transactions = new CopyOnWriteArrayList<>(Arrays.asList(
             new Transaction(LocalDateTime.now(), "Deposit", "BTC", new BigDecimal("0.0052036"),
                     new BigDecimal("0"), "Complete", "3662143"),
             new Transaction(LocalDateTime.now(), "Withdraw", "USD", new BigDecimal("48.22"),

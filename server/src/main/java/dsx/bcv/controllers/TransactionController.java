@@ -13,10 +13,10 @@ public class TransactionController {
     private MockTransactions transactionRepository;
 
     public TransactionController() {
-        transactionRepository = new MockTransactions();
+        transactionRepository = MockTransactions.instance;
     }
 
-    @RequestMapping("list")
+    @GetMapping
     public List<Transaction> getAll(){
         return transactionRepository.getAll();
     }
@@ -31,7 +31,7 @@ public class TransactionController {
         return transactionRepository.add(transaction);
     }
 
-    @PutMapping
+    @PutMapping("{id}")
     public Transaction update(@PathVariable long id, @RequestBody Transaction transaction) {
         return transactionRepository.update(id, transaction);
     }

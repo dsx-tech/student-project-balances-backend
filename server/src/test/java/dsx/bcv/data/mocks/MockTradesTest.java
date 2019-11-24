@@ -14,7 +14,7 @@ public class MockTradesTest {
     @Test
     public void add() {
 
-        var mockTrades = new MockTrades();
+        var mockTrades = MockTrades.instance;
         var trade = new Trade(LocalDateTime.now(), "BTCUSD", "Sell", new BigDecimal("0.00097134"), "BTC",
                 new BigDecimal("10142.28001"), "USD", new BigDecimal("0.02"), "USD", "17387684");
 
