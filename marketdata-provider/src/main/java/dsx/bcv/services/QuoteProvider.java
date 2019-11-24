@@ -22,11 +22,20 @@ public class QuoteProvider {
     private final ObjectMapper mapper;
     private final Formatter formatter;
 
-    QuoteProvider() throws IOException {
+    public QuoteProvider() throws IOException {
         this.mapper = new ObjectMapper();
         this.fetcher = new URLFetcher();
         this.formatter = new Formatter();
         this.actualData = receiveActualData();
+        this.startReceivingActualData();
+    }
+
+    public QuoteProvider(List<String> idsList) throws IOException {
+        this.mapper = new ObjectMapper();
+        this.fetcher = new URLFetcher();
+        this.formatter = new Formatter();
+        this.actualData = receiveActualData();
+        this.startReceivingActualData(idsList);
     }
 
     public List<Tiker> getActualData() {
@@ -54,7 +63,7 @@ public class QuoteProvider {
         return result;
     }
 
-    public void startReceivingActualData(List<String> idsList) {
+    private void startReceivingActualData(List<String> idsList) {
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         service.scheduleAtFixedRate(() -> {
             try {
@@ -65,7 +74,7 @@ public class QuoteProvider {
         }, 0, 60, TimeUnit.SECONDS);
     }
 
-    public void startReceivingActualData() {
+    private void startReceivingActualData() {
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         service.scheduleAtFixedRate(() -> {
             try {
@@ -76,17 +85,17 @@ public class QuoteProvider {
         }, 0, 60, TimeUnit.SECONDS);
     }
 
-    private List<Bar> getHistoricalData(int amount) throws IOException {
+     public List<Bar> getHistoricalData(int amount) throws IOException {
         String response = fetcher.getDsxLastBars(amount);
         return parseHistoricalData(response);
     }
 
-    private List<Bar> getHistoricalData(String period, int amount) throws IOException {
+    public List<Bar> getHistoricalData(String period, int amount) throws IOException {
         String response = fetcher.getDsxLastBars(period, amount);
         return parseHistoricalData(response);
     }
 
-    private List<Bar> getHistoricalData(List<String> idsList, String period, int amount) throws IOException {
+    public List<Bar> getHistoricalData(List<String> idsList, String period, int amount) throws IOException {
         String response = fetcher.getDsxLastBars(idsList, period, amount);
         return parseHistoricalData(response);
     }
@@ -104,17 +113,17 @@ public class QuoteProvider {
         return result;
     }
 
-    void printHistoricalData(int amount, String outputPath) throws IOException {
+    public void printHistoricalData(int amount, String outputPath) throws IOException {
         List<Bar> bars = getHistoricalData(amount);
         printBarsToFile(bars,outputPath);
     }
 
-    void printHistoricalData(String period, int amount, String outputPath) throws IOException {
+    public void printHistoricalData(String period, int amount, String outputPath) throws IOException {
         List<Bar> bars = getHistoricalData(period, amount);
         printBarsToFile(bars,outputPath);
     }
 
-    void printHistoricalData(List<String> idsList,String period, int amount, String outputPath) throws IOException {
+    public void printHistoricalData(List<String> idsList,String period, int amount, String outputPath) throws IOException {
         List<Bar> bars = getHistoricalData(idsList, period, amount);
         printBarsToFile(bars,outputPath);
     }
