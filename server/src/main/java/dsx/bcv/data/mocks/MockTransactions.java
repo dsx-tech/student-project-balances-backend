@@ -3,19 +3,16 @@ package dsx.bcv.data.mocks;
 import dsx.bcv.data.interfaces.ITransactionRepository;
 import dsx.bcv.data.models.Transaction;
 import dsx.bcv.exceptions.NotFoundException;
+import dsx.bcv.services.parsers.dsx.DsxCsvTransactionParserService;
 import lombok.val;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MockTransactions implements ITransactionRepository {
 
     public static final MockTransactions instance = new MockTransactions();
-
-    private MockTransactions(){}
 
     @Override
     public Transaction add(Transaction transaction) {
@@ -56,9 +53,20 @@ public class MockTransactions implements ITransactionRepository {
         transactions.remove(transactionInList);
     }
 
-    private List<Transaction> transactions = new CopyOnWriteArrayList<>(Arrays.asList(
-            new Transaction(LocalDateTime.now(), "Deposit", "BTC", new BigDecimal("0.0052036"),
-                    new BigDecimal("0"), "Complete", "3662143"),
-            new Transaction(LocalDateTime.now(), "Withdraw", "USD", new BigDecimal("48.22"),
-                    new BigDecimal("0"), "Complete", "3662142")));
+    private List<Transaction> transactions;
+
+    private MockTransactions() {
+
+        var classLoader = this.getClass().getClassLoader();
+        var inputStream = classLoader.getResourceAsStream("dsx_transactions.csv");
+        assert inputStream != null;
+        var inputStreamReader = new InputStreamReader(inputStream);
+
+        try {
+            transactions = new DsxCsvTransactionParserService().parseTransactions(
+                    inputStreamReader, ';');
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

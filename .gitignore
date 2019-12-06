@@ -4,3 +4,7 @@
 /target/
 /server/build/
 /marketdata-provider/build/
+/server/src/main/resources/dsx_trades.csv
+/server/src/main/resources/dsx_trades.xlsx
+/server/src/main/resources/dsx_transactions.csv
+/server/src/main/resources/dsx_transactions.xlsx

@@ -3,19 +3,16 @@ package dsx.bcv.data.mocks;
 import dsx.bcv.data.interfaces.ITradeRepository;
 import dsx.bcv.data.models.Trade;
 import dsx.bcv.exceptions.NotFoundException;
+import dsx.bcv.services.parsers.dsx.DsxCsvTradeParserService;
 import lombok.val;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MockTrades implements ITradeRepository {
 
     public static final MockTrades instance = new MockTrades();
-
-    private MockTrades(){}
 
     @Override
     public Trade add(Trade trade) {
@@ -55,9 +52,20 @@ public class MockTrades implements ITradeRepository {
         trades.remove(tradeInList);
     }
 
-    private List<Trade> trades = new CopyOnWriteArrayList<>(Arrays.asList(
-            new Trade(LocalDateTime.now(), "BTCUSD", "Sell", new BigDecimal("0.00097134"), "BTC",
-                    new BigDecimal("10142.28001"), "USD", new BigDecimal("0.02"), "USD", "37387684"),
-            new Trade(LocalDateTime.now(), "ETHBTC", "Buy", new BigDecimal("0.001"), "ETH",
-                    new BigDecimal("0.021"), "BTC", new BigDecimal("0.0000025"), "USD", "37381155")));
+    private List<Trade> trades;
+
+    private MockTrades() {
+
+        var classLoader = this.getClass().getClassLoader();
+        var inputStream = classLoader.getResourceAsStream("dsx_trades.csv");
+        assert inputStream != null;
+        var inputStreamReader = new InputStreamReader(inputStream);
+
+        try {
+            trades = new DsxCsvTradeParserService().parseTrades(
+                    inputStreamReader, ';');
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
