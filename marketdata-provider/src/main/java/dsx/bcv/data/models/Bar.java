@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import java.math.BigDecimal;
+import java.util.Formatter;
 
 @Data
 @EqualsAndHashCode
@@ -35,14 +36,14 @@ public class Bar {
         this.timestamp = timestamp;
     }
 
-    public String toCsvRecord(){
-        StringBuilder record = new StringBuilder(this.toString());
-        record.delete(0,record.indexOf("=") + 1);
-        for (int i = 0; i < 6; ++i){
-            record.delete(record.indexOf(" "),record.indexOf("=") + 1);
-        }
-        record.delete(record.length() - 1,record.length());
-        record.append('\n');
-        return record.toString();
+    public String toCsvRecord(Formatter formatter){
+        return formatter.format("%s,%s,%s,%s,%s,%s,%d\n",
+                this.id,
+                this.high.toString(),
+                this.open.toString(),
+                this.low.toString(),
+                this.close.toString(),
+                this.amount.toString(),
+                this.timestamp).toString();
     }
 }

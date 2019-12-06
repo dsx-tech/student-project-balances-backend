@@ -13,7 +13,7 @@ class URLFetcher {
 
     URLFetcher() throws IOException {
         properties = new Properties();
-        properties.load(new FileInputStream("src/main/resources/config.properties"));
+        properties.load(new FileInputStream("marketdata-provider/src/main/resources/config.properties"));
     }
 
     List<String> getSupportedPairs() {
