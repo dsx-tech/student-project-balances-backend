@@ -1,15 +1,17 @@
-package dsx.bcv.data.models;
+package dsx.bcv.marketdata_provider.data.models;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode
 public class Instrument {
+
     private final String id;
     private final byte decimalPlaces;
     private final BigDecimal minPrice;

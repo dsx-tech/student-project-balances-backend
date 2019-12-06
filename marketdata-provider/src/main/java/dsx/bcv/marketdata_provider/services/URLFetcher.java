@@ -1,19 +1,27 @@
-package dsx.bcv.services;
+package dsx.bcv.marketdata_provider.services;
 
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
 class URLFetcher {
+
     private final Properties properties;
 
     URLFetcher() throws IOException {
+
+        var classLoader = this.getClass().getClassLoader();
+        var inputStream = classLoader.getResourceAsStream("config.properties");
+        assert inputStream != null;
+
         properties = new Properties();
-        properties.load(new FileInputStream("marketdata-provider/src/main/resources/config.properties"));
+        properties.load(inputStream);
     }
 
     List<String> getSupportedPairs() {

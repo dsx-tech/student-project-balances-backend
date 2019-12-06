@@ -1,13 +1,15 @@
-package dsx.bcv.data.models;
+package dsx.bcv.marketdata_provider.data.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode
 public class Tiker {
+
     private final BigDecimal high;
     private final BigDecimal low;
     private final BigDecimal avg;

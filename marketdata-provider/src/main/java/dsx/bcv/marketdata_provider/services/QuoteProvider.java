@@ -1,22 +1,24 @@
-package dsx.bcv.services;
+package dsx.bcv.marketdata_provider.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dsx.bcv.data.models.Bar;
-import dsx.bcv.data.models.Instrument;
-import dsx.bcv.data.models.Tiker;
+import dsx.bcv.marketdata_provider.data.models.Bar;
+import dsx.bcv.marketdata_provider.data.models.Instrument;
+import dsx.bcv.marketdata_provider.data.models.Tiker;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class QuoteProvider {
+
     private final URLFetcher fetcher;
     private volatile List<Tiker> actualData;
     private final ObjectMapper mapper;
@@ -102,7 +104,7 @@ public class QuoteProvider {
 
     private List<Bar> parseHistoricalData(String response) throws IOException {
         JsonNode rootNode = mapper.readValue(response, JsonNode.class);
-        ArrayList<Bar> result =  new ArrayList<Bar>();
+        ArrayList<Bar> result =  new ArrayList<>();
         var iterator = rootNode.fieldNames();
         while (iterator.hasNext()){
             String id = iterator.next();

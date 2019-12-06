@@ -1,16 +1,18 @@
-package dsx.bcv.data.models;
+package dsx.bcv.marketdata_provider.data.models;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import java.math.BigDecimal;
 import java.util.Formatter;
 
 @Data
 @EqualsAndHashCode
 public class Bar {
+
     private final String id;
     private final BigDecimal high;
     private final BigDecimal open;
