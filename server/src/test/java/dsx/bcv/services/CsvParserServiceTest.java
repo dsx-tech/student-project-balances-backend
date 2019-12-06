@@ -2,6 +2,8 @@ package dsx.bcv.services;
 
 import dsx.bcv.data.models.Trade;
 import dsx.bcv.data.models.Transaction;
+import dsx.bcv.services.parsers.project_format.CsvTradeParserService;
+import dsx.bcv.services.parsers.project_format.CsvTransactionParserService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,14 +15,14 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
-public class CSVParserServiceTest {
+public class CsvParserServiceTest {
 
     @Test
     public void parseOneTrade() throws IOException {
 
         var deals = "2019-09-20 07:41:35;btcusd;Sell;0.00097134;BTC;10142.28001;USD;0.02;USD;37387684\n";
 
-        var result = new CSVParserService().parseTrades(new StringReader(deals), ';').get(0);
+        var result = new CsvTradeParserService().parseTrades(new StringReader(deals), ';').get(0);
 
         var expected = new Trade(LocalDateTime.parse("2019-09-20T07:41:35"), "btcusd",
                 "Sell", new BigDecimal("0.00097134"), "BTC",
@@ -38,7 +40,7 @@ public class CSVParserServiceTest {
         var trades = "2019-09-20 07:41:35;btcusd;Sell;0.00097134;BTC;10142.28001;USD;0.02;USD;37387684\n" +
                 "2019-09-18 09:05:05;ethbtc;Buy;0.001;ETH;0.021;BTC;0.0000025;ETH;37381155\n";
 
-        var result = new CSVParserService().parseTrades(new StringReader(trades), ';');
+        var result = new CsvTradeParserService().parseTrades(new StringReader(trades), ';');
 
         var expected = Arrays.asList(
                 new Trade(LocalDateTime.parse("2019-09-20T07:41:35"), "btcusd",
@@ -63,7 +65,7 @@ public class CSVParserServiceTest {
 
         var transactions = "2019-10-26 15:30:34;Deposit;BTC;0.0052036;0;Complete;3662143\n";
 
-        var result = new CSVParserService().parseTransactions(new StringReader(transactions), ';').get(0);
+        var result = new CsvTransactionParserService().parseTransactions(new StringReader(transactions), ';').get(0);
 
         var expected = new Transaction(LocalDateTime.parse("2019-10-26T15:30:34"), "Deposit", "BTC",
                         new BigDecimal("0.0052036"), new BigDecimal("0"),"Complete", "3662143");
@@ -79,7 +81,7 @@ public class CSVParserServiceTest {
         var transactions = "2019-10-26 15:30:34;Deposit;BTC;0.0052036;0;Complete;3662143\n" +
                 "2019-10-26 15:30:34;Withdraw;USD;48.22;0;Complete;3662142\n";
 
-        var result = new CSVParserService().parseTransactions(new StringReader(transactions), ';');
+        var result = new CsvTransactionParserService().parseTransactions(new StringReader(transactions), ';');
 
         var expected = Arrays.asList(
                 new Transaction(LocalDateTime.parse("2019-10-26T15:30:34"), "Deposit", "BTC",
