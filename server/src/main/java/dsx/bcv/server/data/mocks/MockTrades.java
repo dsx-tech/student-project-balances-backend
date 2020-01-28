@@ -3,7 +3,8 @@ package dsx.bcv.server.data.mocks;
 import dsx.bcv.server.data.interfaces.ITradeRepository;
 import dsx.bcv.server.data.models.Trade;
 import dsx.bcv.server.exceptions.NotFoundException;
-import dsx.bcv.server.services.parsers.dsx.DsxCsvTradeParserService;
+import dsx.bcv.server.services.parsers.CsvParser;
+import dsx.bcv.server.services.parsers.data_formats.DsxDataFormat;
 import lombok.val;
 
 import java.io.IOException;
@@ -62,7 +63,7 @@ public class MockTrades implements ITradeRepository {
         var inputStreamReader = new InputStreamReader(inputStream);
 
         try {
-            trades = new DsxCsvTradeParserService().parseTrades(
+            trades = new CsvParser(new DsxDataFormat()).parseTrades(
                     inputStreamReader, ';');
         } catch (IOException e) {
             e.printStackTrace();

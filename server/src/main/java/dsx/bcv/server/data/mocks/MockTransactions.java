@@ -3,7 +3,8 @@ package dsx.bcv.server.data.mocks;
 import dsx.bcv.server.data.interfaces.ITransactionRepository;
 import dsx.bcv.server.data.models.Transaction;
 import dsx.bcv.server.exceptions.NotFoundException;
-import dsx.bcv.server.services.parsers.dsx.DsxCsvTransactionParserService;
+import dsx.bcv.server.services.parsers.CsvParser;
+import dsx.bcv.server.services.parsers.data_formats.DsxDataFormat;
 import lombok.val;
 
 import java.io.IOException;
@@ -63,7 +64,7 @@ public class MockTransactions implements ITransactionRepository {
         var inputStreamReader = new InputStreamReader(inputStream);
 
         try {
-            transactions = new DsxCsvTransactionParserService().parseTransactions(
+            transactions = new CsvParser(new DsxDataFormat()).parseTransactions(
                     inputStreamReader, ';');
         } catch (IOException e) {
             e.printStackTrace();
