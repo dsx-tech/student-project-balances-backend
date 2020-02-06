@@ -1,8 +1,11 @@
 package dsx.bcv.server.controllers;
 
-import dsx.bcv.server.app.Application;
-import dsx.bcv.server.data.mocks.MockTrades;
+import dsx.bcv.server.Application;
+import dsx.bcv.server.data.models.Currency;
+import dsx.bcv.server.data.models.Instrument;
 import dsx.bcv.server.data.models.Trade;
+import dsx.bcv.server.data.models.TradeType;
+import dsx.bcv.server.data.repositories.TradeRepository;
 import dsx.bcv.server.exceptions.NotFoundException;
 import dsx.bcv.server.services.ToJsonConverterService;
 import org.junit.Before;
@@ -18,6 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.stream.StreamSupport;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -30,6 +34,10 @@ public class TradeControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private TradeRepository tradeRepository;
+    @Autowired
+    private ToJsonConverterService toJsonConverterService;
 
     private final String controllerUrl = "/trades/";
 
@@ -41,38 +49,38 @@ public class TradeControllerIT {
 
         trade1 = new Trade(
                 LocalDateTime.now(),
-                "BTCUSD",
-                "Sell",
+                new Instrument(new Currency("btc"), new Currency("usd")),
+                TradeType.Sell,
                 new BigDecimal("0.00097134"),
-                "BTC",
+                new Currency("btc"),
                 new BigDecimal("10142.28001"),
-                "USD",
+                new Currency("usd"),
                 new BigDecimal("0.02"),
-                "USD",
+                new Currency("usd"),
                 "37387684");
 
         trade2 = new Trade(
                 LocalDateTime.now(),
-                "ETHBTC",
-                "Buy",
+                new Instrument(new Currency("ETH"), new Currency("BTC")),
+                TradeType.Buy,
                 new BigDecimal("0.001"),
-                "ETH",
+                new Currency("eth"),
                 new BigDecimal("0.021"),
-                "BTC",
+                new Currency("btc"),
                 new BigDecimal("0.0000025"),
-                "USD",
+                new Currency("usd"),
                 "37381155");
 
         trade3 = new Trade(
                 LocalDateTime.now(),
-                "RUBEUR",
-                "Sell",
+                new Instrument(new Currency("rub"), new Currency("eur")),
+                TradeType.Sell,
                 new BigDecimal("500"),
-                "RUB",
+                new Currency("rub"),
                 new BigDecimal("71.22"),
-                "EUR",
+                new Currency("eur"),
                 new BigDecimal("100"),
-                "RUB",
+                new Currency("rub"),
                 "37381155");
     }
 
@@ -80,13 +88,13 @@ public class TradeControllerIT {
     public void setUp() throws Exception {
 
         mockMvc.perform(post(controllerUrl)
-                .content(ToJsonConverterService.toJson(trade1))
+                .content(toJsonConverterService.toJson(trade1))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
         );
 
         mockMvc.perform(post(controllerUrl)
-                .content(ToJsonConverterService.toJson(trade2))
+                .content(toJsonConverterService.toJson(trade2))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
         );
@@ -122,13 +130,13 @@ public class TradeControllerIT {
     public void add() throws Exception {
 
         mockMvc.perform(post(controllerUrl)
-                .content(ToJsonConverterService.toJson(trade3))
+                .content(toJsonConverterService.toJson(trade3))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
         )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.instrument").value(trade3.getInstrument()));
+                .andExpect(jsonPath("$.instrument").value(trade3.getInstrument().toString()));
     }
 
     @Test
@@ -138,13 +146,13 @@ public class TradeControllerIT {
 
         mockMvc.perform(
                 put(controllerUrl + id)
-                .content(ToJsonConverterService.toJson(trade1))
+                .content(toJsonConverterService.toJson(trade1))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.instrument").value(trade1.getInstrument()))
+                .andExpect(jsonPath("$.instrument").value(trade1.getInstrument().toString()))
                 .andReturn();
     }
 
@@ -165,7 +173,7 @@ public class TradeControllerIT {
     }
 
     private long getAnyId() {
-        return MockTrades.instance.getAll().stream()
+        return StreamSupport.stream(tradeRepository.findAll().spliterator(), false)
                 .map(Trade::getId)
                 .findAny()
                 .orElseThrow(NotFoundException::new);

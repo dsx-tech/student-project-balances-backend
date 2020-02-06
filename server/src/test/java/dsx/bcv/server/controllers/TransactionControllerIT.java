@@ -1,8 +1,11 @@
 package dsx.bcv.server.controllers;
 
-import dsx.bcv.server.app.Application;
-import dsx.bcv.server.data.mocks.MockTransactions;
+import dsx.bcv.server.Application;
+import dsx.bcv.server.data.models.Currency;
 import dsx.bcv.server.data.models.Transaction;
+import dsx.bcv.server.data.models.TransactionStatus;
+import dsx.bcv.server.data.models.TransactionType;
+import dsx.bcv.server.data.repositories.TransactionRepository;
 import dsx.bcv.server.exceptions.NotFoundException;
 import dsx.bcv.server.services.ToJsonConverterService;
 import org.junit.Before;
@@ -18,6 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.stream.StreamSupport;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -30,6 +34,10 @@ public class TransactionControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private TransactionRepository transactionRepository;
+    @Autowired
+    private ToJsonConverterService toJsonConverterService;
 
     private final String controllerUrl = "/transactions/";
 
@@ -41,26 +49,29 @@ public class TransactionControllerIT {
 
         transaction1 = new Transaction(
                 LocalDateTime.now(),
-                "Deposit",
-                "BTC", new BigDecimal("0.21043"),
+                TransactionType.Deposit,
+                new Currency("BTC"),
+                new BigDecimal("0.21043"),
                 new BigDecimal("0"),
-                "Complete",
+                TransactionStatus.Complete,
                 "3669993");
 
         transaction2 = new Transaction(
                 LocalDateTime.now(),
-                "Withdraw",
-                "EUR", new BigDecimal("32.1104"),
+                TransactionType.Withdraw,
+                new Currency("EUR"),
+                new BigDecimal("0.21043"),
                 new BigDecimal("0"),
-                "Complete",
+                TransactionStatus.Complete,
                 "3621995");
 
         transaction3 = new Transaction(
                 LocalDateTime.now(),
-                "Deposit",
-                "RUB", new BigDecimal("24674.11"),
+                TransactionType.Deposit,
+                new Currency("RUB"),
+                new BigDecimal("0.21043"),
                 new BigDecimal("0"),
-                "Complete",
+                TransactionStatus.Complete,
                 "1528613");
     }
 
@@ -68,13 +79,13 @@ public class TransactionControllerIT {
     public void setUp() throws Exception {
 
         mockMvc.perform(post(controllerUrl)
-                .content(ToJsonConverterService.toJson(transaction1))
+                .content(toJsonConverterService.toJson(transaction1))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
         );
 
         mockMvc.perform(post(controllerUrl)
-                .content(ToJsonConverterService.toJson(transaction2))
+                .content(toJsonConverterService.toJson(transaction2))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
         );
@@ -110,13 +121,13 @@ public class TransactionControllerIT {
     public void add() throws Exception {
 
         mockMvc.perform(post(controllerUrl)
-                .content(ToJsonConverterService.toJson(transaction3))
+                .content(toJsonConverterService.toJson(transaction3))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
         )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.transactionType").value(transaction3.getTransactionType()));
+                .andExpect(jsonPath("$.transactionType").value(transaction3.getTransactionType().toString()));
     }
 
     @Test
@@ -126,13 +137,13 @@ public class TransactionControllerIT {
 
         mockMvc.perform(
                 put(controllerUrl + id)
-                        .content(ToJsonConverterService.toJson(transaction1))
+                        .content(toJsonConverterService.toJson(transaction1))
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept(MediaType.APPLICATION_JSON_UTF8)
         )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.transactionType").value(transaction1.getTransactionType()))
+                .andExpect(jsonPath("$.transactionType").value(transaction1.getTransactionType().toString()))
                 .andReturn();
     }
 
@@ -153,7 +164,7 @@ public class TransactionControllerIT {
     }
 
     private long getAnyId() {
-        return MockTransactions.instance.getAll().stream()
+        return StreamSupport.stream(transactionRepository.findAll().spliterator(), false)
                 .map(Transaction::getId)
                 .findAny()
                 .orElseThrow(NotFoundException::new);
