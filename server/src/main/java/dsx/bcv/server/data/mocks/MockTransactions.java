@@ -1,62 +1,24 @@
 package dsx.bcv.server.data.mocks;
 
-import dsx.bcv.server.data.interfaces.ITransactionRepository;
 import dsx.bcv.server.data.models.Transaction;
-import dsx.bcv.server.exceptions.NotFoundException;
+import dsx.bcv.server.services.TransactionService;
 import dsx.bcv.server.services.parsers.CsvParser;
-import dsx.bcv.server.services.parsers.data_formats.DsxDataFormat;
-import lombok.val;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-public class MockTransactions implements ITransactionRepository {
+@Component
+public class MockTransactions {
 
-    public static final MockTransactions instance = new MockTransactions();
-
-    @Override
-    public Transaction add(Transaction transaction) {
-        transactions.add(transaction);
-        return transaction;
-    }
-
-    @Override
-    public boolean contains(Transaction transaction) {
-        return transactions.contains(transaction);
-    }
-
-    @Override
     public List<Transaction> getAll() {
         return transactions;
     }
 
-    @Override
-    public Transaction getById(long id) {
-        return transactions.stream()
-                .filter(transaction -> transaction.getId() == id)
-                .findFirst()
-                .orElseThrow(NotFoundException::new);
-    }
-
-    @Override
-    public Transaction update(long id, Transaction transaction) {
-        transaction.setId(id);
-        val transactionInList = getById(id);
-        val index = transactions.indexOf(transactionInList);
-        transactions.set(index, transaction);
-        return transaction;
-    }
-
-    @Override
-    public void delete(long id) {
-        var transactionInList = getById(id);
-        transactions.remove(transactionInList);
-    }
-
     private List<Transaction> transactions;
 
-    private MockTransactions() {
+    private MockTransactions(CsvParser csvParser, TransactionService transactionService) {
 
         var classLoader = this.getClass().getClassLoader();
         var inputStream = classLoader.getResourceAsStream("dsx_transactions.csv");
@@ -64,10 +26,14 @@ public class MockTransactions implements ITransactionRepository {
         var inputStreamReader = new InputStreamReader(inputStream);
 
         try {
-            transactions = new CsvParser(new DsxDataFormat()).parseTransactions(
+            transactions = csvParser.parseTransactions(
                     inputStreamReader, ';');
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        for (var transaction : transactions) {
+            transactionService.save(transaction);
         }
     }
 }
