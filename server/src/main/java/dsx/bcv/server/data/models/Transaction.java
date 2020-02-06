@@ -1,42 +1,40 @@
 package dsx.bcv.server.data.models;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.concurrent.atomic.AtomicLong;
 
+@Entity(name = "transactions")
 @Data
 @RequiredArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(exclude = "id")
 public class Transaction {
-
-    private long id = TmpTransactionIdGeneratorService.createID();
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
     @NonNull
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime dateTime;
     @NonNull
-    private String transactionType;
+    @Enumerated(EnumType.STRING)
+    private TransactionType transactionType;
     @NonNull
-    private String currency;
+    @JsonSerialize(using = ToStringSerializer.class)
+    @ManyToOne
+    private Currency currency;
     @NonNull
     private BigDecimal amount;
     @NonNull
     private BigDecimal commission;
     @NonNull
-    private String transactionStatus;
+    @Enumerated(EnumType.STRING)
+    private TransactionStatus transactionStatus;
     @NonNull
     private String transactionValueId;
-}
-
-class TmpTransactionIdGeneratorService {
-    private static AtomicLong idCounter = new AtomicLong();
-
-    static long createID()
-    {
-        return idCounter.getAndIncrement();
-    }
 }
