@@ -2,9 +2,11 @@ package dsx.bcv.server.services.parsers.data_formats;
 
 import dsx.bcv.server.services.parsers.TradeField;
 import dsx.bcv.server.services.parsers.TransactionField;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+@Component("dsx_data_format")
 public class DsxDataFormat implements IMarketplaceDataFormat {
 
     private final Map<TradeField, Integer> tradeFormat = Map.of(
