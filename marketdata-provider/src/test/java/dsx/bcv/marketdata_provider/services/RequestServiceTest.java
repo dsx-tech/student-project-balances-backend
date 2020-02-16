@@ -3,8 +3,9 @@ package dsx.bcv.marketdata_provider.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dsx.bcv.marketdata_provider.Application;
-import dsx.bcv.marketdata_provider.data.models.Bar;
-import dsx.bcv.marketdata_provider.data.models.Ticker;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_converters.DsxTickerConverter;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxBar;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxTicker;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -23,7 +24,7 @@ public class RequestServiceTest {
     @Autowired
     private RequestService requestService;
     @Autowired
-    private TickerService tickerService;
+    private DsxTickerConverter dsxTickerConverter;
 
     @Test
     public void doGetRequest() throws IOException, JSONException {
@@ -33,9 +34,9 @@ public class RequestServiceTest {
         JSONObject jsonObject = new JSONObject(responseBody);
         String x = String.valueOf(jsonObject.get("usdrub"));
         ObjectMapper mapper = new ObjectMapper();
-        List<Bar> listBar = mapper.readValue(x, new TypeReference<List<Bar>>(){});
-        for (Bar bar : listBar) {
-            System.out.println(bar);
+        List<DsxBar> listDsxBar = mapper.readValue(x, new TypeReference<List<DsxBar>>(){});
+        for (DsxBar dsxBar : listDsxBar) {
+            System.out.println(dsxBar);
         }
     }
 
@@ -46,7 +47,7 @@ public class RequestServiceTest {
         System.out.println(responseBody);
         JSONObject jsonObject = new JSONObject(responseBody);
         String tickerString = String.valueOf(jsonObject.get("usdrub"));
-        Ticker ticker = new ObjectMapper().readValue(tickerString, Ticker.class);
-        System.out.println(tickerService.convertTickerToTickerDTO(ticker));
+        DsxTicker dsxTicker = new ObjectMapper().readValue(tickerString, DsxTicker.class);
+        System.out.println(dsxTickerConverter.convertDsxTickerToTicker(dsxTicker));
     }
 }
