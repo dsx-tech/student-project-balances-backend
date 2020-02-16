@@ -1,13 +1,11 @@
-package dsx.bcv.marketdata_provider.data.dto;
+package dsx.bcv.marketdata_provider.views;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
-@NoArgsConstructor
-public class BarDTO {
+public class BarVO {
     private BigDecimal exchangeRate;
     private long timestamp;
 }

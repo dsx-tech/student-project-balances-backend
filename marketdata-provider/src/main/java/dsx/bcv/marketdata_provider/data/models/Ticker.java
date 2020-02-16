@@ -1,21 +1,14 @@
 package dsx.bcv.marketdata_provider.data.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Ticker {
-    private BigDecimal high;
-    private BigDecimal low;
-    private BigDecimal avg;
-    private BigDecimal vol;
-    private BigDecimal vol_cur;
-    private BigDecimal last;
-    private BigDecimal buy;
-    private BigDecimal sell;
-    private long updated;
-    private String pair;
+    private BigDecimal exchangeRate;
 }
-
-

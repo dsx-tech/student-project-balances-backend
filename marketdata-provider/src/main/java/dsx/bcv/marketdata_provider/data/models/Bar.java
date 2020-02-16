@@ -1,15 +1,15 @@
 package dsx.bcv.marketdata_provider.data.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Bar {
-    private BigDecimal high;
-    private BigDecimal open;
-    private BigDecimal low;
-    private BigDecimal close;
-    private BigDecimal amount;
+    private BigDecimal exchangeRate;
     private long timestamp;
 }
