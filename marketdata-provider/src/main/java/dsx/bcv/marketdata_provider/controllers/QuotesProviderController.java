@@ -1,91 +1,46 @@
 package dsx.bcv.marketdata_provider.controllers;
 
-import dsx.bcv.marketdata_provider.data.dto.BarDTO;
-import dsx.bcv.marketdata_provider.data.dto.TickerDTO;
-import dsx.bcv.marketdata_provider.services.QuotesProviderService;
+import dsx.bcv.marketdata_provider.services.QuoteProviderService;
+import dsx.bcv.marketdata_provider.views.BarVO;
+import dsx.bcv.marketdata_provider.views.TickerVO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("quotes")
 public class QuotesProviderController {
 
-    private final QuotesProviderService quotesProviderService;
+    private final QuoteProviderService quoteProviderService;
 
-    public QuotesProviderController(QuotesProviderService quotesProviderService) {
-        this.quotesProviderService = quotesProviderService;
+    public QuotesProviderController(QuoteProviderService quoteProviderService) {
+        this.quoteProviderService = quoteProviderService;
     }
 
-    @ApiOperation("Get bars for every day from startTime to endTime in unix format (https://www.epochconverter.com).\n" +
-            "Supported instruments:\n" +
-            "btgeur\n" +
-            "eosbtc\n" +
-            "btctry\n" +
-            "bcceurs\n" +
-            "xrpeur\n" +
-            "eursusd\n" +
-            "btgbtc\n" +
-            "usdrub\n" +
-            "bccbtc\n" +
-            "ltcusd\n" +
-            "bsveur\n" +
-            "xrpbtc\n" +
-            "bcceur\n" +
-            "btceur\n" +
-            "ethusd\n" +
-            "bsvbtc\n" +
-            "gbpusd\n" +
-            "bccgbp\n" +
-            "eoseur\n" +
-            "ltcusdt\n" +
-            "usdtusd\n" +
-            "etheurs\n" +
-            "btcusdt\n" +
-            "btcrub\n" +
-            "eurtry\n" +
-            "btcgbp\n" +
-            "eurseur\n" +
-            "ltcbtc\n" +
-            "bccusdt\n" +
-            "btggbp\n" +
-            "ethgbp\n" +
-            "xrpusd\n" +
-            "bccusd\n" +
-            "btcusd\n" +
-            "ltceur\n" +
-            "eoseth\n" +
-            "ltctry\n" +
-            "btgusd\n" +
-            "usdtry\n" +
-            "etheur\n" +
-            "ltcgbp\n" +
-            "bsvusd\n" +
-            "ethtry\n" +
-            "bsveth\n" +
-            "ethbtc\n" +
-            "btceurs\n" +
-            "eosusd\n" +
-            "ltceurs\n" +
-            "usdteur\n" +
-            "eurusd\n" +
-            "ethusdt\n")
+    @ApiOperation("Get bars for every day from startTime to endTime.\n" +
+            "StartTime & endTime are Unix Timestamps in seconds (https://www.epochconverter.com).\n" +
+            "Instrument example: eur-rub.\n" +
+            "Supported currencies:\n" + "usd\n" + "bsv\n" + "bch\n" + "eurs\n" + "eos\n" + "btc\n" +
+            "xrp\n" + "btg\n" + "gbp\n" + "eth\n" + "ltc\n" + "try\n" + "rub\n" + "eur\n" + "usdt\n")
     @GetMapping("bars/{instrument}/{startTime}/{endTime}")
-    public List<BarDTO> getBarsInPeriod(
+    public List<BarVO> getBarsInPeriod(
             @PathVariable String instrument,
             @PathVariable long startTime,
             @PathVariable long endTime
-    ) throws IOException {
-        return quotesProviderService.getBarsInPeriod(instrument, startTime, endTime);
+    ) {
+        return quoteProviderService.getBarsInPeriod(instrument, startTime, endTime);
     }
 
+    @ApiOperation("Get ticker.\n" +
+            "Instrument example: eur-rub.\n" +
+            "Supported currencies:\n" + "usd\n" + "bsv\n" + "bch\n" + "eurs\n" + "eos\n" + "btc\n" +
+            "xrp\n" + "btg\n" + "gbp\n" + "eth\n" + "ltc\n" + "try\n" + "rub\n" + "eur\n" + "usdt\n")
     @GetMapping("ticker/{instrument}")
-    public TickerDTO getActualData(@PathVariable String instrument) throws IOException {
-        return quotesProviderService.getTicker(instrument);
+    public TickerVO getTicker(@PathVariable String instrument) {
+        return quoteProviderService.getTicker(instrument);
     }
 }
