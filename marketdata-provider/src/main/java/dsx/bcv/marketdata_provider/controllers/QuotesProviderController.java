@@ -24,7 +24,7 @@ public class QuotesProviderController {
     @ApiOperation("Get bars for every day from startTime to endTime.\n" +
             "StartTime & endTime are Unix Timestamps in seconds (https://www.epochconverter.com).\n" +
             "Instrument example: eur-rub.\n" +
-            "Supported currencies:\n" + "usd\n" + "bsv\n" + "bch\n" + "eurs\n" + "eos\n" + "btc\n" +
+            "Supported currencies:\n" + "usd\n" + "bsv\n" + "bcc\n" + "eurs\n" + "eos\n" + "btc\n" +
             "xrp\n" + "btg\n" + "gbp\n" + "eth\n" + "ltc\n" + "try\n" + "rub\n" + "eur\n" + "usdt\n")
     @GetMapping("bars/{instrument}/{startTime}/{endTime}")
     public List<BarVO> getBarsInPeriod(
@@ -37,7 +37,7 @@ public class QuotesProviderController {
 
     @ApiOperation("Get ticker.\n" +
             "Instrument example: eur-rub.\n" +
-            "Supported currencies:\n" + "usd\n" + "bsv\n" + "bch\n" + "eurs\n" + "eos\n" + "btc\n" +
+            "Supported currencies:\n" + "usd\n" + "bsv\n" + "bcc\n" + "eurs\n" + "eos\n" + "btc\n" +
             "xrp\n" + "btg\n" + "gbp\n" + "eth\n" + "ltc\n" + "try\n" + "rub\n" + "eur\n" + "usdt\n")
     @GetMapping("ticker/{instrument}")
     public TickerVO getTicker(@PathVariable String instrument) {

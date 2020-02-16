@@ -3,7 +3,7 @@ package dsx.bcv.marketdata_provider.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dsx.bcv.marketdata_provider.Application;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_converters.DsxTickerConverter;
+import dsx.bcv.marketdata_provider.data.models.Ticker;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxBar;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxTicker;
 import org.json.JSONException;
@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ public class RequestServiceTest {
     @Autowired
     private RequestService requestService;
     @Autowired
-    private DsxTickerConverter dsxTickerConverter;
+    private ConversionService conversionService;
 
     @Test
     public void doGetRequest() throws IOException, JSONException {
@@ -48,6 +49,6 @@ public class RequestServiceTest {
         JSONObject jsonObject = new JSONObject(responseBody);
         String tickerString = String.valueOf(jsonObject.get("usdrub"));
         DsxTicker dsxTicker = new ObjectMapper().readValue(tickerString, DsxTicker.class);
-        System.out.println(dsxTickerConverter.convertDsxTickerToTicker(dsxTicker));
+        System.out.println(conversionService.convert(dsxTicker, Ticker.class));
     }
 }
