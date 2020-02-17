@@ -15,12 +15,12 @@ import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.currenc
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxBar;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxTicker;
 import kotlin.Pair;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -52,7 +52,6 @@ public class DsxQuoteProvider implements QuoteProvider {
     }
 
     @Override
-    @SneakyThrows
     public List<Bar> getBarsInPeriod(String instrument, long startTime, long endTime) {
 
         var currencyPair = getCurrencyPairFromString(instrument);
@@ -63,16 +62,28 @@ public class DsxQuoteProvider implements QuoteProvider {
 
         var barsList = new ArrayList<List<Bar>>();
         for (var dsxInstrumentEdge : instrumentList) {
-            var responseBody = requestService.doGetRequest(
-                    String.format(
-                            "https://dsx.uk/mapi/periodBars/%s/d/%d/%d",
-                            dsxInstrumentEdge.toString(),
-                            startTime,
-                            endTime
-                    ));
+            String responseBody;
+            try {
+                responseBody = requestService.doGetRequest(
+                        String.format(
+                                "https://dsx.uk/mapi/periodBars/%s/d/%d/%d",
+                                dsxInstrumentEdge.toString(),
+                                startTime,
+                                endTime
+                        ));
+            } catch (IOException e) {
+                log.warn(e.getMessage(), e);
+                throw new RuntimeException(e);
+            }
             var jsonObject = new JSONObject(responseBody);
             var barsString = String.valueOf(jsonObject.get(fixBchProblem(dsxInstrumentEdge.toString())));
-            List<DsxBar> tmp = objectMapper.readValue(barsString, new TypeReference<List<DsxBar>>() {});
+            List<DsxBar> tmp;
+            try {
+                tmp = objectMapper.readValue(barsString, new TypeReference<List<DsxBar>>() {});
+            } catch (IOException e) {
+                log.warn(e.getMessage(), e);
+                throw new RuntimeException(e);
+            }
             barsList.add(tmp.stream()
                     .map(dsxBar -> conversionService.convert(dsxBar, Bar.class))
                     .collect(Collectors.toList()));
@@ -80,7 +91,8 @@ public class DsxQuoteProvider implements QuoteProvider {
 
         for (var bars : barsList) {
             if (bars.size() != barsList.get(0).size()) {
-                throw new NotFoundException("Not enough data on server");
+                log.warn("Not enough data on server");
+                throw new RuntimeException("Not enough data on server");
             }
         }
 
@@ -108,7 +120,6 @@ public class DsxQuoteProvider implements QuoteProvider {
     }
 
     @Override
-    @SneakyThrows
     public Ticker getTicker(String instrument) {
 
         var currencyPair = getCurrencyPairFromString(instrument);
@@ -119,14 +130,26 @@ public class DsxQuoteProvider implements QuoteProvider {
 
         var tickerList = new ArrayList<Ticker>();
         for (var instrumentEdge : instrumentEdgeList) {
-            var responseBody = requestService.doGetRequest(
-                    String.format(
-                            "https://dsx.uk/mapi/ticker/%s",
-                            instrumentEdge.toString()
-                    ));
+            String responseBody;
+            try {
+                responseBody = requestService.doGetRequest(
+                        String.format(
+                                "https://dsx.uk/mapi/ticker/%s",
+                                instrumentEdge.toString()
+                        ));
+            } catch (IOException e) {
+                log.warn(e.getMessage(), e);
+                throw new RuntimeException(e);
+            }
             var jsonObject = new JSONObject(responseBody);
             var tickerString = String.valueOf(jsonObject.get(fixBchProblem(instrumentEdge.toString())));
-            var dsxTicker = objectMapper.readValue(tickerString, DsxTicker.class);
+            DsxTicker dsxTicker;
+            try {
+                dsxTicker = objectMapper.readValue(tickerString, DsxTicker.class);
+            } catch (IOException e) {
+                log.warn(e.getMessage(), e);
+                throw new RuntimeException(e);
+            }
             tickerList.add(conversionService.convert(dsxTicker, Ticker.class));
         }
 
@@ -156,17 +179,21 @@ public class DsxQuoteProvider implements QuoteProvider {
         var quotedCurrency = new DsxCurrencyVertex(currencyPair.get(1));
         if (!dsxSupportedCurrenciesRepository.getSupportedCurrencies().contains(baseCurrency)) {
             log.warn("Base currency {} from request is not supported by dsx", baseCurrency);
-            throw new NotFoundException("Base currency from request is not supported by dsx");
+            throw new NotFoundException(
+                    "Base currency" + baseCurrency + "from request is not supported by dsx"
+            );
         }
         if (!dsxSupportedCurrenciesRepository.getSupportedCurrencies().contains(quotedCurrency)) {
             log.warn("Quoted currency {} from request is not supported by dsx", quotedCurrency);
-            throw new NotFoundException("Base currency from request is not supported by dsx");
+            throw new NotFoundException(
+                    "Quoted currency" + quotedCurrency + "from request is not supported by dsx"
+            );
         }
 
         return new Pair<>(baseCurrency, quotedCurrency);
     }
 
     private String fixBchProblem(String instrument) {
-        return instrument.replace("bcc", "bch");
+        return instrument.replace("bch", "bcc");
     }
 }
