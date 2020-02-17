@@ -1,12 +1,14 @@
 package dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.currency_graph;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Component
+@Slf4j
 public class DsxSupportedCurrenciesRepository {
 
     @Getter
@@ -17,6 +19,7 @@ public class DsxSupportedCurrenciesRepository {
     public DsxSupportedCurrenciesRepository(DsxSupportedInstrumentsRepository dsxSupportedInstrumentsRepository) {
         this.dsxSupportedInstrumentsRepository = dsxSupportedInstrumentsRepository;
         supportedCurrencies = initSupportedCurrencies();
+        log.info("Dsx supported currencies: {}", supportedCurrencies);
     }
 
     private Set<DsxCurrencyVertex> initSupportedCurrencies() {

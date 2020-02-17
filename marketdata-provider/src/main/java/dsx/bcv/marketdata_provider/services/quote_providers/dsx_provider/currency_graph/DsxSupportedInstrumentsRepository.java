@@ -5,6 +5,7 @@ import dsx.bcv.marketdata_provider.services.RequestService;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxInstrument;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
+@Slf4j
 public class DsxSupportedInstrumentsRepository {
 
     @Getter
@@ -29,6 +31,7 @@ public class DsxSupportedInstrumentsRepository {
         this.objectMapper = objectMapper;
 
         supportedInstruments = initSupportedInstruments();
+        log.info("Dsx supported instruments: {}", supportedInstruments);
 
         reversedInstruments = new HashSet<>();
         supportedInstruments.forEach(dsxInstrumentEdge -> reversedInstruments.add(dsxInstrumentEdge.reverse()));

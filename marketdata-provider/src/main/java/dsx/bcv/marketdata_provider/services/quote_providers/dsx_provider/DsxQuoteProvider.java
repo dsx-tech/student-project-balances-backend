@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import dsx.bcv.marketdata_provider.converters.DsxTickerToTickerConverter;
 import dsx.bcv.marketdata_provider.data.models.Bar;
 import dsx.bcv.marketdata_provider.data.models.Ticker;
 import dsx.bcv.marketdata_provider.exceptions.NotFoundException;
@@ -17,6 +16,7 @@ import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_mod
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxTicker;
 import kotlin.Pair;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
@@ -28,26 +28,25 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class DsxQuoteProvider implements QuoteProvider {
 
     private RequestService requestService;
     private ObjectMapper objectMapper;
     private ConversionService conversionService;
-    private DsxTickerToTickerConverter dsxTickerToTickerConverter;
     private DsxCurrencyGraph dsxCurrencyGraph;
     private DsxSupportedCurrenciesRepository dsxSupportedCurrenciesRepository;
 
     public DsxQuoteProvider(
             RequestService requestService,
             ObjectMapper objectMapper,
-            ConversionService conversionService, DsxTickerToTickerConverter dsxTickerToTickerConverter,
+            ConversionService conversionService,
             DsxCurrencyGraph dsxCurrencyGraph,
             DsxSupportedCurrenciesRepository dsxSupportedCurrenciesRepository)
     {
         this.requestService = requestService;
         this.objectMapper = objectMapper;
         this.conversionService = conversionService;
-        this.dsxTickerToTickerConverter = dsxTickerToTickerConverter;
         this.dsxCurrencyGraph = dsxCurrencyGraph;
         this.dsxSupportedCurrenciesRepository = dsxSupportedCurrenciesRepository;
     }
@@ -72,7 +71,7 @@ public class DsxQuoteProvider implements QuoteProvider {
                             endTime
                     ));
             var jsonObject = new JSONObject(responseBody);
-            var barsString = String.valueOf(jsonObject.get(dsxInstrumentEdge.toString()));
+            var barsString = String.valueOf(jsonObject.get(fixBchProblem(dsxInstrumentEdge.toString())));
             List<DsxBar> tmp = objectMapper.readValue(barsString, new TypeReference<List<DsxBar>>() {});
             barsList.add(tmp.stream()
                     .map(dsxBar -> conversionService.convert(dsxBar, Bar.class))
@@ -126,7 +125,7 @@ public class DsxQuoteProvider implements QuoteProvider {
                             instrumentEdge.toString()
                     ));
             var jsonObject = new JSONObject(responseBody);
-            var tickerString = String.valueOf(jsonObject.get(instrumentEdge.toString()));
+            var tickerString = String.valueOf(jsonObject.get(fixBchProblem(instrumentEdge.toString())));
             var dsxTicker = objectMapper.readValue(tickerString, DsxTicker.class);
             tickerList.add(conversionService.convert(dsxTicker, Ticker.class));
         }
@@ -156,12 +155,18 @@ public class DsxQuoteProvider implements QuoteProvider {
         var baseCurrency = new DsxCurrencyVertex(currencyPair.get(0));
         var quotedCurrency = new DsxCurrencyVertex(currencyPair.get(1));
         if (!dsxSupportedCurrenciesRepository.getSupportedCurrencies().contains(baseCurrency)) {
-            throw new NotFoundException("Invalid base currency");
+            log.warn("Base currency {} from request is not supported by dsx", baseCurrency);
+            throw new NotFoundException("Base currency from request is not supported by dsx");
         }
         if (!dsxSupportedCurrenciesRepository.getSupportedCurrencies().contains(quotedCurrency)) {
-            throw new NotFoundException("Invalid quoted currency");
+            log.warn("Quoted currency {} from request is not supported by dsx", quotedCurrency);
+            throw new NotFoundException("Base currency from request is not supported by dsx");
         }
 
         return new Pair<>(baseCurrency, quotedCurrency);
+    }
+
+    private String fixBchProblem(String instrument) {
+        return instrument.replace("bcc", "bch");
     }
 }
