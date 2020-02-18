@@ -30,6 +30,7 @@ public class QuotesProviderController {
         this.quoteProviderService = quoteProviderService;
     }
 
+    @ApiOperation("Get supported instruments")
     @GetMapping("instruments")
     public List<InstrumentVO> getInstruments() {
         log.info(
