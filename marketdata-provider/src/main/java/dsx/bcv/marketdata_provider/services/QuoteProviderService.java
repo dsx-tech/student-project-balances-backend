@@ -2,6 +2,7 @@ package dsx.bcv.marketdata_provider.services;
 
 import dsx.bcv.marketdata_provider.services.quote_providers.QuoteProvider;
 import dsx.bcv.marketdata_provider.views.BarVO;
+import dsx.bcv.marketdata_provider.views.InstrumentVO;
 import dsx.bcv.marketdata_provider.views.TickerVO;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,12 @@ public class QuoteProviderService {
     public QuoteProviderService(QuoteProvider quoteProvider, ConversionService conversionService) {
         this.quoteProvider = quoteProvider;
         this.conversionService = conversionService;
+    }
+
+    public List<InstrumentVO> getInstruments() {
+        return quoteProvider.getInstruments().stream()
+                .map(instrument -> conversionService.convert(instrument, InstrumentVO.class))
+                .collect(Collectors.toList());
     }
 
     public List<BarVO> getBarsInPeriod(String instrument, long startTime, long endTime) {

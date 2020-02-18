@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import dsx.bcv.marketdata_provider.data.models.Bar;
+import dsx.bcv.marketdata_provider.data.models.Instrument;
 import dsx.bcv.marketdata_provider.data.models.Ticker;
 import dsx.bcv.marketdata_provider.exceptions.NotFoundException;
 import dsx.bcv.marketdata_provider.services.RequestService;
@@ -12,6 +13,7 @@ import dsx.bcv.marketdata_provider.services.quote_providers.QuoteProvider;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.currency_graph.DsxCurrencyGraph;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.currency_graph.DsxCurrencyVertex;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.currency_graph.DsxSupportedCurrenciesRepository;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.currency_graph.DsxSupportedInstrumentsRepository;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxBar;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxTicker;
 import kotlin.Pair;
@@ -36,19 +38,21 @@ public class DsxQuoteProvider implements QuoteProvider {
     private ConversionService conversionService;
     private DsxCurrencyGraph dsxCurrencyGraph;
     private DsxSupportedCurrenciesRepository dsxSupportedCurrenciesRepository;
+    private DsxSupportedInstrumentsRepository dsxSupportedInstrumentsRepository;
 
     public DsxQuoteProvider(
             RequestService requestService,
             ObjectMapper objectMapper,
             ConversionService conversionService,
             DsxCurrencyGraph dsxCurrencyGraph,
-            DsxSupportedCurrenciesRepository dsxSupportedCurrenciesRepository)
+            DsxSupportedCurrenciesRepository dsxSupportedCurrenciesRepository, DsxSupportedInstrumentsRepository dsxSupportedInstrumentsRepository)
     {
         this.requestService = requestService;
         this.objectMapper = objectMapper;
         this.conversionService = conversionService;
         this.dsxCurrencyGraph = dsxCurrencyGraph;
         this.dsxSupportedCurrenciesRepository = dsxSupportedCurrenciesRepository;
+        this.dsxSupportedInstrumentsRepository = dsxSupportedInstrumentsRepository;
     }
 
     @Override
@@ -167,6 +171,13 @@ public class DsxQuoteProvider implements QuoteProvider {
         }
 
         return new Ticker(exchangeRate);
+    }
+
+    @Override
+    public List<Instrument> getInstruments() {
+        return dsxSupportedInstrumentsRepository.getSupportedInstruments().stream()
+                .map(instrument -> conversionService.convert(instrument, Instrument.class))
+                .collect(Collectors.toList());
     }
 
     private Pair<DsxCurrencyVertex, DsxCurrencyVertex> getCurrencyPairFromString(String instrument) {

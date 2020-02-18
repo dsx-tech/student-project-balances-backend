@@ -1,9 +1,6 @@
 package dsx.bcv.marketdata_provider.config;
 
-import dsx.bcv.marketdata_provider.converters.BarToBarVOConverter;
-import dsx.bcv.marketdata_provider.converters.DsxBarToBarConverter;
-import dsx.bcv.marketdata_provider.converters.DsxTickerToTickerConverter;
-import dsx.bcv.marketdata_provider.converters.TickerToTickerVOConverter;
+import dsx.bcv.marketdata_provider.converters.*;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -16,5 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addConverter(new DsxTickerToTickerConverter());
         registry.addConverter(new BarToBarVOConverter());
         registry.addConverter(new TickerToTickerVOConverter());
+        registry.addConverter(new DsxInstrumentEdgeToInstrumentConverter());
+        registry.addConverter(new InstrumentToInstrumentVOConverter());
     }
 }

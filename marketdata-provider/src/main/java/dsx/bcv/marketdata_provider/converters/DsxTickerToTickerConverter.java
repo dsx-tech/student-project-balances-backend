@@ -3,12 +3,10 @@ package dsx.bcv.marketdata_provider.converters;
 import dsx.bcv.marketdata_provider.data.models.Ticker;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxTicker;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-@Service
 public class DsxTickerToTickerConverter implements Converter<DsxTicker, Ticker> {
     @Override
     public Ticker convert(DsxTicker dsxTicker) {

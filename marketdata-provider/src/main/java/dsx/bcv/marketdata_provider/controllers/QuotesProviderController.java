@@ -2,6 +2,7 @@ package dsx.bcv.marketdata_provider.controllers;
 
 import dsx.bcv.marketdata_provider.services.QuoteProviderService;
 import dsx.bcv.marketdata_provider.views.BarVO;
+import dsx.bcv.marketdata_provider.views.InstrumentVO;
 import dsx.bcv.marketdata_provider.views.TickerVO;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,15 @@ public class QuotesProviderController {
 
     public QuotesProviderController(QuoteProviderService quoteProviderService) {
         this.quoteProviderService = quoteProviderService;
+    }
+
+    @GetMapping("instruments")
+    public List<InstrumentVO> getInstruments() {
+        log.info(
+                "Request received. Url: {}",
+                ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
+        );
+        return quoteProviderService.getInstruments();
     }
 
     @ApiOperation("Get bars for every day from startTime to endTime.\n" +
