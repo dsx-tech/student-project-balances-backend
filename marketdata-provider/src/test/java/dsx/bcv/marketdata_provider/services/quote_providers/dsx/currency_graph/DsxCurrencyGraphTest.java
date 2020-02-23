@@ -1,4 +1,4 @@
-package dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.currency_graph;
+package dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph;
 
 import dsx.bcv.marketdata_provider.Application;
 import org.junit.Test;

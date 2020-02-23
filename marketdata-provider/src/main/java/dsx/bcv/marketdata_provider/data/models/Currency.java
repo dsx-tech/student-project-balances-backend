@@ -5,13 +5,17 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Instrument {
+public class Currency {
 
-    public Currency baseCurrency;
-    public Currency quotedCurrency;
+    private String code;
+    private String name;
+
+    public Currency (String code) {
+        this.code = code;
+    }
 
     @Override
     public String toString() {
-        return baseCurrency + "-" + quotedCurrency;
+        return code;
     }
 }

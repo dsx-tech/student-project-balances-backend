@@ -1,8 +1,8 @@
-package dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.currency_graph;
+package dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dsx.bcv.marketdata_provider.services.RequestService;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxInstrument;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.dsx_models.DsxInstrument;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

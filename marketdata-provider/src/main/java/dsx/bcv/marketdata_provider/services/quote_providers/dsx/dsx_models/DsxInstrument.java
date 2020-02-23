@@ -1,8 +1,8 @@
-package dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models;
+package dsx.bcv.marketdata_provider.services.quote_providers.dsx.dsx_models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.currency_graph.DsxCurrencyVertex;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxCurrencyVertex;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

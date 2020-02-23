@@ -9,7 +9,7 @@ public class BarToBarVOConverter implements Converter<Bar, BarVO> {
     public BarVO convert(Bar bar) {
         var barVO = new BarVO();
         barVO.setExchangeRate(bar.getExchangeRate());
-        barVO.setTimestamp(bar.getTimestamp());
+        barVO.setTimestamp(bar.getDate());
         return barVO;
     }
 }

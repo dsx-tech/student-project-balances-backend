@@ -1,4 +1,4 @@
-package dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider;
+package dsx.bcv.marketdata_provider.services.quote_providers.dsx;
 
 import dsx.bcv.marketdata_provider.Application;
 import org.junit.Test;

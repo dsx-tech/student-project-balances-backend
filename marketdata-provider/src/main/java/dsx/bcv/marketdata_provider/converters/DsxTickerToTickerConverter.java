@@ -1,7 +1,7 @@
 package dsx.bcv.marketdata_provider.converters;
 
 import dsx.bcv.marketdata_provider.data.models.Ticker;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxTicker;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.dsx_models.DsxTicker;
 import org.springframework.core.convert.converter.Converter;
 
 import java.math.BigDecimal;

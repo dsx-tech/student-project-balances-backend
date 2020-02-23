@@ -1,4 +1,4 @@
-package dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider;
+package dsx.bcv.marketdata_provider.services.quote_providers.dsx;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,12 +10,12 @@ import dsx.bcv.marketdata_provider.data.models.Ticker;
 import dsx.bcv.marketdata_provider.exceptions.NotFoundException;
 import dsx.bcv.marketdata_provider.services.RequestService;
 import dsx.bcv.marketdata_provider.services.quote_providers.QuoteProvider;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.currency_graph.DsxCurrencyGraph;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.currency_graph.DsxCurrencyVertex;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.currency_graph.DsxSupportedCurrenciesRepository;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.currency_graph.DsxSupportedInstrumentsRepository;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxBar;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx_provider.dsx_models.DsxTicker;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxCurrencyGraph;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxCurrencyVertex;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxSupportedCurrenciesRepository;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxSupportedInstrumentsRepository;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.dsx_models.DsxBar;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.dsx_models.DsxTicker;
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -64,7 +64,7 @@ public class DsxQuoteProvider implements QuoteProvider {
                 currencyPair.getSecond()
         );
 
-        var barsList = new ArrayList<List<Bar>>();
+        var barsList = new ArrayList<List<DsxBar>>();
         for (var dsxInstrumentEdge : instrumentList) {
             String responseBody;
             try {
@@ -88,9 +88,10 @@ public class DsxQuoteProvider implements QuoteProvider {
                 log.warn(e.getMessage(), e);
                 throw new RuntimeException(e);
             }
-            barsList.add(tmp.stream()
-                    .map(dsxBar -> conversionService.convert(dsxBar, Bar.class))
-                    .collect(Collectors.toList()));
+            barsList.add(tmp);
+//            barsList.add(tmp.stream()
+//                    .map(dsxBar -> conversionService.convert(dsxBar, Bar.class))
+//                    .collect(Collectors.toList()));
         }
 
         for (var bars : barsList) {
@@ -100,27 +101,33 @@ public class DsxQuoteProvider implements QuoteProvider {
             }
         }
 
-        var resultList = new ArrayList<Bar>();
+        var resultList = new ArrayList<DsxBar>();
         for (int i = 0; i < barsList.get(0).size(); i++) {
             var exchangeRate = new BigDecimal("1");
             for (int j = 0; j < barsList.size(); j++) {
                 if (instrumentList.get(j).isReversed()) {
                     exchangeRate = exchangeRate.divide(
-                            barsList.get(j).get(i).getExchangeRate(),
+                            barsList.get(j).get(i).getClose(),
                             10,
                             RoundingMode.HALF_UP
                     );
                 } else {
-                    exchangeRate = exchangeRate.multiply(barsList.get(j).get(i).getExchangeRate());
+                    exchangeRate = exchangeRate.multiply(barsList.get(j).get(i).getClose());
                 }
             }
-            resultList.add(new Bar(
+            resultList.add(new DsxBar(
+                    new BigDecimal("0"),
+                    new BigDecimal("0"),
+                    new BigDecimal("0"),
                     exchangeRate,
+                    new BigDecimal("0"),
                     barsList.get(0).get(i).getTimestamp()
             ));
         }
 
-        return resultList;
+        return resultList.stream()
+                .map(dsxBar -> conversionService.convert(dsxBar, Bar.class))
+                .collect(Collectors.toList());
     }
 
     @Override
