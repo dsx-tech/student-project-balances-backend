@@ -9,13 +9,10 @@ import dsx.bcv.marketdata_provider.data.models.Instrument;
 import dsx.bcv.marketdata_provider.data.models.Ticker;
 import dsx.bcv.marketdata_provider.exceptions.NotFoundException;
 import dsx.bcv.marketdata_provider.services.RequestService;
-import dsx.bcv.marketdata_provider.services.quote_providers.QuoteProvider;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxCurrencyGraph;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxCurrencyVertex;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxSupportedCurrenciesRepository;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxSupportedInstrumentsRepository;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx.dsx_models.DsxBar;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx.dsx_models.DsxTicker;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.models.DsxBar;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.models.DsxTicker;
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -31,31 +28,30 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class DsxQuoteProvider implements QuoteProvider {
+public class DsxQuoteProvider {
 
     private RequestService requestService;
     private ObjectMapper objectMapper;
     private ConversionService conversionService;
     private DsxCurrencyGraph dsxCurrencyGraph;
-    private DsxSupportedCurrenciesRepository dsxSupportedCurrenciesRepository;
-    private DsxSupportedInstrumentsRepository dsxSupportedInstrumentsRepository;
+    private DsxSupportedCurrencies dsxSupportedCurrencies;
+    private DsxSupportedInstruments dsxSupportedInstruments;
 
     public DsxQuoteProvider(
             RequestService requestService,
             ObjectMapper objectMapper,
             ConversionService conversionService,
             DsxCurrencyGraph dsxCurrencyGraph,
-            DsxSupportedCurrenciesRepository dsxSupportedCurrenciesRepository, DsxSupportedInstrumentsRepository dsxSupportedInstrumentsRepository)
+            DsxSupportedCurrencies dsxSupportedCurrencies, DsxSupportedInstruments dsxSupportedInstruments)
     {
         this.requestService = requestService;
         this.objectMapper = objectMapper;
         this.conversionService = conversionService;
         this.dsxCurrencyGraph = dsxCurrencyGraph;
-        this.dsxSupportedCurrenciesRepository = dsxSupportedCurrenciesRepository;
-        this.dsxSupportedInstrumentsRepository = dsxSupportedInstrumentsRepository;
+        this.dsxSupportedCurrencies = dsxSupportedCurrencies;
+        this.dsxSupportedInstruments = dsxSupportedInstruments;
     }
 
-    @Override
     public List<Bar> getBarsInPeriod(String instrument, long startTime, long endTime) {
 
         var currencyPair = getCurrencyPairFromString(instrument);
@@ -89,9 +85,6 @@ public class DsxQuoteProvider implements QuoteProvider {
                 throw new RuntimeException(e);
             }
             barsList.add(tmp);
-//            barsList.add(tmp.stream()
-//                    .map(dsxBar -> conversionService.convert(dsxBar, Bar.class))
-//                    .collect(Collectors.toList()));
         }
 
         for (var bars : barsList) {
@@ -130,7 +123,6 @@ public class DsxQuoteProvider implements QuoteProvider {
                 .collect(Collectors.toList());
     }
 
-    @Override
     public Ticker getTicker(String instrument) {
 
         var currencyPair = getCurrencyPairFromString(instrument);
@@ -180,9 +172,8 @@ public class DsxQuoteProvider implements QuoteProvider {
         return new Ticker(exchangeRate);
     }
 
-    @Override
     public List<Instrument> getInstruments() {
-        return dsxSupportedInstrumentsRepository.getSupportedInstruments().stream()
+        return dsxSupportedInstruments.getInstruments().stream()
                 .map(instrument -> conversionService.convert(instrument, Instrument.class))
                 .collect(Collectors.toList());
     }
@@ -195,13 +186,13 @@ public class DsxQuoteProvider implements QuoteProvider {
         }
         var baseCurrency = new DsxCurrencyVertex(currencyPair.get(0));
         var quotedCurrency = new DsxCurrencyVertex(currencyPair.get(1));
-        if (!dsxSupportedCurrenciesRepository.getSupportedCurrencies().contains(baseCurrency)) {
+        if (!dsxSupportedCurrencies.getCurrencies().contains(baseCurrency)) {
             log.warn("Base currency {} from request is not supported by dsx", baseCurrency);
             throw new NotFoundException(
                     "Base currency" + baseCurrency + "from request is not supported by dsx"
             );
         }
-        if (!dsxSupportedCurrenciesRepository.getSupportedCurrencies().contains(quotedCurrency)) {
+        if (!dsxSupportedCurrencies.getCurrencies().contains(quotedCurrency)) {
             log.warn("Quoted currency {} from request is not supported by dsx", quotedCurrency);
             throw new NotFoundException(
                     "Quoted currency" + quotedCurrency + "from request is not supported by dsx"

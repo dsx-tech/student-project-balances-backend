@@ -1,5 +1,7 @@
 package dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph;
 
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.DsxSupportedCurrencies;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.DsxSupportedInstruments;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -12,32 +14,32 @@ public class DsxCurrencyGraph {
 
     private final Graph<DsxCurrencyVertex, DsxInstrumentEdge> currencyGraph = new SimpleDirectedGraph<>(DsxInstrumentEdge.class);
 
-    private DsxSupportedCurrenciesRepository dsxSupportedCurrenciesRepository;
-    private DsxSupportedInstrumentsRepository dsxSupportedInstrumentsRepository;
+    private DsxSupportedCurrencies dsxSupportedCurrencies;
+    private DsxSupportedInstruments dsxSupportedInstruments;
 
     public DsxCurrencyGraph(
-            DsxSupportedCurrenciesRepository dsxSupportedCurrenciesRepository,
-            DsxSupportedInstrumentsRepository dsxSupportedInstrumentsRepository)
+            DsxSupportedCurrencies dsxSupportedCurrencies,
+            DsxSupportedInstruments dsxSupportedInstruments)
     {
-        this.dsxSupportedCurrenciesRepository = dsxSupportedCurrenciesRepository;
-        this.dsxSupportedInstrumentsRepository = dsxSupportedInstrumentsRepository;
+        this.dsxSupportedCurrencies = dsxSupportedCurrencies;
+        this.dsxSupportedInstruments = dsxSupportedInstruments;
 
         fillGraph();
     }
 
     private void fillGraph() {
 
-        dsxSupportedCurrenciesRepository.getSupportedCurrencies()
+        dsxSupportedCurrencies.getCurrencies()
                 .forEach(currencyGraph::addVertex);
 
-        dsxSupportedInstrumentsRepository.getSupportedInstruments()
+        dsxSupportedInstruments.getInstruments()
                 .forEach(dsxInstrumentEdge -> currencyGraph.addEdge(
                         dsxInstrumentEdge.getBaseCurrency(),
                         dsxInstrumentEdge.getQuotedCurrency(),
                         dsxInstrumentEdge
                 ));
 
-        dsxSupportedInstrumentsRepository.getReversedInstruments()
+        dsxSupportedInstruments.getReversedInstruments()
                 .forEach(dsxInstrumentEdge -> currencyGraph.addEdge(
                         dsxInstrumentEdge.getQuotedCurrency(),
                         dsxInstrumentEdge.getBaseCurrency(),

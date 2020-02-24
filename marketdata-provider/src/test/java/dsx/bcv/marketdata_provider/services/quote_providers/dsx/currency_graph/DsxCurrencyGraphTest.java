@@ -1,6 +1,7 @@
 package dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph;
 
 import dsx.bcv.marketdata_provider.Application;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.DsxSupportedInstruments;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ public class DsxCurrencyGraphTest {
     @Autowired
     private DsxCurrencyGraph dsxCurrencyGraph;
     @Autowired
-    private DsxSupportedInstrumentsRepository dsxSupportedInstrumentsRepository;
+    private DsxSupportedInstruments dsxSupportedInstruments;
 
     @Test
     public void getShortestPath() {

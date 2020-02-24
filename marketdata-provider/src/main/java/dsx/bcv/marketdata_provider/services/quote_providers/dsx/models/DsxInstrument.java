@@ -1,4 +1,4 @@
-package dsx.bcv.marketdata_provider.services.quote_providers.dsx.dsx_models;
+package dsx.bcv.marketdata_provider.services.quote_providers.dsx.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,4 +1,4 @@
-package dsx.bcv.marketdata_provider.services.quote_providers.dsx.dsx_models;
+package dsx.bcv.marketdata_provider.services.quote_providers.dsx.models;
 
 import lombok.Data;
 

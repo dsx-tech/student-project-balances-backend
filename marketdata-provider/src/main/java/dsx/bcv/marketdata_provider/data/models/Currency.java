@@ -10,7 +10,7 @@ public class Currency {
     private String code;
     private String name;
 
-    public Currency (String code) {
+    public Currency(String code) {
         this.code = code;
     }
 

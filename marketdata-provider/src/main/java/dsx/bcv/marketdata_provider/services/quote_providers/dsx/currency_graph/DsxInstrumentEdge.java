@@ -1,6 +1,6 @@
 package dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph;
 
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx.dsx_models.DsxInstrument;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.models.DsxInstrument;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

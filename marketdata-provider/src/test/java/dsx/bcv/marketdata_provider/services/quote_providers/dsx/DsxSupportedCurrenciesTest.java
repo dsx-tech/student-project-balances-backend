@@ -1,7 +1,6 @@
 package dsx.bcv.marketdata_provider.services.quote_providers.dsx;
 
 import dsx.bcv.marketdata_provider.Application;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxSupportedInstrumentsRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,15 +9,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
-public class DsxSupportedInstrumentsRepositoryTest {
+public class DsxSupportedCurrenciesTest {
 
     @Autowired
-    private DsxSupportedInstrumentsRepository dsxSupportedInstrumentsRepository;
+    private DsxSupportedCurrencies dsxSupportedCurrencies;
 
     @Test
-    public void getSupportedInstruments() {
+    public void getSupportedCurrencies() {
 
-        var result = dsxSupportedInstrumentsRepository.getSupportedInstruments();
+        var result = dsxSupportedCurrencies.getCurrencies();
 
         System.out.println(result);
     }

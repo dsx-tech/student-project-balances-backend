@@ -1,8 +1,9 @@
-package dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph;
+package dsx.bcv.marketdata_provider.services.quote_providers.dsx;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dsx.bcv.marketdata_provider.services.RequestService;
-import dsx.bcv.marketdata_provider.services.quote_providers.dsx.dsx_models.DsxInstrument;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxInstrumentEdge;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.models.DsxInstrument;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +15,10 @@ import java.util.Set;
 
 @Component
 @Slf4j
-public class DsxSupportedInstrumentsRepository {
+public class DsxSupportedInstruments {
 
     @Getter
-    private final Set<DsxInstrumentEdge> supportedInstruments;
+    private final Set<DsxInstrumentEdge> instruments;
 
     @Getter
     private final Set<DsxInstrumentEdge> reversedInstruments;
@@ -25,16 +26,16 @@ public class DsxSupportedInstrumentsRepository {
     private final RequestService requestService;
     private final ObjectMapper objectMapper;
 
-    public DsxSupportedInstrumentsRepository(RequestService requestService, ObjectMapper objectMapper) {
+    public DsxSupportedInstruments(RequestService requestService, ObjectMapper objectMapper) {
 
         this.requestService = requestService;
         this.objectMapper = objectMapper;
 
-        supportedInstruments = initSupportedInstruments();
-        log.info("Dsx supported instruments: {}", supportedInstruments);
+        instruments = initSupportedInstruments();
+        log.info("Dsx supported instruments: {}", instruments);
 
         reversedInstruments = new HashSet<>();
-        supportedInstruments.forEach(dsxInstrumentEdge -> reversedInstruments.add(dsxInstrumentEdge.reverse()));
+        instruments.forEach(dsxInstrumentEdge -> reversedInstruments.add(dsxInstrumentEdge.reverse()));
     }
 
     @SneakyThrows
