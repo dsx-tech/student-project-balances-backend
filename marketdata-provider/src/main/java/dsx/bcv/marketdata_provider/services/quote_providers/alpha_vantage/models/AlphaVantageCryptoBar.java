@@ -10,14 +10,14 @@ import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
-//Change name!!!!!
-public class AlphaVantageCryptoHistoricalRate {
+public class AlphaVantageCryptoBar {
 
+    private AlphaVantageCurrency currency;
     private BigDecimal exchangeRate;
     private LocalDate date;
 
     @JsonCreator
-    public AlphaVantageCryptoHistoricalRate(
+    public AlphaVantageCryptoBar(
             @JsonProperty("4a. close (USD)") BigDecimal exchangeRate
     ) {
         this.exchangeRate = exchangeRate;

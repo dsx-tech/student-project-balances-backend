@@ -7,9 +7,9 @@ import org.springframework.core.convert.converter.Converter;
 public class BarToBarVOConverter implements Converter<Bar, BarVO> {
     @Override
     public BarVO convert(Bar bar) {
-        var barVO = new BarVO();
-        barVO.setExchangeRate(bar.getExchangeRate());
-        barVO.setTimestamp(bar.getDate());
-        return barVO;
+        return new BarVO(
+                bar.getExchangeRate(),
+                bar.getTimestamp()
+        );
     }
 }

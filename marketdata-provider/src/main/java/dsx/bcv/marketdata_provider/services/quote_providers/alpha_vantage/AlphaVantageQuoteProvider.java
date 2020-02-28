@@ -1,11 +1,12 @@
 package dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
 import dsx.bcv.marketdata_provider.data.models.Bar;
-import dsx.bcv.marketdata_provider.data.models.Currency;
 import dsx.bcv.marketdata_provider.services.RequestService;
-import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageCryptoHistoricalRate;
-import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageForexHistoricalRate;
+import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageCryptoBar;
+import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageCurrency;
+import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageForexBar;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -22,7 +24,24 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AlphaVantageQuoteProvider {
 
-    private final String apiKey = "IBD9WPO8HRINYP15";
+    private final List<String> apiKeyList = ImmutableList.of(
+            "9AHDGW3TU1P53QD5",
+            "KLSNN06MT5YKD8G6",
+            "M17XFAE2JFPU6GB0",
+            "M593Q9YBLNAHRXS9",
+            "R8E6U7RI11YSJ9YU",
+            "GPHASUAC6Y3JNZLH",
+            "N9NMMTJL56RZO0EW",
+            "CLWFP9W6HGD5KSO9",
+            "X4T83HP3NZMB985U",
+            "2Z98LLDBELVNIS9H",
+            "3XFWJR1EBGNZ0LIG",
+            "E4DD94ZAZ9Z1ZE0G",
+            "SILL33XLLYXOXDEZ",
+            "6YNTYM5J7YETR6X9",
+            "FTBUJQ2P079OLHI9"
+    );
+
     private final RequestService requestService;
     private final ObjectMapper objectMapper;
     private final ConversionService conversionService;
@@ -34,18 +53,31 @@ public class AlphaVantageQuoteProvider {
     }
 
     @SneakyThrows
-    public List<Bar> getForexDailyHistoricalRate(Currency baseCurrency) {
+    public List<Bar> getForexDailyHistoricalRate(AlphaVantageCurrency baseCurrency) {
 
-        log.debug("getForexDailyHistoricalRate called for {}", baseCurrency);
+        log.trace("Historical rate for {} method called", baseCurrency);
 
-        var responseBody = requestService.doGetRequest(
+        var requestUrl =
                 "https://www.alphavantage.co/query" +
-                        "?function=FX_DAILY" +
-                        "&from_symbol=" + baseCurrency +
-                        "&to_symbol=USD" +
-                        "&outputsize=full" +
-                        "&apikey=" + apiKey
-        );
+                "?function=FX_DAILY" +
+                "&from_symbol=" + baseCurrency +
+                "&to_symbol=USD" +
+                "&outputsize=full" +
+                "&apikey=" + getApiKey();
+
+        log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
+
+        var responseBody = requestService.doGetRequest(requestUrl);
+
+        if (responseBody.contains("Error Message")) {
+            log.warn("{} is not supported? Retry request...", baseCurrency);
+            getForexDailyHistoricalRate(baseCurrency);
+        }
+        if (responseBody.contains("Our standard API call frequency is 5 calls per minute and 500 calls per day")) {
+            log.warn("ERROR. High API call frequency");
+        }
+
+        log.trace("Alpha Vantage returns:\n{}...", responseBody.substring(0, 200));
 
         var responseBodyJO = new JSONObject(responseBody);
         var rates = String.valueOf(responseBodyJO.get("Time Series FX (Daily)"));
@@ -54,51 +86,67 @@ public class AlphaVantageQuoteProvider {
         var sortedKeySet = new TreeSet<>(ratesJO.keySet());
 
         var firstDate = sortedKeySet.first();
-        var previousAlphaVantageForexHistoricalRate = objectMapper.readValue(
+        var previousAlphaVantageForexBar = objectMapper.readValue(
                 String.valueOf(ratesJO.get(firstDate)),
-                AlphaVantageForexHistoricalRate.class
+                AlphaVantageForexBar.class
         );
-        previousAlphaVantageForexHistoricalRate.setDate(LocalDate.parse(firstDate));
+        previousAlphaVantageForexBar.setDate(LocalDate.parse(firstDate));
 
-        var resultList = new ArrayList<AlphaVantageForexHistoricalRate>();
+        var resultList = new ArrayList<AlphaVantageForexBar>();
         for (var key : sortedKeySet) {
             var currencyRateString = String.valueOf(ratesJO.get(key));
-            var currentAlphaVantageBar = objectMapper.readValue(
+            var currentAlphaVantageForexBar = objectMapper.readValue(
                     currencyRateString,
-                    AlphaVantageForexHistoricalRate.class
+                    AlphaVantageForexBar.class
             );
-            currentAlphaVantageBar.setDate(LocalDate.parse(key));
-            for (var epochDay = previousAlphaVantageForexHistoricalRate.getDate().toEpochDay() + 1;
-                 epochDay < currentAlphaVantageBar.getDate().toEpochDay();
+            currentAlphaVantageForexBar.setCurrency(baseCurrency);
+            currentAlphaVantageForexBar.setDate(LocalDate.parse(key));
+            for (var epochDay = previousAlphaVantageForexBar.getDate().toEpochDay() + 1;
+                 epochDay < currentAlphaVantageForexBar.getDate().toEpochDay();
                  epochDay++) {
                 resultList.add(
-                        new AlphaVantageForexHistoricalRate(
-                                previousAlphaVantageForexHistoricalRate.getExchangeRate(),
+                        new AlphaVantageForexBar(
+                                baseCurrency,
+                                previousAlphaVantageForexBar.getExchangeRate(),
                                 LocalDate.ofEpochDay(epochDay)
                         )
                 );
             }
-            resultList.add(currentAlphaVantageBar);
-            previousAlphaVantageForexHistoricalRate = currentAlphaVantageBar;
+            resultList.add(currentAlphaVantageForexBar);
+            previousAlphaVantageForexBar = currentAlphaVantageForexBar;
         }
 
+        log.trace("First 5 bars: {}", resultList.subList(0, 5));
+
         return resultList.stream()
-                .map(rate -> conversionService.convert(rate, Bar.class))
+                .map(bar -> conversionService.convert(bar, Bar.class))
                 .collect(Collectors.toList());
     }
 
     @SneakyThrows
-    public List<Bar> getDigitalDailyHistoricalRate(Currency baseCurrency) {
+    public List<Bar> getDigitalDailyHistoricalRate(AlphaVantageCurrency baseCurrency) {
 
-        log.debug("getDigitalDailyHistoricalRate called for {}", baseCurrency);
+        log.trace("Historical rate for {} method called", baseCurrency);
 
-        var responseBody = requestService.doGetRequest(
+        var requestUrl =
                 "https://www.alphavantage.co/query" +
-                        "?function=DIGITAL_CURRENCY_DAILY" +
-                        "&symbol=" + baseCurrency +
-                        "&market=USD" +
-                        "&apikey=" + apiKey
-        );
+                "?function=DIGITAL_CURRENCY_DAILY" +
+                "&symbol=" + baseCurrency +
+                "&market=USD" +
+                "&apikey=" + getApiKey();
+
+        log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
+
+        var responseBody = requestService.doGetRequest(requestUrl);
+
+        if (responseBody.contains("Error Message")) {
+            log.warn("{} is not supported", baseCurrency);
+        }
+        if (responseBody.contains("Our standard API call frequency is 5 calls per minute and 500 calls per day")) {
+            log.warn("ERROR. High API call frequency");
+        }
+
+        log.trace("Alpha Vantage returns:\n{}...", responseBody.substring(0, 1000));
 
         var responseBodyJO = new JSONObject(responseBody);
         var rates = String.valueOf(responseBodyJO.get("Time Series (Digital Currency Daily)"));
@@ -107,36 +155,44 @@ public class AlphaVantageQuoteProvider {
         var sortedKeySet = new TreeSet<>(ratesJO.keySet());
 
         var firstDate = sortedKeySet.first();
-        var previousAlphaVantageCryptoHistoricalRate = objectMapper.readValue(
+        var previousAlphaVantageCryptoBar = objectMapper.readValue(
                 String.valueOf(ratesJO.get(firstDate)),
-                AlphaVantageCryptoHistoricalRate.class
+                AlphaVantageCryptoBar.class
         );
-        previousAlphaVantageCryptoHistoricalRate.setDate(LocalDate.parse(firstDate));
+        previousAlphaVantageCryptoBar.setDate(LocalDate.parse(firstDate));
 
-        var resultList = new ArrayList<AlphaVantageCryptoHistoricalRate>();
+        var resultList = new ArrayList<AlphaVantageCryptoBar>();
         for (var key : sortedKeySet) {
             var currencyRateString = String.valueOf(ratesJO.get(key));
-            var currentAlphaVantageCryptoHistoricalRate = objectMapper.readValue(
+            var currentAlphaVantageCryptoBar = objectMapper.readValue(
                     currencyRateString,
-                    AlphaVantageCryptoHistoricalRate.class
+                    AlphaVantageCryptoBar.class
             );
-            currentAlphaVantageCryptoHistoricalRate.setDate(LocalDate.parse(key));
-            for (var epochDay = previousAlphaVantageCryptoHistoricalRate.getDate().toEpochDay() + 1;
-                 epochDay < currentAlphaVantageCryptoHistoricalRate.getDate().toEpochDay();
+            currentAlphaVantageCryptoBar.setCurrency(baseCurrency);
+            currentAlphaVantageCryptoBar.setDate(LocalDate.parse(key));
+            for (var epochDay = previousAlphaVantageCryptoBar.getDate().toEpochDay() + 1;
+                 epochDay < currentAlphaVantageCryptoBar.getDate().toEpochDay();
                  epochDay++) {
                 resultList.add(
-                        new AlphaVantageCryptoHistoricalRate(
-                                previousAlphaVantageCryptoHistoricalRate.getExchangeRate(),
+                        new AlphaVantageCryptoBar(
+                                baseCurrency,
+                                previousAlphaVantageCryptoBar.getExchangeRate(),
                                 LocalDate.ofEpochDay(epochDay)
                         )
                 );
             }
-            resultList.add(currentAlphaVantageCryptoHistoricalRate);
-            previousAlphaVantageCryptoHistoricalRate = currentAlphaVantageCryptoHistoricalRate;
+            resultList.add(currentAlphaVantageCryptoBar);
+            previousAlphaVantageCryptoBar = currentAlphaVantageCryptoBar;
         }
+
+        log.trace("First 5 bars: {}", resultList.subList(0, 5));
 
         return resultList.stream()
                 .map(rate -> conversionService.convert(rate, Bar.class))
                 .collect(Collectors.toList());
+    }
+
+    private String getApiKey() {
+        return apiKeyList.get(new Random().nextInt(apiKeyList.size()));
     }
 }

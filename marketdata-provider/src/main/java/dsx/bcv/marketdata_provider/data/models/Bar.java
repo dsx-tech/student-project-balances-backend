@@ -1,16 +1,27 @@
 package dsx.bcv.marketdata_provider.data.models;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
+@Entity(name = "bars")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class Bar {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+    @ManyToOne
+    private Currency baseCurrency;
+    @Column(precision = 20, scale = 10)
     private BigDecimal exchangeRate;
-    private LocalDate date;
+    private long timestamp;
+
+    public Bar(Currency baseCurrency, BigDecimal exchangeRate, long timestamp) {
+        this.baseCurrency = baseCurrency;
+        this.exchangeRate = exchangeRate;
+        this.timestamp = timestamp;
+    }
 }

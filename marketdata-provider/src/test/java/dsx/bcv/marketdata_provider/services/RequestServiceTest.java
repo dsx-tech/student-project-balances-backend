@@ -2,6 +2,7 @@ package dsx.bcv.marketdata_provider.services;
 
 import dsx.bcv.marketdata_provider.Application;
 import org.json.JSONException;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertNotNull;
 
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
 public class RequestServiceTest {
