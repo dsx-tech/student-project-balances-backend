@@ -6,6 +6,8 @@ import dsx.bcv.marketdata_provider.data.repositories.BarRepository;
 import dsx.bcv.marketdata_provider.exceptions.NotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BarService {
 
@@ -35,5 +37,13 @@ public class BarService {
         return barRepository.findByBaseCurrency(
                 currencyService.findByCode(currency.getCode()).orElseThrow(NotFoundException::new)
         ).isPresent();
+    }
+
+    public List<Bar> findByBaseCurrencyAndTimestampBetween(Currency currency, long startTime, long endTime) {
+        return barRepository.findByBaseCurrencyAndTimestampBetween(currency, startTime, endTime);
+    }
+
+    public Bar findTopByBaseCurrencyOrderByTimestampDesc(Currency currency) {
+        return barRepository.findTopByBaseCurrencyOrderByTimestampDesc(currency).orElseThrow(NotFoundException::new);
     }
 }

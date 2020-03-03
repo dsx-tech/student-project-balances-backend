@@ -12,14 +12,14 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 apply plugin: "application"
-//mainClassName = 'dsx.bcv.marketdata_provider.Application'
+mainClassName = 'dsx.bcv.marketdata_provider.Application'
 
 repositories {
     mavenCentral()
 }
 
-//sourceCompatibility = 11
-//targetCompatibility = 11
+sourceCompatibility = 11
+targetCompatibility = 11
 
 dependencies{
     annotationProcessor 'org.projectlombok:lombok:1.18.10'

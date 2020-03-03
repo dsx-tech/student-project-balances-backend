@@ -19,5 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addConverter(new AlphaVantageCryptoBarToBarConverter());
         registry.addConverter(new AlphaVantageCurrencyToCurrencyConverter());
         registry.addConverter(new CurrencyToAlphaVantageCurrencyConverter());
+        registry.addConverter(new CurrencyToCurrencyVOConverter());
+        registry.addConverter(new AlphaVantageTickerToTickerConverter());
     }
 }

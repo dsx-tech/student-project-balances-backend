@@ -7,8 +7,8 @@ import org.springframework.core.convert.converter.Converter;
 public class TickerToTickerVOConverter implements Converter<Ticker, TickerVO> {
     @Override
     public TickerVO convert(Ticker ticker) {
-        var tickerVO = new TickerVO();
-        tickerVO.setExchangeRate(ticker.getExchangeRate());
-        return tickerVO;
+        return new TickerVO(
+                ticker.getExchangeRate()
+        );
     }
 }

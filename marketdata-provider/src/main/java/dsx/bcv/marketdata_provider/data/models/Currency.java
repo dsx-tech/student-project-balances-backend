@@ -18,7 +18,7 @@ public class Currency {
     private String name;
 
     public Currency(String code) {
-        this.code = code;
+        this(code, "unknown");
     }
 
     public Currency(String code, String name) {

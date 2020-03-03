@@ -9,7 +9,7 @@ public class DsxBarToBarConverter implements Converter<DsxBar, Bar> {
     @Override
     public Bar convert(DsxBar dsxBar) {
         return new Bar(
-                new Currency("usd"),//?
+                new Currency("unknown"),
                 dsxBar.getClose(),
                 dsxBar.getTimestamp()
         );

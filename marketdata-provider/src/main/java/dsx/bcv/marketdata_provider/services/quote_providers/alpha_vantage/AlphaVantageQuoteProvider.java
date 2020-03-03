@@ -7,6 +7,7 @@ import dsx.bcv.marketdata_provider.services.RequestService;
 import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageCryptoBar;
 import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageCurrency;
 import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageForexBar;
+import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageTicker;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -190,6 +191,41 @@ public class AlphaVantageQuoteProvider {
         return resultList.stream()
                 .map(rate -> conversionService.convert(rate, Bar.class))
                 .collect(Collectors.toList());
+    }
+
+    @SneakyThrows
+    public AlphaVantageTicker getTicker(String baseCurrencyCode, String quotedCurrencyCode) {
+
+        log.trace("Historical rate for {}-{} method called", baseCurrencyCode, quotedCurrencyCode);
+
+        var requestUrl =
+                "https://www.alphavantage.co/query" +
+                        "?function=CURRENCY_EXCHANGE_RATE" +
+                        "&from_currency=" + baseCurrencyCode +
+                        "&to_currency=" + quotedCurrencyCode +
+                        "&apikey=" + getApiKey();
+
+        log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
+
+        var responseBody = requestService.doGetRequest(requestUrl);
+        if (responseBody.contains("Error Message")) {
+            log.warn("Error messsage");
+        }
+        if (responseBody.contains(
+                "Our standard API call frequency is 5 calls per minute and 500 calls per day"
+        )) {
+            log.warn("Error. High API call frequency");
+            throw new RuntimeException(
+                    "Error. High API call frequency. " +
+                    "Our standard ticker API call frequency is 5 calls per minute and 500 calls per day. " +
+                    "Sorry, скоро сделаю нормально"
+            );
+        }
+
+        var responseBodyJO = new JSONObject(responseBody);
+        var alphaVantageTickerString = String.valueOf(responseBodyJO.get("Realtime Currency Exchange Rate"));
+
+        return objectMapper.readValue(alphaVantageTickerString, AlphaVantageTicker.class);
     }
 
     private String getApiKey() {

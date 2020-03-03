@@ -4,13 +4,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import dsx.bcv.marketdata_provider.data.models.Bar;
-import dsx.bcv.marketdata_provider.data.models.Instrument;
+import dsx.bcv.marketdata_provider.data.models.Currency;
 import dsx.bcv.marketdata_provider.data.models.Ticker;
 import dsx.bcv.marketdata_provider.exceptions.NotFoundException;
 import dsx.bcv.marketdata_provider.services.RequestService;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxCurrencyGraph;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxCurrencyVertex;
+import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxInstrumentEdge;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx.models.DsxBar;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx.models.DsxTicker;
 import kotlin.Pair;
@@ -24,7 +24,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -52,7 +51,7 @@ public class DsxQuoteProvider {
         this.dsxSupportedInstruments = dsxSupportedInstruments;
     }
 
-    public List<Bar> getBarsInPeriod(String instrument, long startTime, long endTime) {
+    public List<DsxBar> getBarsInPeriod(String instrument, long startTime, long endTime) {
 
         var currencyPair = getCurrencyPairFromString(instrument);
         var instrumentList = dsxCurrencyGraph.getShortestPath(
@@ -118,9 +117,7 @@ public class DsxQuoteProvider {
             ));
         }
 
-        return resultList.stream()
-                .map(dsxBar -> conversionService.convert(dsxBar, Bar.class))
-                .collect(Collectors.toList());
+        return resultList;
     }
 
     public Ticker getTicker(String instrument) {
@@ -169,13 +166,15 @@ public class DsxQuoteProvider {
             }
         }
 
-        return new Ticker(exchangeRate);
+        return new Ticker(
+                new Currency(currencyPair.getFirst().getName()),
+                exchangeRate,
+                0
+        );
     }
 
-    public List<Instrument> getInstruments() {
-        return dsxSupportedInstruments.getInstruments().stream()
-                .map(instrument -> conversionService.convert(instrument, Instrument.class))
-                .collect(Collectors.toList());
+    public List<DsxInstrumentEdge> getInstruments() {
+        return new ArrayList<>(dsxSupportedInstruments.getInstruments());
     }
 
     private Pair<DsxCurrencyVertex, DsxCurrencyVertex> getCurrencyPairFromString(String instrument) {
