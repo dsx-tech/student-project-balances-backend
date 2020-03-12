@@ -1,7 +1,6 @@
 package dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
 import dsx.bcv.marketdata_provider.data.models.Bar;
 import dsx.bcv.marketdata_provider.services.RequestService;
 import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageCryptoBar;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -25,32 +23,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AlphaVantageQuoteProvider {
 
-    private final List<String> apiKeyList = ImmutableList.of(
-            "9AHDGW3TU1P53QD5",
-            "KLSNN06MT5YKD8G6",
-            "M17XFAE2JFPU6GB0",
-            "M593Q9YBLNAHRXS9",
-            "R8E6U7RI11YSJ9YU",
-            "GPHASUAC6Y3JNZLH",
-            "N9NMMTJL56RZO0EW",
-            "CLWFP9W6HGD5KSO9",
-            "X4T83HP3NZMB985U",
-            "2Z98LLDBELVNIS9H",
-            "3XFWJR1EBGNZ0LIG",
-            "E4DD94ZAZ9Z1ZE0G",
-            "SILL33XLLYXOXDEZ",
-            "6YNTYM5J7YETR6X9",
-            "FTBUJQ2P079OLHI9"
-    );
-
     private final RequestService requestService;
     private final ObjectMapper objectMapper;
     private final ConversionService conversionService;
+    private final AlphaVantageApiKeyProvider alphaVantageApiKeyProvider;
 
-    public AlphaVantageQuoteProvider(RequestService requestService, ObjectMapper objectMapper, ConversionService conversionService) {
+    public AlphaVantageQuoteProvider(RequestService requestService, ObjectMapper objectMapper, ConversionService conversionService, AlphaVantageApiKeyProvider alphaVantageApiKeyProvider) {
         this.requestService = requestService;
         this.objectMapper = objectMapper;
         this.conversionService = conversionService;
+        this.alphaVantageApiKeyProvider = alphaVantageApiKeyProvider;
     }
 
     @SneakyThrows
@@ -64,7 +46,7 @@ public class AlphaVantageQuoteProvider {
                 "&from_symbol=" + baseCurrency +
                 "&to_symbol=USD" +
                 "&outputsize=full" +
-                "&apikey=" + getApiKey();
+                "&apikey=" + alphaVantageApiKeyProvider.getApiKey();
 
         log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
 
@@ -134,7 +116,7 @@ public class AlphaVantageQuoteProvider {
                 "?function=DIGITAL_CURRENCY_DAILY" +
                 "&symbol=" + baseCurrency +
                 "&market=USD" +
-                "&apikey=" + getApiKey();
+                "&apikey=" + alphaVantageApiKeyProvider.getApiKey();
 
         log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
 
@@ -203,7 +185,7 @@ public class AlphaVantageQuoteProvider {
                         "?function=CURRENCY_EXCHANGE_RATE" +
                         "&from_currency=" + baseCurrencyCode +
                         "&to_currency=" + quotedCurrencyCode +
-                        "&apikey=" + getApiKey();
+                        "&apikey=" + alphaVantageApiKeyProvider.getApiKey();
 
         log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
 
@@ -228,7 +210,5 @@ public class AlphaVantageQuoteProvider {
         return objectMapper.readValue(alphaVantageTickerString, AlphaVantageTicker.class);
     }
 
-    private String getApiKey() {
-        return apiKeyList.get(new Random().nextInt(apiKeyList.size()));
-    }
+
 }

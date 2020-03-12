@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 
+import java.io.IOException;
 import java.util.stream.Collectors;
 
 //@Service
@@ -15,24 +16,30 @@ public class AlphaVantageApiChecker {
     private final AlphaVantageSupportedCurrencies alphaVantageSupportedCurrencies;
     private final ConversionService conversionService;
     private final RequestService requestService;
+    private final AlphaVantageApiKeyProvider alphaVantageApiKeyProvider;
 
     public AlphaVantageApiChecker(
             AlphaVantageSupportedCurrencies alphaVantageSupportedCurrencies,
             ConversionService conversionService,
-            RequestService requestService
-    ) {
+            RequestService requestService,
+            AlphaVantageApiKeyProvider alphaVantageApiKeyProvider) {
         this.alphaVantageSupportedCurrencies = alphaVantageSupportedCurrencies;
         this.conversionService = conversionService;
         this.requestService = requestService;
+        this.alphaVantageApiKeyProvider = alphaVantageApiKeyProvider;
 
-        new Thread(this::check).start();
+        new Thread(this::checkAll).start();
+    }
+
+    private void checkAll() {
+        checkPhysicalCurrencies();
+        checkDigitalCurrencies();
     }
 
     @SneakyThrows
-    private void check() {
+    private void checkPhysicalCurrencies() {
 
-        final var apiKey1 = "PPKFFSGZ5IH9KBU9";
-        final var apiKey2 = "IBD9WPO8HRINYP15";
+        log.info("Checking supported physical currencies");
 
         final var physicalCurrencies = this.alphaVantageSupportedCurrencies.getPhysicalCurrencies()
                 .stream()
@@ -40,26 +47,22 @@ public class AlphaVantageApiChecker {
                 .collect(Collectors.toList());
 
         for (var currency : physicalCurrencies) {
-
             log.info("Request history for {}", currency);
             var requestUrl =
                     "https://www.alphavantage.co/query" +
                             "?function=FX_DAILY" +
                             "&from_symbol=" + currency +
                             "&to_symbol=USD" +
-                            "&apikey=" + apiKey1;
-
-            log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
-            var responseBody = requestService.doGetRequest(requestUrl);
-            log.trace("Response body: {}", responseBody);
-            if (responseBody.contains("Error Message")) {
-                log.info("{} is not supported", currency);
-            }
-            if (responseBody.contains("Our standard API call frequency is 5 calls per minute and 500 calls per day")) {
-                log.info("ERROR. High API call frequency");
-            }
+                            "&apikey=" + alphaVantageApiKeyProvider.getApiKey();
+            sendRequest(currency, requestUrl);
             sleep();
         }
+    }
+
+    @SneakyThrows
+    private void checkDigitalCurrencies() {
+
+        log.info("Checking supported digital currencies");
 
         final var digitalCurrencies = this.alphaVantageSupportedCurrencies.getDigitalCurrencies()
                 .stream()
@@ -68,26 +71,27 @@ public class AlphaVantageApiChecker {
 
         var i = 1;
         for (var currency : digitalCurrencies) {
-
             log.info("{}. Request history for {}", i++, currency);
-
             var requestUrl =
                     "https://www.alphavantage.co/query" +
                             "?function=DIGITAL_CURRENCY_DAILY" +
                             "&symbol=" + currency +
                             "&market=USD" +
-                            "&apikey=" + ((i < 400) ? apiKey1 : apiKey2);
-
-            log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
-            var responseBody = requestService.doGetRequest(requestUrl);
-            log.trace("Response body: {}", responseBody);
-            if (responseBody.contains("Error Message")) {
-                log.info("{} is not supported", currency);
-            }
-            if (responseBody.contains("Our standard API call frequency is 5 calls per minute and 500 calls per day")) {
-                log.info("high API call frequency");
-            }
+                            "&apikey=" + alphaVantageApiKeyProvider.getApiKey();
+            sendRequest(currency, requestUrl);
             sleep();
+        }
+    }
+
+    private void sendRequest(Currency currency, String requestUrl) throws IOException {
+        log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
+        var responseBody = requestService.doGetRequest(requestUrl);
+        log.trace("Response body: {}", responseBody);
+        if (responseBody.contains("Error Message")) {
+            log.info("{} is not supported", currency);
+        }
+        if (responseBody.contains("Our standard API call frequency is 5 calls per minute and 500 calls per day")) {
+            log.info("ERROR. High API call frequency");
         }
     }
 
