@@ -8,8 +8,8 @@ public class InstrumentToInstrumentVOConverter implements Converter<Instrument, 
     @Override
     public InstrumentVO convert(Instrument instrument) {
         return new InstrumentVO(
-                instrument.baseCurrency.toString(),
-                instrument.quotedCurrency.toString()
+                instrument.baseAsset.toString(),
+                instrument.quotedAsset.toString()
         );
     }
 }

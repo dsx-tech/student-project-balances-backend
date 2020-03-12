@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import dsx.bcv.marketdata_provider.data.models.Currency;
+import dsx.bcv.marketdata_provider.data.models.Asset;
 import dsx.bcv.marketdata_provider.data.models.Ticker;
 import dsx.bcv.marketdata_provider.exceptions.NotFoundException;
 import dsx.bcv.marketdata_provider.services.RequestService;
@@ -167,7 +167,7 @@ public class DsxQuoteProvider {
         }
 
         return new Ticker(
-                new Currency(currencyPair.getFirst().getName()),
+                new Asset(currencyPair.getFirst().getName()),
                 exchangeRate,
                 0
         );

@@ -5,10 +5,10 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Entity(name = "currencies")
+@Entity(name = "assets")
 @Data
 @NoArgsConstructor
-public class Currency {
+public class Asset {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -17,11 +17,11 @@ public class Currency {
     @Column(unique = true)
     private String name;
 
-    public Currency(String code) {
+    public Asset(String code) {
         this(code, "unknown");
     }
 
-    public Currency(String code, String name) {
+    public Asset(String code, String name) {
         this.code = code;
         this.name = name;
     }

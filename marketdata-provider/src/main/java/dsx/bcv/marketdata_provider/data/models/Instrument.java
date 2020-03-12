@@ -7,11 +7,11 @@ import lombok.Data;
 @AllArgsConstructor
 public class Instrument {
 
-    public Currency baseCurrency;
-    public Currency quotedCurrency;
+    public Asset baseAsset;
+    public Asset quotedAsset;
 
     @Override
     public String toString() {
-        return baseCurrency + "-" + quotedCurrency;
+        return baseAsset + "-" + quotedAsset;
     }
 }

@@ -10,16 +10,16 @@ public class ActualDataLoaderService {
 
     private final TickerService tickerService;
     private final BarService barService;
-    private final CurrencyService currencyService;
+    private final AssetService assetService;
 
     public ActualDataLoaderService(
             TickerService tickerService,
             BarService barService,
-            CurrencyService currencyService
+            AssetService assetService
     ) {
         this.tickerService = tickerService;
         this.barService = barService;
-        this.currencyService = currencyService;
+        this.assetService = assetService;
 
         loadDataFromLastBars();
     }
@@ -32,11 +32,11 @@ public class ActualDataLoaderService {
             return;
         }
 
-        final var currencies = currencyService.findAll();
+        final var currencies = assetService.findAll();
         for (var currency : currencies) {
             final var lastBar = barService.findTopByBaseCurrencyOrderByTimestampDesc(currency);
             final var ticker = new Ticker(
-                    lastBar.getBaseCurrency(),
+                    lastBar.getBaseAsset(),
                     lastBar.getExchangeRate(),
                     lastBar.getTimestamp()
             );

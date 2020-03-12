@@ -8,14 +8,14 @@ import lombok.Data;
 @JsonSerialize(using = ToStringSerializer.class)
 public class InstrumentVO {
 
-    private String currencyPair;
+    private String assetPair;
 
-    public InstrumentVO (String baseCurrency, String quotedCurrency) {
-        currencyPair = baseCurrency + "-" + quotedCurrency;
+    public InstrumentVO (String baseAsset, String quotedAsset) {
+        assetPair = baseAsset + "-" + quotedAsset;
     }
 
     @Override
     public String toString() {
-        return currencyPair;
+        return assetPair;
     }
 }

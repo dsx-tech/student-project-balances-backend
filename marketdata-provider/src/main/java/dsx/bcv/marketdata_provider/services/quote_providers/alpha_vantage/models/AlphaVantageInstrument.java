@@ -7,11 +7,11 @@ import lombok.Data;
 @AllArgsConstructor
 public class AlphaVantageInstrument {
 
-    public AlphaVantageCurrency baseCurrency;
-    public AlphaVantageCurrency quotedCurrency;
+    public AlphaVantageAsset baseAsset;
+    public AlphaVantageAsset quotedAsset;
 
     @Override
     public String toString() {
-        return baseCurrency + "-" + quotedCurrency;
+        return baseAsset + "-" + quotedAsset;
     }
 }

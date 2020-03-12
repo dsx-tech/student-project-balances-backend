@@ -1,7 +1,7 @@
 package dsx.bcv.marketdata_provider.services;
 
+import dsx.bcv.marketdata_provider.data.models.Asset;
 import dsx.bcv.marketdata_provider.data.models.Bar;
-import dsx.bcv.marketdata_provider.data.models.Currency;
 import dsx.bcv.marketdata_provider.data.repositories.BarRepository;
 import dsx.bcv.marketdata_provider.exceptions.NotFoundException;
 import org.springframework.stereotype.Service;
@@ -12,38 +12,38 @@ import java.util.List;
 public class BarService {
 
     private final BarRepository barRepository;
-    private final CurrencyService currencyService;
+    private final AssetService assetService;
 
-    public BarService(BarRepository barRepository, CurrencyService currencyService) {
+    public BarService(BarRepository barRepository, AssetService assetService) {
         this.barRepository = barRepository;
-        this.currencyService = currencyService;
+        this.assetService = assetService;
     }
 
     public Bar save(Bar bar) {
-        bar.setBaseCurrency(
-                currencyService.findByCode(bar.getBaseCurrency().getCode()).orElseThrow(NotFoundException::new)
+        bar.setBaseAsset(
+                assetService.findByCode(bar.getBaseAsset().getCode()).orElseThrow(NotFoundException::new)
         );
         return barRepository.save(bar);
     }
 
     public Iterable<Bar> saveAll(Iterable<Bar> bars) {
-        bars.forEach(bar -> bar.setBaseCurrency(
-                currencyService.findByCode(bar.getBaseCurrency().getCode()).orElseThrow(NotFoundException::new)
+        bars.forEach(bar -> bar.setBaseAsset(
+                assetService.findByCode(bar.getBaseAsset().getCode()).orElseThrow(NotFoundException::new)
         ));
         return barRepository.saveAll(bars);
     }
 
-    public boolean existsByCurrency(Currency currency) {
+    public boolean existsByCurrency(Asset asset) {
         return barRepository.findByBaseCurrency(
-                currencyService.findByCode(currency.getCode()).orElseThrow(NotFoundException::new)
+                assetService.findByCode(asset.getCode()).orElseThrow(NotFoundException::new)
         ).isPresent();
     }
 
-    public List<Bar> findByBaseCurrencyAndTimestampBetween(Currency currency, long startTime, long endTime) {
-        return barRepository.findByBaseCurrencyAndTimestampBetween(currency, startTime, endTime);
+    public List<Bar> findByBaseCurrencyAndTimestampBetween(Asset asset, long startTime, long endTime) {
+        return barRepository.findByBaseCurrencyAndTimestampBetween(asset, startTime, endTime);
     }
 
-    public Bar findTopByBaseCurrencyOrderByTimestampDesc(Currency currency) {
-        return barRepository.findTopByBaseCurrencyOrderByTimestampDesc(currency).orElseThrow(NotFoundException::new);
+    public Bar findTopByBaseCurrencyOrderByTimestampDesc(Asset asset) {
+        return barRepository.findTopByBaseCurrencyOrderByTimestampDesc(asset).orElseThrow(NotFoundException::new);
     }
 }

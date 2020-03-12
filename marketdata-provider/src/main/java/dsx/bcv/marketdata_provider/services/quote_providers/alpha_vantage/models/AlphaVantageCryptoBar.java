@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class AlphaVantageCryptoBar {
 
-    private AlphaVantageCurrency currency;
+    private AlphaVantageAsset asset;
     private BigDecimal exchangeRate;
     private LocalDate date;
 

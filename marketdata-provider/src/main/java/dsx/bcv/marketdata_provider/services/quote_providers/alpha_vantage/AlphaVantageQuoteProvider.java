@@ -3,8 +3,8 @@ package dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dsx.bcv.marketdata_provider.data.models.Bar;
 import dsx.bcv.marketdata_provider.services.RequestService;
+import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageAsset;
 import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageCryptoBar;
-import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageCurrency;
 import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageForexBar;
 import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageTicker;
 import lombok.SneakyThrows;
@@ -36,14 +36,14 @@ public class AlphaVantageQuoteProvider {
     }
 
     @SneakyThrows
-    public List<Bar> getForexDailyHistoricalRate(AlphaVantageCurrency baseCurrency) {
+    public List<Bar> getForexDailyHistoricalRate(AlphaVantageAsset baseAsset) {
 
-        log.trace("Historical rate for {} method called", baseCurrency);
+        log.trace("Historical rate for {} method called", baseAsset);
 
         var requestUrl =
                 "https://www.alphavantage.co/query" +
                 "?function=FX_DAILY" +
-                "&from_symbol=" + baseCurrency +
+                "&from_symbol=" + baseAsset +
                 "&to_symbol=USD" +
                 "&outputsize=full" +
                 "&apikey=" + alphaVantageApiKeyProvider.getApiKey();
@@ -53,8 +53,8 @@ public class AlphaVantageQuoteProvider {
         var responseBody = requestService.doGetRequest(requestUrl);
 
         if (responseBody.contains("Error Message")) {
-            log.warn("{} is not supported? Retry request...", baseCurrency);
-            getForexDailyHistoricalRate(baseCurrency);
+            log.warn("{} is not supported? Retry request...", baseAsset);
+            getForexDailyHistoricalRate(baseAsset);
         }
         if (responseBody.contains("Our standard API call frequency is 5 calls per minute and 500 calls per day")) {
             log.warn("ERROR. High API call frequency");
@@ -77,19 +77,19 @@ public class AlphaVantageQuoteProvider {
 
         var resultList = new ArrayList<AlphaVantageForexBar>();
         for (var key : sortedKeySet) {
-            var currencyRateString = String.valueOf(ratesJO.get(key));
+            var assetRateString = String.valueOf(ratesJO.get(key));
             var currentAlphaVantageForexBar = objectMapper.readValue(
-                    currencyRateString,
+                    assetRateString,
                     AlphaVantageForexBar.class
             );
-            currentAlphaVantageForexBar.setCurrency(baseCurrency);
+            currentAlphaVantageForexBar.setAsset(baseAsset);
             currentAlphaVantageForexBar.setDate(LocalDate.parse(key));
             for (var epochDay = previousAlphaVantageForexBar.getDate().toEpochDay() + 1;
                  epochDay < currentAlphaVantageForexBar.getDate().toEpochDay();
                  epochDay++) {
                 resultList.add(
                         new AlphaVantageForexBar(
-                                baseCurrency,
+                                baseAsset,
                                 previousAlphaVantageForexBar.getExchangeRate(),
                                 LocalDate.ofEpochDay(epochDay)
                         )
@@ -107,14 +107,14 @@ public class AlphaVantageQuoteProvider {
     }
 
     @SneakyThrows
-    public List<Bar> getDigitalDailyHistoricalRate(AlphaVantageCurrency baseCurrency) {
+    public List<Bar> getDigitalDailyHistoricalRate(AlphaVantageAsset baseAsset) {
 
-        log.trace("Historical rate for {} method called", baseCurrency);
+        log.trace("Historical rate for {} method called", baseAsset);
 
         var requestUrl =
                 "https://www.alphavantage.co/query" +
                 "?function=DIGITAL_CURRENCY_DAILY" +
-                "&symbol=" + baseCurrency +
+                "&symbol=" + baseAsset +
                 "&market=USD" +
                 "&apikey=" + alphaVantageApiKeyProvider.getApiKey();
 
@@ -123,7 +123,7 @@ public class AlphaVantageQuoteProvider {
         var responseBody = requestService.doGetRequest(requestUrl);
 
         if (responseBody.contains("Error Message")) {
-            log.warn("{} is not supported", baseCurrency);
+            log.warn("{} is not supported", baseAsset);
         }
         if (responseBody.contains("Our standard API call frequency is 5 calls per minute and 500 calls per day")) {
             log.warn("ERROR. High API call frequency");
@@ -146,19 +146,19 @@ public class AlphaVantageQuoteProvider {
 
         var resultList = new ArrayList<AlphaVantageCryptoBar>();
         for (var key : sortedKeySet) {
-            var currencyRateString = String.valueOf(ratesJO.get(key));
+            var assetRateString = String.valueOf(ratesJO.get(key));
             var currentAlphaVantageCryptoBar = objectMapper.readValue(
-                    currencyRateString,
+                    assetRateString,
                     AlphaVantageCryptoBar.class
             );
-            currentAlphaVantageCryptoBar.setCurrency(baseCurrency);
+            currentAlphaVantageCryptoBar.setAsset(baseAsset);
             currentAlphaVantageCryptoBar.setDate(LocalDate.parse(key));
             for (var epochDay = previousAlphaVantageCryptoBar.getDate().toEpochDay() + 1;
                  epochDay < currentAlphaVantageCryptoBar.getDate().toEpochDay();
                  epochDay++) {
                 resultList.add(
                         new AlphaVantageCryptoBar(
-                                baseCurrency,
+                                baseAsset,
                                 previousAlphaVantageCryptoBar.getExchangeRate(),
                                 LocalDate.ofEpochDay(epochDay)
                         )
@@ -176,15 +176,15 @@ public class AlphaVantageQuoteProvider {
     }
 
     @SneakyThrows
-    public AlphaVantageTicker getTicker(String baseCurrencyCode, String quotedCurrencyCode) {
+    public AlphaVantageTicker getTicker(String baseAssetCode, String quotedAssetCode) {
 
-        log.trace("Historical rate for {}-{} method called", baseCurrencyCode, quotedCurrencyCode);
+        log.trace("Historical rate for {}-{} method called", baseAssetCode, quotedAssetCode);
 
         var requestUrl =
                 "https://www.alphavantage.co/query" +
                         "?function=CURRENCY_EXCHANGE_RATE" +
-                        "&from_currency=" + baseCurrencyCode +
-                        "&to_currency=" + quotedCurrencyCode +
+                        "&from_currency=" + baseAssetCode +
+                        "&to_currency=" + quotedAssetCode +
                         "&apikey=" + alphaVantageApiKeyProvider.getApiKey();
 
         log.trace("Send request to Alpha Vantage, url: {}", requestUrl);

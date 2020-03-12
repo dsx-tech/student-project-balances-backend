@@ -14,13 +14,13 @@ public class Ticker {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     @ManyToOne
-    private Currency baseCurrency;
+    private Asset baseAsset;
     @Column(precision = 20, scale = 10)
     private BigDecimal exchangeRate;
     private long timestamp;
 
-    public Ticker(Currency baseCurrency, BigDecimal exchangeRate, long timestamp) {
-        this.baseCurrency = baseCurrency;
+    public Ticker(Asset baseAsset, BigDecimal exchangeRate, long timestamp) {
+        this.baseAsset = baseAsset;
         this.exchangeRate = exchangeRate;
         this.timestamp = timestamp;
     }

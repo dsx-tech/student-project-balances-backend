@@ -2,11 +2,11 @@ package dsx.bcv.marketdata_provider.services;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import dsx.bcv.marketdata_provider.data.models.Asset;
 import dsx.bcv.marketdata_provider.data.models.Bar;
-import dsx.bcv.marketdata_provider.data.models.Currency;
 import dsx.bcv.marketdata_provider.data.models.Ticker;
 import dsx.bcv.marketdata_provider.exceptions.NotFoundException;
-import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.AlphaVantageSupportedCurrencies;
+import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.AlphaVantageSupportedAssets;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx.DsxQuoteProvider;
 import dsx.bcv.marketdata_provider.views.InstrumentVO;
 import kotlin.Pair;
@@ -25,33 +25,33 @@ public class QuoteProviderService {
 
     private final DsxQuoteProvider dsxQuoteProvider;
     private final ConversionService conversionService;
-    private final AlphaVantageSupportedCurrencies alphaVantageSupportedCurrencies;
+    private final AlphaVantageSupportedAssets alphaVantageSupportedCurrencies;
     private final BarService barService;
     private final TickerService tickerService;
-    private final CurrencyService currencyService;
+    private final AssetService assetService;
 
     public QuoteProviderService(
             DsxQuoteProvider dsxQuoteProvider,
             ConversionService conversionService,
-            AlphaVantageSupportedCurrencies alphaVantageSupportedCurrencies,
+            AlphaVantageSupportedAssets alphaVantageSupportedCurrencies,
             BarService barService,
             TickerService tickerService,
-            CurrencyService currencyService
+            AssetService assetService
     ) {
         this.dsxQuoteProvider = dsxQuoteProvider;
         this.conversionService = conversionService;
         this.alphaVantageSupportedCurrencies = alphaVantageSupportedCurrencies;
         this.barService = barService;
         this.tickerService = tickerService;
-        this.currencyService = currencyService;
+        this.assetService = assetService;
     }
 
-    public List<Currency> getCurrencies() {
+    public List<Asset> getCurrencies() {
         var currencies = alphaVantageSupportedCurrencies.getPhysicalCurrencies();
         currencies.addAll(alphaVantageSupportedCurrencies.getDigitalCurrencies());
         return currencies.stream()
                 .map(alphaVantageCurrency ->
-                        conversionService.convert(alphaVantageCurrency, Currency.class)
+                        conversionService.convert(alphaVantageCurrency, Asset.class)
                 )
                 .collect(Collectors.toList());
     }
@@ -108,31 +108,31 @@ public class QuoteProviderService {
         return resultBars;
     }
 
-    private Pair<Currency, Currency> getCurrencyPairFromInstrumentString(String instrument) {
+    private Pair<Asset, Asset> getCurrencyPairFromInstrumentString(String instrument) {
 
         var currencyPair = Lists.newArrayList(Splitter.on("-").split(instrument));
         if (currencyPair.size() != 2) {
             throw new NotFoundException("Invalid instrument");
         }
 
-        var baseCurrency = new Currency(currencyPair.get(0));
-        var quotedCurrency = new Currency(currencyPair.get(1));
+        var baseCurrency = new Asset(currencyPair.get(0));
+        var quotedCurrency = new Asset(currencyPair.get(1));
 
-        if (currencyService.findByCode(baseCurrency.getCode()).isEmpty()) {
+        if (assetService.findByCode(baseCurrency.getCode()).isEmpty()) {
             log.warn("Base currency {} from request is not supported", baseCurrency);
             throw new NotFoundException(
                     "Base currency" + baseCurrency + "from request is not supported"
             );
         }
-        if (currencyService.findByCode(quotedCurrency.getCode()).isEmpty()) {
+        if (assetService.findByCode(quotedCurrency.getCode()).isEmpty()) {
             log.warn("Quoted currency {} from request is not supported", quotedCurrency);
             throw new NotFoundException(
                     "Quoted currency" + quotedCurrency + "from request is not supported"
             );
         }
 
-        baseCurrency = currencyService.findByCode(baseCurrency.getCode()).get();
-        quotedCurrency = currencyService.findByCode(quotedCurrency.getCode()).get();
+        baseCurrency = assetService.findByCode(baseCurrency.getCode()).get();
+        quotedCurrency = assetService.findByCode(quotedCurrency.getCode()).get();
 
         return new Pair<>(baseCurrency, quotedCurrency);
     }

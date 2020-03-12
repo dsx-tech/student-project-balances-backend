@@ -1,8 +1,8 @@
 package dsx.bcv.marketdata_provider.controllers;
 
 import dsx.bcv.marketdata_provider.services.QuoteProviderService;
+import dsx.bcv.marketdata_provider.views.AssetVO;
 import dsx.bcv.marketdata_provider.views.BarVO;
-import dsx.bcv.marketdata_provider.views.CurrencyVO;
 import dsx.bcv.marketdata_provider.views.InstrumentVO;
 import dsx.bcv.marketdata_provider.views.TickerVO;
 import io.swagger.annotations.ApiOperation;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("quotes")
 @Slf4j
-public class QuotesProviderController {
+public class QuoteProviderController {
 
     private final QuoteProviderService quoteProviderService;
     private final ConversionService conversionService;
@@ -30,20 +30,20 @@ public class QuotesProviderController {
             "btc\n" + "xrp\n" + "btg\n" + "gbp\n"  + "eth\n" +
             "ltc\n" + "try\n" + "rub\n" + "eur\n"  + "usdt\n";
 
-    public QuotesProviderController(QuoteProviderService quoteProviderService, ConversionService conversionService) {
+    public QuoteProviderController(QuoteProviderService quoteProviderService, ConversionService conversionService) {
         this.quoteProviderService = quoteProviderService;
         this.conversionService = conversionService;
     }
 
     @ApiOperation("Get supported currencies")
     @GetMapping("currencies")
-    public List<CurrencyVO> getCurrencies() {
+    public List<AssetVO> getCurrencies() {
         log.info(
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
         return quoteProviderService.getCurrencies().stream()
-                .map(currency -> conversionService.convert(currency, CurrencyVO.class))
+                .map(currency -> conversionService.convert(currency, AssetVO.class))
                 .collect(Collectors.toList());
     }
 

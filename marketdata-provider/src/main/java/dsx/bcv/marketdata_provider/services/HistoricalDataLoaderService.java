@@ -1,9 +1,9 @@
 package dsx.bcv.marketdata_provider.services;
 
-import dsx.bcv.marketdata_provider.data.models.Currency;
+import dsx.bcv.marketdata_provider.data.models.Asset;
 import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.AlphaVantageQuoteProvider;
-import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.AlphaVantageSupportedCurrencies;
-import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageCurrency;
+import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.AlphaVantageSupportedAssets;
+import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageAsset;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 
@@ -16,21 +16,21 @@ public class HistoricalDataLoaderService {
 
     private final AlphaVantageQuoteProvider alphaVantageQuoteProvider;
     private final ConversionService conversionService;
-    private final CurrencyService currencyService;
-    private final AlphaVantageSupportedCurrencies alphaVantageSupportedCurrencies;
+    private final AssetService assetService;
+    private final AlphaVantageSupportedAssets alphaVantageSupportedCurrencies;
     private final BarService barService;
 
     public HistoricalDataLoaderService(
             AlphaVantageQuoteProvider alphaVantageQuoteProvider,
             ConversionService conversionService,
-            CurrencyService currencyService,
-            AlphaVantageSupportedCurrencies alphaVantageSupportedCurrencies,
+            AssetService assetService,
+            AlphaVantageSupportedAssets alphaVantageSupportedCurrencies,
             BarService barService
     ) {
 
         this.alphaVantageQuoteProvider = alphaVantageQuoteProvider;
         this.conversionService = conversionService;
-        this.currencyService = currencyService;
+        this.assetService = assetService;
         this.alphaVantageSupportedCurrencies = alphaVantageSupportedCurrencies;
         this.barService = barService;
 
@@ -43,25 +43,25 @@ public class HistoricalDataLoaderService {
 
         log.info("saveSupportedCurrenciesToDb method called");
 
-        if (currencyService.count() != 0) {
+        if (assetService.count() != 0) {
             log.info("Supported currencies are already saved in database");
             return;
         }
 
-        final List<Currency> physicalCurrencies = alphaVantageSupportedCurrencies.getPhysicalCurrencies()
+        final List<Asset> physicalCurrencies = alphaVantageSupportedCurrencies.getPhysicalCurrencies()
                 .stream()
-                .map(currency -> conversionService.convert(currency, Currency.class))
+                .map(currency -> conversionService.convert(currency, Asset.class))
                 .collect(Collectors.toList());
 
-        currencyService.saveAll(physicalCurrencies);
+        assetService.saveAll(physicalCurrencies);
         log.info("Physical currencies saved. List: {}", physicalCurrencies);
 
-        final List<Currency> digitalCurrencies = alphaVantageSupportedCurrencies.getDigitalCurrencies()
+        final List<Asset> digitalCurrencies = alphaVantageSupportedCurrencies.getDigitalCurrencies()
                 .stream()
-                .map(currency -> conversionService.convert(currency, Currency.class))
+                .map(currency -> conversionService.convert(currency, Asset.class))
                 .collect(Collectors.toList());
 
-        currencyService.saveAll(digitalCurrencies);
+        assetService.saveAll(digitalCurrencies);
         log.info("Digital currencies saved. List: {}", digitalCurrencies);
     }
 
@@ -71,7 +71,7 @@ public class HistoricalDataLoaderService {
 
         final var physicalCurrencies = alphaVantageSupportedCurrencies.getPhysicalCurrencies()
                 .stream()
-                .map(currency -> conversionService.convert(currency, Currency.class))
+                .map(currency -> conversionService.convert(currency, Asset.class))
                 .collect(Collectors.toList());
 
         log.debug("Start loading physical currencies. List: {}", physicalCurrencies);
@@ -84,7 +84,7 @@ public class HistoricalDataLoaderService {
             if (!barService.existsByCurrency(currency)) {
                 final var forexDailyBars =
                         alphaVantageQuoteProvider.getForexDailyHistoricalRate(
-                                conversionService.convert(currency, AlphaVantageCurrency.class)
+                                conversionService.convert(currency, AlphaVantageAsset.class)
                         );
                 barService.saveAll(forexDailyBars);
                 log.debug("History for {} saved", currency);
@@ -98,7 +98,7 @@ public class HistoricalDataLoaderService {
 
         final var digitalCurrencies = alphaVantageSupportedCurrencies.getDigitalCurrencies()
                 .stream()
-                .map(currency -> conversionService.convert(currency, Currency.class))
+                .map(currency -> conversionService.convert(currency, Asset.class))
                 .collect(Collectors.toList());
 
         log.debug("Start loading digital currencies. List: {}", digitalCurrencies);
@@ -111,7 +111,7 @@ public class HistoricalDataLoaderService {
             if (!barService.existsByCurrency(currency)) {
                 final var digitalDailyBars =
                         alphaVantageQuoteProvider.getDigitalDailyHistoricalRate(
-                                conversionService.convert(currency, AlphaVantageCurrency.class)
+                                conversionService.convert(currency, AlphaVantageAsset.class)
                         );
                 barService.saveAll(digitalDailyBars);
                 log.debug("History for {} saved", currency);

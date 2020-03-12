@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class CurrencyVO {
+public class AssetVO {
     private String code;
     private String name;
 }

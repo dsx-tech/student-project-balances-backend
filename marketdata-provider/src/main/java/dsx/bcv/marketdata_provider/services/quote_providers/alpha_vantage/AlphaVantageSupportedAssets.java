@@ -1,6 +1,6 @@
 package dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage;
 
-import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageCurrency;
+import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageAsset;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,16 +13,16 @@ import java.util.Set;
 
 @Component
 @Slf4j
-public class AlphaVantageSupportedCurrencies {
+public class AlphaVantageSupportedAssets {
 
     private final AlphaVantageCsvParser alphaVantageCsvParser;
 
     @Getter
-    private Set<AlphaVantageCurrency> physicalCurrencies;
+    private Set<AlphaVantageAsset> physicalCurrencies;
     @Getter
-    private Set<AlphaVantageCurrency> digitalCurrencies;
+    private Set<AlphaVantageAsset> digitalCurrencies;
 
-    public AlphaVantageSupportedCurrencies(AlphaVantageCsvParser alphaVantageCsvParser) {
+    public AlphaVantageSupportedAssets(AlphaVantageCsvParser alphaVantageCsvParser) {
 
         this.alphaVantageCsvParser = alphaVantageCsvParser;
 
@@ -32,14 +32,14 @@ public class AlphaVantageSupportedCurrencies {
         } catch (IOException e) {
             log.warn(e.getMessage(), e);
         }
-        log.info("AlphaVantageSupportedCurrencies:\n" +
-                "Physical: {}\n" +
-                "Digital: {}",
+        log.info("AlphaVantageSupportedAssets:\n" +
+                "Physical currencies: {}\n" +
+                "Digital currencies: {}",
                 physicalCurrencies,
                 digitalCurrencies);
     }
 
-    private List<AlphaVantageCurrency> getCurrenciesFromFile(String fileName) throws IOException {
+    private List<AlphaVantageAsset> getCurrenciesFromFile(String fileName) throws IOException {
 
         var classLoader = this.getClass().getClassLoader();
         var inputStream = classLoader.getResourceAsStream(fileName);

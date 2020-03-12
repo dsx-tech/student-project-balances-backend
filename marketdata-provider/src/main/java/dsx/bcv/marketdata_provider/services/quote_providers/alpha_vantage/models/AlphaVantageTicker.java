@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 @Data
 public class AlphaVantageTicker {
 
-    private AlphaVantageCurrency baseCurrency;
-    private AlphaVantageCurrency quotedCurrency;
+    private AlphaVantageAsset baseAsset;
+    private AlphaVantageAsset quotedAsset;
     private BigDecimal exchangeRate;
 
     @JsonCreator
@@ -21,8 +21,8 @@ public class AlphaVantageTicker {
             @JsonProperty("4. To_Currency Name") String quotedCurrencyName,
             @JsonProperty("5. Exchange Rate") BigDecimal exchangeRate
     ) {
-        baseCurrency = new AlphaVantageCurrency(baseCurrencyCode, baseCurrencyName);
-        quotedCurrency = new AlphaVantageCurrency(quotedCurrencyCode, quotedCurrencyName);
+        baseAsset = new AlphaVantageAsset(baseCurrencyCode, baseCurrencyName);
+        quotedAsset = new AlphaVantageAsset(quotedCurrencyCode, quotedCurrencyName);
         this.exchangeRate = exchangeRate;
     }
 }

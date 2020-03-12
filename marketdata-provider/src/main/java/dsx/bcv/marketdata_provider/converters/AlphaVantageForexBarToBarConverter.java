@@ -12,7 +12,7 @@ public class AlphaVantageForexBarToBarConverter
     @Override
     public Bar convert(AlphaVantageForexBar source) {
         return new Bar(
-                new AlphaVantageCurrencyToCurrencyConverter().convert(source.getCurrency()),
+                new AlphaVantageAssetToAssetConverter().convert(source.getAsset()),
                 source.getExchangeRate(),
                 source.getDate().toEpochSecond(LocalTime.ofSecondOfDay(0), ZoneOffset.UTC)
         );

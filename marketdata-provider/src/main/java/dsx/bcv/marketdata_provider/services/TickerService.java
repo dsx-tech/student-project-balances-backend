@@ -1,6 +1,6 @@
 package dsx.bcv.marketdata_provider.services;
 
-import dsx.bcv.marketdata_provider.data.models.Currency;
+import dsx.bcv.marketdata_provider.data.models.Asset;
 import dsx.bcv.marketdata_provider.data.models.Ticker;
 import dsx.bcv.marketdata_provider.data.repositories.TickerRepository;
 import org.springframework.stereotype.Service;
@@ -22,8 +22,8 @@ public class TickerService {
         return tickerRepository.saveAll(tickers);
     }
 
-    public Ticker findByBaseCurrency(Currency baseCurrency) {
-        return tickerRepository.findByBaseCurrency(baseCurrency);
+    public Ticker findByBaseCurrency(Asset baseAsset) {
+        return tickerRepository.findByBaseCurrency(baseAsset);
     }
 
     public void deleteAll() {

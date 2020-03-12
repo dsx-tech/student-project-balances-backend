@@ -8,7 +8,7 @@ public class AlphaVantageTickerToTickerConverter implements Converter<AlphaVanta
     @Override
     public Ticker convert(AlphaVantageTicker source) {
         return new Ticker(
-                new AlphaVantageCurrencyToCurrencyConverter().convert(source.getBaseCurrency()),
+                new AlphaVantageAssetToAssetConverter().convert(source.getBaseAsset()),
                 source.getExchangeRate(),
                 0
         );

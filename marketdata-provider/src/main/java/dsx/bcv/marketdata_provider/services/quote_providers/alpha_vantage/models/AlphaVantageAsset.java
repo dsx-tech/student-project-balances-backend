@@ -3,12 +3,12 @@ package dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.model
 import lombok.Data;
 
 @Data
-public class AlphaVantageCurrency {
+public class AlphaVantageAsset {
 
     private String code;
     private String name;
 
-    public AlphaVantageCurrency(String code, String name) {
+    public AlphaVantageAsset(String code, String name) {
         this.code = code.toLowerCase();
         this.name = name.toLowerCase();
     }

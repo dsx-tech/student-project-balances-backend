@@ -1,6 +1,6 @@
 package dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage;
 
-import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageCurrency;
+import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageAsset;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
@@ -13,19 +13,19 @@ import java.util.List;
 @Service
 public class AlphaVantageCsvParser {
 
-    public List<AlphaVantageCurrency> parseCurrencies(Reader inputReader, char separator) throws IOException {
+    public List<AlphaVantageAsset> parseCurrencies(Reader inputReader, char separator) throws IOException {
 
         Iterable<CSVRecord> records = CSVFormat.newFormat(separator).parse(inputReader);
 
-        List<AlphaVantageCurrency> currencies = new ArrayList<>();
+        List<AlphaVantageAsset> assets = new ArrayList<>();
         for (CSVRecord record : records) {
-            var currency = new AlphaVantageCurrency(
+            var asset = new AlphaVantageAsset(
                     record.get(0),
                     record.get(1)
             );
-            currencies.add(currency);
+            assets.add(asset);
         }
 
-        return currencies;
+        return assets;
     }
 }

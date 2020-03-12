@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class AlphaVantageForexBar {
 
-    private AlphaVantageCurrency currency;
+    private AlphaVantageAsset asset;
     private BigDecimal exchangeRate;
     private LocalDate date;
 

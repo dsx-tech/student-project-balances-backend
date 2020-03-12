@@ -1,6 +1,6 @@
 package dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage;
 
-import dsx.bcv.marketdata_provider.data.models.Currency;
+import dsx.bcv.marketdata_provider.data.models.Asset;
 import dsx.bcv.marketdata_provider.services.RequestService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AlphaVantageApiChecker {
 
-    private final AlphaVantageSupportedCurrencies alphaVantageSupportedCurrencies;
+    private final AlphaVantageSupportedAssets alphaVantageSupportedCurrencies;
     private final ConversionService conversionService;
     private final RequestService requestService;
     private final AlphaVantageApiKeyProvider alphaVantageApiKeyProvider;
 
     public AlphaVantageApiChecker(
-            AlphaVantageSupportedCurrencies alphaVantageSupportedCurrencies,
+            AlphaVantageSupportedAssets alphaVantageSupportedCurrencies,
             ConversionService conversionService,
             RequestService requestService,
             AlphaVantageApiKeyProvider alphaVantageApiKeyProvider) {
@@ -43,7 +43,7 @@ public class AlphaVantageApiChecker {
 
         final var physicalCurrencies = this.alphaVantageSupportedCurrencies.getPhysicalCurrencies()
                 .stream()
-                .map(currency -> conversionService.convert(currency, Currency.class))
+                .map(currency -> conversionService.convert(currency, Asset.class))
                 .collect(Collectors.toList());
 
         for (var currency : physicalCurrencies) {
@@ -66,7 +66,7 @@ public class AlphaVantageApiChecker {
 
         final var digitalCurrencies = this.alphaVantageSupportedCurrencies.getDigitalCurrencies()
                 .stream()
-                .map(currency -> conversionService.convert(currency, Currency.class))
+                .map(currency -> conversionService.convert(currency, Asset.class))
                 .collect(Collectors.toList());
 
         var i = 1;
@@ -83,12 +83,12 @@ public class AlphaVantageApiChecker {
         }
     }
 
-    private void sendRequest(Currency currency, String requestUrl) throws IOException {
+    private void sendRequest(Asset asset, String requestUrl) throws IOException {
         log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
         var responseBody = requestService.doGetRequest(requestUrl);
         log.trace("Response body: {}", responseBody);
         if (responseBody.contains("Error Message")) {
-            log.info("{} is not supported", currency);
+            log.info("{} is not supported", asset);
         }
         if (responseBody.contains("Our standard API call frequency is 5 calls per minute and 500 calls per day")) {
             log.info("ERROR. High API call frequency");
