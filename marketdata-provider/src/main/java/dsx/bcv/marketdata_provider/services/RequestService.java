@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class RequestService {
 
-    public String doGetRequest(String url) throws IOException {
+    public String doGetRequest(String url) {
         log.trace("doGetRequest called. Url: {}", url);
         OkHttpClient client = new OkHttpClient.Builder()
                 .readTimeout(1, TimeUnit.MINUTES)
@@ -22,10 +22,25 @@ public class RequestService {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
-        Response response = client.newCall(request).execute();
+        Response response;
+        try {
+            response = client.newCall(request).execute();
+        } catch (IOException e) {
+            log.warn(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
         log.trace("Response isSuccessful: {}", response.isSuccessful());
         log.trace("Response message: {}", response.message());
         log.trace("Response code: {}", response.code());
-        return Objects.requireNonNull(response.body()).string();
+        if (!response.isSuccessful()) {
+            log.trace("Retry request");
+            return doGetRequest(url);
+        }
+        try {
+            return Objects.requireNonNull(response.body()).string();
+        } catch (IOException e) {
+            log.warn(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
     }
 }

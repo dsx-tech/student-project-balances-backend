@@ -62,18 +62,13 @@ public class DsxQuoteProvider {
         var barsList = new ArrayList<List<DsxBar>>();
         for (var dsxInstrumentEdge : instrumentList) {
             String responseBody;
-            try {
-                responseBody = requestService.doGetRequest(
-                        String.format(
-                                "https://dsx.uk/mapi/periodBars/%s/d/%d/%d",
-                                dsxInstrumentEdge.toString(),
-                                startTime,
-                                endTime
-                        ));
-            } catch (IOException e) {
-                log.warn(e.getMessage(), e);
-                throw new RuntimeException(e);
-            }
+            responseBody = requestService.doGetRequest(
+                    String.format(
+                            "https://dsx.uk/mapi/periodBars/%s/d/%d/%d",
+                            dsxInstrumentEdge.toString(),
+                            startTime,
+                            endTime
+                    ));
             var jsonObject = new JSONObject(responseBody);
             var barsString = String.valueOf(jsonObject.get(fixBchProblem(dsxInstrumentEdge.toString())));
             List<DsxBar> tmp;
@@ -131,16 +126,11 @@ public class DsxQuoteProvider {
         var tickerList = new ArrayList<Ticker>();
         for (var instrumentEdge : instrumentEdgeList) {
             String responseBody;
-            try {
-                responseBody = requestService.doGetRequest(
-                        String.format(
-                                "https://dsx.uk/mapi/ticker/%s",
-                                instrumentEdge.toString()
-                        ));
-            } catch (IOException e) {
-                log.warn(e.getMessage(), e);
-                throw new RuntimeException(e);
-            }
+            responseBody = requestService.doGetRequest(
+                    String.format(
+                            "https://dsx.uk/mapi/ticker/%s",
+                            instrumentEdge.toString()
+                    ));
             var jsonObject = new JSONObject(responseBody);
             var tickerString = String.valueOf(jsonObject.get(fixBchProblem(instrumentEdge.toString())));
             DsxTicker dsxTicker;

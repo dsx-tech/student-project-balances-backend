@@ -3,7 +3,6 @@ package dsx.bcv.marketdata_provider.controllers;
 import dsx.bcv.marketdata_provider.services.QuoteProviderService;
 import dsx.bcv.marketdata_provider.views.AssetVO;
 import dsx.bcv.marketdata_provider.views.BarVO;
-import dsx.bcv.marketdata_provider.views.InstrumentVO;
 import dsx.bcv.marketdata_provider.views.TickerVO;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -24,46 +25,31 @@ public class QuoteProviderController {
 
     private final QuoteProviderService quoteProviderService;
     private final ConversionService conversionService;
-    private final String instrumentExample = "Instrument example: eur-rub.\n";
-    private final String supportedCurrencies = "Supported currencies:\n" +
-            "usd\n" + "bsv\n" + "bch\n" + "eurs\n" + "eos\n" +
-            "btc\n" + "xrp\n" + "btg\n" + "gbp\n"  + "eth\n" +
-            "ltc\n" + "try\n" + "rub\n" + "eur\n"  + "usdt\n";
+    private final String instrumentExample = "Instruments example: eur-rub,yndx-usd.\n";
 
     public QuoteProviderController(QuoteProviderService quoteProviderService, ConversionService conversionService) {
         this.quoteProviderService = quoteProviderService;
         this.conversionService = conversionService;
     }
 
-    @ApiOperation("Get supported currencies")
-    @GetMapping("currencies")
-    public List<AssetVO> getCurrencies() {
+    @ApiOperation("Get supported assets")
+    @GetMapping("assets")
+    public List<AssetVO> getAssets() {
         log.info(
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
-        return quoteProviderService.getCurrencies().stream()
+        return quoteProviderService.getAssets().stream()
                 .map(currency -> conversionService.convert(currency, AssetVO.class))
                 .collect(Collectors.toList());
     }
 
-    @Deprecated
-    @ApiOperation("Get supported instruments")
-    @GetMapping("instruments")
-    public List<InstrumentVO> getInstruments() {
-        log.info(
-                "Request received. Url: {}",
-                ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
-        );
-        return quoteProviderService.getInstruments();
-    }
-
     @ApiOperation("Get bars for every day from startTime to endTime.\n" +
             "StartTime & endTime are Unix Timestamps in seconds (https://www.epochconverter.com).\n" +
-            instrumentExample + supportedCurrencies)
-    @GetMapping("bars/{instrument}/{startTime}/{endTime}")
-    public List<BarVO> getBarsInPeriod(
-            @PathVariable String instrument,
+            instrumentExample)
+    @GetMapping("bars/{instruments}/{startTime}/{endTime}")
+    public Map<String, List<BarVO>> getBarsInPeriod(
+            @PathVariable String instruments,
             @PathVariable long startTime,
             @PathVariable long endTime
     ) {
@@ -71,21 +57,31 @@ public class QuoteProviderController {
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
-        return quoteProviderService.getBarsInPeriod(instrument, startTime, endTime).stream()
-                .map(bar -> conversionService.convert(bar, BarVO.class))
-                .collect(Collectors.toList());
+        var barsMap = quoteProviderService.getBarsInPeriodForSeveralInstruments(instruments, startTime, endTime);
+        var convertedBarsMap = new HashMap<String, List<BarVO>>();
+        for (var key : barsMap.keySet()) {
+            convertedBarsMap.put(key, barsMap.get(key).stream()
+                            .map(bar -> conversionService.convert(bar, BarVO.class))
+                            .collect(Collectors.toList()));
+        }
+        return convertedBarsMap;
     }
 
-
-
-    @ApiOperation("Get ticker.\n" + instrumentExample + supportedCurrencies)
-    @GetMapping("ticker/{instrument}")
-    public TickerVO getTicker(@PathVariable String instrument) {
+    @ApiOperation("Get ticker.\n" + instrumentExample)
+    @GetMapping("ticker/{instruments}")
+    public Map<String, TickerVO> getTicker(@PathVariable String instruments) {
         log.info(
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
-        var ticker = quoteProviderService.getTicker(instrument);
-        return conversionService.convert(ticker, TickerVO.class);
+        var tickersMap = quoteProviderService.getTickers(instruments);
+        var convertedTickersMap = new HashMap<String, TickerVO>();
+        for (var key : tickersMap.keySet()) {
+            convertedTickersMap.put(
+                    key,
+                    conversionService.convert(tickersMap.get(key), TickerVO.class)
+            );
+        }
+        return convertedTickersMap;
     }
 }

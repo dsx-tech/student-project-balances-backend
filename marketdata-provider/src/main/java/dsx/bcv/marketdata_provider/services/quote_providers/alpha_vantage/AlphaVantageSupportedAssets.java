@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.List;
@@ -21,31 +20,33 @@ public class AlphaVantageSupportedAssets {
     private Set<AlphaVantageAsset> physicalCurrencies;
     @Getter
     private Set<AlphaVantageAsset> digitalCurrencies;
+    @Getter
+    private Set<AlphaVantageAsset> stocks;
 
     public AlphaVantageSupportedAssets(AlphaVantageCsvParser alphaVantageCsvParser) {
 
         this.alphaVantageCsvParser = alphaVantageCsvParser;
 
-        try {
-            physicalCurrencies = new HashSet<>(getCurrenciesFromFile("physical_currency_list.csv"));
-            digitalCurrencies = new HashSet<>(getCurrenciesFromFile("digital_currency_list.csv"));
-        } catch (IOException e) {
-            log.warn(e.getMessage(), e);
-        }
+        physicalCurrencies = new HashSet<>(getAssetsFromFile("physical_currency_list.csv"));
+        digitalCurrencies = new HashSet<>(getAssetsFromFile("digital_currency_list.csv"));
+        stocks = new HashSet<>(getAssetsFromFile("stock_list.csv"));
+
         log.info("AlphaVantageSupportedAssets:\n" +
                 "Physical currencies: {}\n" +
-                "Digital currencies: {}",
+                "Digital currencies: {}\n" +
+                "Stocks: {}",
                 physicalCurrencies,
-                digitalCurrencies);
+                digitalCurrencies,
+                stocks);
     }
 
-    private List<AlphaVantageAsset> getCurrenciesFromFile(String fileName) throws IOException {
+    private List<AlphaVantageAsset> getAssetsFromFile(String fileName) {
 
         var classLoader = this.getClass().getClassLoader();
         var inputStream = classLoader.getResourceAsStream(fileName);
         assert inputStream != null;
         var inputStreamReader = new InputStreamReader(inputStream);
 
-        return alphaVantageCsvParser.parseCurrencies(inputStreamReader, ',');
+        return alphaVantageCsvParser.parseAssets(inputStreamReader, ',');
     }
 }

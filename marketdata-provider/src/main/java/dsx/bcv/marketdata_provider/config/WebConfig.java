@@ -17,6 +17,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addConverter(new InstrumentToInstrumentVOConverter());
         registry.addConverter(new AlphaVantageForexBarToBarConverter());
         registry.addConverter(new AlphaVantageCryptoBarToBarConverter());
+        registry.addConverter(new AlphaVantageStockBarToBarConverter());
         registry.addConverter(new AlphaVantageAssetToAssetConverter());
         registry.addConverter(new AssetToAlphaVantageAssetConverter());
         registry.addConverter(new AssetToAssetVOConverter());

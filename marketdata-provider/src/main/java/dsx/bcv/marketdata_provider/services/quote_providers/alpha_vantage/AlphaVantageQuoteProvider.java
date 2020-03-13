@@ -3,10 +3,7 @@ package dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dsx.bcv.marketdata_provider.data.models.Bar;
 import dsx.bcv.marketdata_provider.services.RequestService;
-import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageAsset;
-import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageCryptoBar;
-import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageForexBar;
-import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageTicker;
+import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -54,7 +51,7 @@ public class AlphaVantageQuoteProvider {
 
         if (responseBody.contains("Error Message")) {
             log.warn("{} is not supported? Retry request...", baseAsset);
-            getForexDailyHistoricalRate(baseAsset);
+            return getForexDailyHistoricalRate(baseAsset);
         }
         if (responseBody.contains("Our standard API call frequency is 5 calls per minute and 500 calls per day")) {
             log.warn("ERROR. High API call frequency");
@@ -124,12 +121,13 @@ public class AlphaVantageQuoteProvider {
 
         if (responseBody.contains("Error Message")) {
             log.warn("{} is not supported", baseAsset);
+            return getDigitalDailyHistoricalRate(baseAsset);
         }
         if (responseBody.contains("Our standard API call frequency is 5 calls per minute and 500 calls per day")) {
             log.warn("ERROR. High API call frequency");
         }
 
-        log.trace("Alpha Vantage returns:\n{}...", responseBody.substring(0, 1000));
+        log.trace("Alpha Vantage returns:\n{}...", responseBody.substring(0, 200));
 
         var responseBodyJO = new JSONObject(responseBody);
         var rates = String.valueOf(responseBodyJO.get("Time Series (Digital Currency Daily)"));
@@ -176,6 +174,76 @@ public class AlphaVantageQuoteProvider {
     }
 
     @SneakyThrows
+    public List<Bar> getStockDailyHistoricalRate(AlphaVantageAsset baseAsset) {
+
+        log.trace("Historical rate for {} method called", baseAsset);
+
+        var requestUrl =
+                "https://www.alphavantage.co/query" +
+                        "?function=TIME_SERIES_DAILY" +
+                        "&symbol=" + baseAsset +
+                        "&outputsize=full" +
+                        "&apikey=" + alphaVantageApiKeyProvider.getApiKey();
+
+        log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
+
+        var responseBody = requestService.doGetRequest(requestUrl);
+
+        if (responseBody.contains("Error Message")) {
+            log.warn("{} is not supported? Retry request...", baseAsset);
+            return getStockDailyHistoricalRate(baseAsset);
+        }
+        if (responseBody.contains("Our standard API call frequency is 5 calls per minute and 500 calls per day")) {
+            log.warn("ERROR. High API call frequency");
+        }
+
+        log.trace("Alpha Vantage returns:\n{}...", responseBody.substring(0, 200));
+
+        var responseBodyJO = new JSONObject(responseBody);
+        var rates = String.valueOf(responseBodyJO.get("Time Series (Daily)"));
+
+        var ratesJO = new JSONObject(rates);
+        var sortedKeySet = new TreeSet<>(ratesJO.keySet());
+
+        var firstDate = sortedKeySet.first();
+        var previousAlphaVantageStockBar = objectMapper.readValue(
+                String.valueOf(ratesJO.get(firstDate)),
+                AlphaVantageStockBar.class
+        );
+        previousAlphaVantageStockBar.setDate(LocalDate.parse(firstDate));
+
+        var resultList = new ArrayList<AlphaVantageStockBar>();
+        for (var key : sortedKeySet) {
+            var assetRateString = String.valueOf(ratesJO.get(key));
+            var currentAlphaVantageStockBar = objectMapper.readValue(
+                    assetRateString,
+                    AlphaVantageStockBar.class
+            );
+            currentAlphaVantageStockBar.setAsset(baseAsset);
+            currentAlphaVantageStockBar.setDate(LocalDate.parse(key));
+            for (var epochDay = previousAlphaVantageStockBar.getDate().toEpochDay() + 1;
+                 epochDay < currentAlphaVantageStockBar.getDate().toEpochDay();
+                 epochDay++) {
+                resultList.add(
+                        new AlphaVantageStockBar(
+                                baseAsset,
+                                previousAlphaVantageStockBar.getExchangeRate(),
+                                LocalDate.ofEpochDay(epochDay)
+                        )
+                );
+            }
+            resultList.add(currentAlphaVantageStockBar);
+            previousAlphaVantageStockBar = currentAlphaVantageStockBar;
+        }
+
+        log.trace("First 5 bars: {}", resultList.subList(0, 5));
+
+        return resultList.stream()
+                .map(bar -> conversionService.convert(bar, Bar.class))
+                .collect(Collectors.toList());
+    }
+
+    @SneakyThrows
     public AlphaVantageTicker getTicker(String baseAssetCode, String quotedAssetCode) {
 
         log.trace("Historical rate for {}-{} method called", baseAssetCode, quotedAssetCode);
@@ -199,8 +267,7 @@ public class AlphaVantageQuoteProvider {
             log.warn("Error. High API call frequency");
             throw new RuntimeException(
                     "Error. High API call frequency. " +
-                    "Our standard ticker API call frequency is 5 calls per minute and 500 calls per day. " +
-                    "Sorry, скоро сделаю нормально"
+                    "Our standard ticker API call frequency is 5 calls per minute and 500 calls per day."
             );
         }
 

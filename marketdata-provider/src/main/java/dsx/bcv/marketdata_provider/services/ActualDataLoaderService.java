@@ -21,7 +21,7 @@ public class ActualDataLoaderService {
         this.barService = barService;
         this.assetService = assetService;
 
-        loadDataFromLastBars();
+        //loadDataFromLastBars();
     }
 
     public void loadDataFromLastBars() {
@@ -32,9 +32,9 @@ public class ActualDataLoaderService {
             return;
         }
 
-        final var currencies = assetService.findAll();
-        for (var currency : currencies) {
-            final var lastBar = barService.findTopByBaseCurrencyOrderByTimestampDesc(currency);
+        final var assets = assetService.findAll();
+        for (var asset : assets) {
+            final var lastBar = barService.findTopByBaseAssetOrderByTimestampDesc(asset);
             final var ticker = new Ticker(
                     lastBar.getBaseAsset(),
                     lastBar.getExchangeRate(),
@@ -43,7 +43,7 @@ public class ActualDataLoaderService {
             tickerService.save(ticker);
             log.debug(
                     "Ticker for {} saved. Rate: {}. Timestamp: {}",
-                    currency,
+                    asset,
                     ticker.getExchangeRate(),
                     ticker.getTimestamp()
             );

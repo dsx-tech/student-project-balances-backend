@@ -33,17 +33,17 @@ public class BarService {
         return barRepository.saveAll(bars);
     }
 
-    public boolean existsByCurrency(Asset asset) {
-        return barRepository.findByBaseCurrency(
+    public boolean existsByAsset(Asset asset) {
+        return barRepository.findByBaseAsset(
                 assetService.findByCode(asset.getCode()).orElseThrow(NotFoundException::new)
         ).isPresent();
     }
 
-    public List<Bar> findByBaseCurrencyAndTimestampBetween(Asset asset, long startTime, long endTime) {
-        return barRepository.findByBaseCurrencyAndTimestampBetween(asset, startTime, endTime);
+    public List<Bar> findByBaseAssetAndTimestampBetween(Asset asset, long startTime, long endTime) {
+        return barRepository.findByBaseAssetAndTimestampBetween(asset, startTime, endTime);
     }
 
-    public Bar findTopByBaseCurrencyOrderByTimestampDesc(Asset asset) {
-        return barRepository.findTopByBaseCurrencyOrderByTimestampDesc(asset).orElseThrow(NotFoundException::new);
+    public Bar findTopByBaseAssetOrderByTimestampDesc(Asset asset) {
+        return barRepository.findTopByBaseAssetOrderByTimestampDesc(asset).orElseThrow(NotFoundException::new);
     }
 }

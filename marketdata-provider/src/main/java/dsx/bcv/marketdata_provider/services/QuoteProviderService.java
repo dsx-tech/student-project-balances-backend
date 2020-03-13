@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,7 +27,7 @@ public class QuoteProviderService {
 
     private final DsxQuoteProvider dsxQuoteProvider;
     private final ConversionService conversionService;
-    private final AlphaVantageSupportedAssets alphaVantageSupportedCurrencies;
+    private final AlphaVantageSupportedAssets alphaVantageSupportedAssets;
     private final BarService barService;
     private final TickerService tickerService;
     private final AssetService assetService;
@@ -33,23 +35,24 @@ public class QuoteProviderService {
     public QuoteProviderService(
             DsxQuoteProvider dsxQuoteProvider,
             ConversionService conversionService,
-            AlphaVantageSupportedAssets alphaVantageSupportedCurrencies,
+            AlphaVantageSupportedAssets alphaVantageSupportedAssets,
             BarService barService,
             TickerService tickerService,
             AssetService assetService
     ) {
         this.dsxQuoteProvider = dsxQuoteProvider;
         this.conversionService = conversionService;
-        this.alphaVantageSupportedCurrencies = alphaVantageSupportedCurrencies;
+        this.alphaVantageSupportedAssets = alphaVantageSupportedAssets;
         this.barService = barService;
         this.tickerService = tickerService;
         this.assetService = assetService;
     }
 
-    public List<Asset> getCurrencies() {
-        var currencies = alphaVantageSupportedCurrencies.getPhysicalCurrencies();
-        currencies.addAll(alphaVantageSupportedCurrencies.getDigitalCurrencies());
-        return currencies.stream()
+    public List<Asset> getAssets() {
+        var assets = alphaVantageSupportedAssets.getPhysicalCurrencies();
+        assets.addAll(alphaVantageSupportedAssets.getDigitalCurrencies());
+        assets.addAll(alphaVantageSupportedAssets.getStocks());
+        return assets.stream()
                 .map(alphaVantageCurrency ->
                         conversionService.convert(alphaVantageCurrency, Asset.class)
                 )
@@ -68,13 +71,13 @@ public class QuoteProviderService {
         final var baseCurrency = currencyPair.getFirst();
         final var quotedCurrency = currencyPair.getSecond();
 
-        var baseCurrencyBars = barService.findByBaseCurrencyAndTimestampBetween(
+        var baseCurrencyBars = barService.findByBaseAssetAndTimestampBetween(
                 baseCurrency,
                 startTime,
                 endTime
         );
 
-        var quotedCurrencyBars = barService.findByBaseCurrencyAndTimestampBetween(
+        var quotedCurrencyBars = barService.findByBaseAssetAndTimestampBetween(
                 quotedCurrency,
                 startTime,
                 endTime
@@ -106,6 +109,20 @@ public class QuoteProviderService {
         }
 
         return resultBars;
+    }
+
+    public Map<String, List<Bar>> getBarsInPeriodForSeveralInstruments(
+            String instruments,
+            long startTime,
+            long endTime
+    ) {
+        var instrumentList = instruments.split(",");
+        var result = new HashMap<String, List<Bar>>();
+        for (var instrument : instrumentList) {
+            var bars = getBarsInPeriod(instrument, startTime, endTime);
+            result.put(instrument, bars);
+        }
+        return result;
     }
 
     private Pair<Asset, Asset> getCurrencyPairFromInstrumentString(String instrument) {
@@ -143,8 +160,8 @@ public class QuoteProviderService {
         final var baseCurrency = currencyPair.getFirst();
         final var quotedCurrency = currencyPair.getSecond();
 
-        var baseCurrencyTicker = tickerService.findByBaseCurrency(baseCurrency);
-        var quotedCurrencyTicker = tickerService.findByBaseCurrency(quotedCurrency);
+        var baseCurrencyTicker = tickerService.findByBaseAsset(baseCurrency);
+        var quotedCurrencyTicker = tickerService.findByBaseAsset(quotedCurrency);
 
         return new Ticker(
                 baseCurrency,
@@ -155,5 +172,16 @@ public class QuoteProviderService {
                 ),
                 baseCurrencyTicker.getTimestamp()
         );
+    }
+
+    public Map<String, Ticker> getTickers(String instruments) {
+
+        var instrumentList = instruments.split(",");
+        var result = new HashMap<String, Ticker>();
+        for (var instrument : instrumentList) {
+            var ticker = getTicker(instrument);
+            result.put(instrument, ticker);
+        }
+        return result;
     }
 }

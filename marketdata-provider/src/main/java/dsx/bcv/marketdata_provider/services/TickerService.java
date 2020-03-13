@@ -22,8 +22,8 @@ public class TickerService {
         return tickerRepository.saveAll(tickers);
     }
 
-    public Ticker findByBaseCurrency(Asset baseAsset) {
-        return tickerRepository.findByBaseCurrency(baseAsset);
+    public Ticker findByBaseAsset(Asset baseAsset) {
+        return tickerRepository.findByBaseAsset(baseAsset);
     }
 
     public void deleteAll() {
