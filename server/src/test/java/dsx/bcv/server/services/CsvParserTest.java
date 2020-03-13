@@ -3,6 +3,7 @@ package dsx.bcv.server.services;
 import dsx.bcv.server.Application;
 import dsx.bcv.server.data.models.*;
 import dsx.bcv.server.services.parsers.CsvParser;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
 public class CsvParserTest {
