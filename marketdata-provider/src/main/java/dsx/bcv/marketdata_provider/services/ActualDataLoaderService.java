@@ -2,6 +2,7 @@ package dsx.bcv.marketdata_provider.services;
 
 import dsx.bcv.marketdata_provider.data.models.Ticker;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,17 +21,12 @@ public class ActualDataLoaderService {
         this.tickerService = tickerService;
         this.barService = barService;
         this.assetService = assetService;
-
-        //loadDataFromLastBars();
     }
 
+    @Scheduled(cron = "0 0 3 * * *")
     public void loadDataFromLastBars() {
 
         log.info("Loading tickers from last bars");
-        if (tickerService.count() != 0) {
-            log.info("Tickers are already saved");
-            return;
-        }
 
         final var assets = assetService.findAll();
         for (var asset : assets) {

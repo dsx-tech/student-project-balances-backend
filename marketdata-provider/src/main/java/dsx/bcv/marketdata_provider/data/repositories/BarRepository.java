@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface BarRepository extends CrudRepository<Bar, Long> {
-    Optional<Bar> findByBaseAsset(Asset asset);
+    Optional<Bar> findTopByBaseAsset(Asset asset);
     List<Bar> findByBaseAssetAndTimestampBetween(Asset asset, long from, long to);
     Optional<Bar> findTopByBaseAssetOrderByTimestampDesc(Asset asset);
 }

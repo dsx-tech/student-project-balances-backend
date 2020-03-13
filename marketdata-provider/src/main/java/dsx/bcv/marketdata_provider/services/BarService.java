@@ -34,7 +34,7 @@ public class BarService {
     }
 
     public boolean existsByAsset(Asset asset) {
-        return barRepository.findByBaseAsset(
+        return barRepository.findTopByBaseAsset(
                 assetService.findByCode(asset.getCode()).orElseThrow(NotFoundException::new)
         ).isPresent();
     }
