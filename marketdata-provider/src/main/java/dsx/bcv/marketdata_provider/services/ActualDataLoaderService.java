@@ -1,6 +1,5 @@
 package dsx.bcv.marketdata_provider.services;
 
-import dsx.bcv.marketdata_provider.data.models.Ticker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -28,22 +27,22 @@ public class ActualDataLoaderService {
 
         log.info("Loading tickers from last bars");
 
-        final var assets = assetService.findAll();
-        for (var asset : assets) {
-            final var lastBar = barService.findTopByBaseAssetOrderByTimestampDesc(asset);
-            final var ticker = new Ticker(
-                    lastBar.getBaseAsset(),
-                    lastBar.getExchangeRate(),
-                    lastBar.getTimestamp()
-            );
-            tickerService.save(ticker);
-            log.debug(
-                    "Ticker for {} saved. Rate: {}. Timestamp: {}",
-                    asset,
-                    ticker.getExchangeRate(),
-                    ticker.getTimestamp()
-            );
-        }
-        log.info("Loading tickers from last bars is complete");
+//        final var assets = assetService.findAll();
+//        for (var asset : assets) {
+//            final var lastBar = barService.findTopByBaseAssetOrderByTimestampDesc(asset);
+//            final var ticker = new Ticker(
+//                    lastBar.getBaseAsset(),
+//                    lastBar.getExchangeRate(),
+//                    lastBar.getTimestamp()
+//            );
+//            tickerService.save(ticker);
+//            log.debug(
+//                    "Ticker for {} saved. Rate: {}. Timestamp: {}",
+//                    asset,
+//                    ticker.getExchangeRate(),
+//                    ticker.getTimestamp()
+//            );
+//        }
+//        log.info("Loading tickers from last bars is complete");
     }
 }

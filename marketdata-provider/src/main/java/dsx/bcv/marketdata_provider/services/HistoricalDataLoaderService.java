@@ -108,7 +108,6 @@ public class HistoricalDataLoaderService {
                         );
                 barService.saveAll(forexDailyBars);
                 log.debug("History for {} saved", currency);
-                sleep();
             } else {
                 log.debug("History for {} is already saved", currency);
             }
@@ -137,7 +136,6 @@ public class HistoricalDataLoaderService {
                         );
                 barService.saveAll(digitalDailyBars);
                 log.debug("History for {} saved", currency);
-                sleep();
             } else {
                 log.debug("History for {} is already saved", currency);
             }
@@ -166,23 +164,10 @@ public class HistoricalDataLoaderService {
                         );
                 barService.saveAll(stockDailyBars);
                 log.debug("History for {} saved", stock);
-                sleep();
             } else {
                 log.debug("History for {} is already saved", stock);
             }
         }
         log.info("Stocks history saved");
-    }
-
-
-    private void sleep() {
-        final var sleepTimeInSeconds = 12;
-        final var millisecondsInSecond = 1000;
-        final var sleepTimeInMilliseconds = (long)millisecondsInSecond * sleepTimeInSeconds;
-        try {
-            Thread.sleep(sleepTimeInMilliseconds);
-        } catch (InterruptedException e) {
-            log.warn(e.getMessage(), e);
-        }
     }
 }

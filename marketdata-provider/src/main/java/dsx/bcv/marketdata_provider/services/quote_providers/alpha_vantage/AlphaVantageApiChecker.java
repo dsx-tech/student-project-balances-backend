@@ -17,16 +17,19 @@ public class AlphaVantageApiChecker {
     private final ConversionService conversionService;
     private final RequestService requestService;
     private final AlphaVantageApiKeyProvider alphaVantageApiKeyProvider;
+    private final AlphaVantageRateLimiterService rateLimiterService;
 
     public AlphaVantageApiChecker(
             AlphaVantageSupportedAssets alphaVantageSupportedCurrencies,
             ConversionService conversionService,
             RequestService requestService,
-            AlphaVantageApiKeyProvider alphaVantageApiKeyProvider) {
+            AlphaVantageApiKeyProvider alphaVantageApiKeyProvider,
+            AlphaVantageRateLimiterService rateLimiterService) {
         this.alphaVantageSupportedCurrencies = alphaVantageSupportedCurrencies;
         this.conversionService = conversionService;
         this.requestService = requestService;
         this.alphaVantageApiKeyProvider = alphaVantageApiKeyProvider;
+        this.rateLimiterService = rateLimiterService;
 
         new Thread(this::checkAll).start();
     }
@@ -55,7 +58,6 @@ public class AlphaVantageApiChecker {
                             "&to_symbol=USD" +
                             "&apikey=" + alphaVantageApiKeyProvider.getApiKey();
             sendRequest(currency, requestUrl);
-            sleep();
         }
     }
 
@@ -79,12 +81,12 @@ public class AlphaVantageApiChecker {
                             "&market=USD" +
                             "&apikey=" + alphaVantageApiKeyProvider.getApiKey();
             sendRequest(currency, requestUrl);
-            sleep();
         }
     }
 
     private void sendRequest(Asset asset, String requestUrl) throws IOException {
         log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
+        rateLimiterService.getRateLimiter().acquire();
         var responseBody = requestService.doGetRequest(requestUrl);
         log.trace("Response body: {}", responseBody);
         if (responseBody.contains("Error Message")) {
@@ -92,17 +94,6 @@ public class AlphaVantageApiChecker {
         }
         if (responseBody.contains("Our standard API call frequency is 5 calls per minute and 500 calls per day")) {
             log.info("ERROR. High API call frequency");
-        }
-    }
-
-    private void sleep() {
-        final var sleepTimeInSeconds = 12;
-        final var millisecondsInSecond = 1000;
-        final var sleepTimeInMilliseconds = (long)millisecondsInSecond * sleepTimeInSeconds;
-        try {
-            Thread.sleep(sleepTimeInMilliseconds);
-        } catch (InterruptedException e) {
-            log.warn(e.getMessage(), e);
         }
     }
 }

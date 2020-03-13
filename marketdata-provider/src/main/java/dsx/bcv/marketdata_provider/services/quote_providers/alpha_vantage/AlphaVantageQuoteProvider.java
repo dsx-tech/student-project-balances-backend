@@ -24,12 +24,14 @@ public class AlphaVantageQuoteProvider {
     private final ObjectMapper objectMapper;
     private final ConversionService conversionService;
     private final AlphaVantageApiKeyProvider alphaVantageApiKeyProvider;
+    private final AlphaVantageRateLimiterService rateLimiterService;
 
-    public AlphaVantageQuoteProvider(RequestService requestService, ObjectMapper objectMapper, ConversionService conversionService, AlphaVantageApiKeyProvider alphaVantageApiKeyProvider) {
+    public AlphaVantageQuoteProvider(RequestService requestService, ObjectMapper objectMapper, ConversionService conversionService, AlphaVantageApiKeyProvider alphaVantageApiKeyProvider, AlphaVantageRateLimiterService rateLimiterService) {
         this.requestService = requestService;
         this.objectMapper = objectMapper;
         this.conversionService = conversionService;
         this.alphaVantageApiKeyProvider = alphaVantageApiKeyProvider;
+        this.rateLimiterService = rateLimiterService;
     }
 
     @SneakyThrows
@@ -47,6 +49,7 @@ public class AlphaVantageQuoteProvider {
 
         log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
 
+        rateLimiterService.getRateLimiter().acquire();
         var responseBody = requestService.doGetRequest(requestUrl);
 
         if (responseBody.contains("Error Message")) {
@@ -117,6 +120,7 @@ public class AlphaVantageQuoteProvider {
 
         log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
 
+        rateLimiterService.getRateLimiter().acquire();
         var responseBody = requestService.doGetRequest(requestUrl);
 
         if (responseBody.contains("Error Message")) {
@@ -187,6 +191,7 @@ public class AlphaVantageQuoteProvider {
 
         log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
 
+        rateLimiterService.getRateLimiter().acquire();
         var responseBody = requestService.doGetRequest(requestUrl);
 
         if (responseBody.contains("Error Message")) {
@@ -246,7 +251,7 @@ public class AlphaVantageQuoteProvider {
     @SneakyThrows
     public AlphaVantageTicker getTicker(String baseAssetCode, String quotedAssetCode) {
 
-        log.trace("Historical rate for {}-{} method called", baseAssetCode, quotedAssetCode);
+        log.trace("Rate for {}-{} method called", baseAssetCode, quotedAssetCode);
 
         var requestUrl =
                 "https://www.alphavantage.co/query" +
@@ -257,6 +262,7 @@ public class AlphaVantageQuoteProvider {
 
         log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
 
+        rateLimiterService.getRateLimiter().acquire();
         var responseBody = requestService.doGetRequest(requestUrl);
         if (responseBody.contains("Error Message")) {
             log.warn("Error messsage");
@@ -276,6 +282,4 @@ public class AlphaVantageQuoteProvider {
 
         return objectMapper.readValue(alphaVantageTickerString, AlphaVantageTicker.class);
     }
-
-
 }
