@@ -6,12 +6,11 @@ import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.AlphaV
 import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageAsset;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
+//@Service
 @Slf4j
 public class HistoricalDataLoaderService {
 

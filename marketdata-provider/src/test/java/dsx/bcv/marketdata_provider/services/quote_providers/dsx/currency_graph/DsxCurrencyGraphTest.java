@@ -2,14 +2,16 @@ package dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph;
 
 import dsx.bcv.marketdata_provider.Application;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx.DsxSupportedInstruments;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@Ignore
+import java.util.List;
+
+import static org.junit.Assert.assertArrayEquals;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
 public class DsxCurrencyGraphTest {
@@ -20,21 +22,50 @@ public class DsxCurrencyGraphTest {
     private DsxSupportedInstruments dsxSupportedInstruments;
 
     @Test
-    public void getShortestPath() {
+    public void getShortestPathFromEurToRub() {
         final var shortestPath = dsxCurrencyGraph.getShortestPath(
-                new DsxCurrencyVertex("usd"),
+                new DsxCurrencyVertex("eur"),
+                new DsxCurrencyVertex("rub")
+        );
+
+        assertArrayEquals(
+                List.of(
+                        new DsxInstrumentEdge(
+                                new DsxCurrencyVertex("eur"),
+                                new DsxCurrencyVertex("usd"),
+                                false
+                        ),
+                        new DsxInstrumentEdge(
+                                new DsxCurrencyVertex("usd"),
+                                new DsxCurrencyVertex("rub"),
+                                false
+                        )
+                ).toArray(),
+                shortestPath.toArray()
+        );
+    }
+
+    @Test
+    public void getShortestPathFromRubToEur() {
+        final var shortestPath = dsxCurrencyGraph.getShortestPath(
+                new DsxCurrencyVertex("rub"),
                 new DsxCurrencyVertex("eur")
         );
 
-        for (var edge : shortestPath) {
-            if (!edge.isReversed()) {
-                System.out.println(edge + " Correct edge");
-            } else {
-                System.out.println(edge + " Reversed edge");
-            }
-
-        }
-
-        System.out.println(shortestPath);
+        assertArrayEquals(
+                List.of(
+                        new DsxInstrumentEdge(
+                                new DsxCurrencyVertex("btc"),
+                                new DsxCurrencyVertex("rub"),
+                                true
+                        ),
+                        new DsxInstrumentEdge(
+                                new DsxCurrencyVertex("btc"),
+                                new DsxCurrencyVertex("eur"),
+                                false
+                        )
+                ).toArray(),
+                shortestPath.toArray()
+        );
     }
 }
