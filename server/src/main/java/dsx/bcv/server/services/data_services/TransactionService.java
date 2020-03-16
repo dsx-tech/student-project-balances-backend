@@ -1,12 +1,15 @@
-package dsx.bcv.server.services;
+package dsx.bcv.server.services.data_services;
 
-import dsx.bcv.server.data.dto.TransactionDTO;
+import dsx.bcv.server.data.models.Currency;
 import dsx.bcv.server.data.models.Transaction;
 import dsx.bcv.server.data.models.TransactionStatus;
 import dsx.bcv.server.data.models.TransactionType;
 import dsx.bcv.server.data.repositories.TransactionRepository;
+import dsx.bcv.server.exceptions.NotFoundException;
+import dsx.bcv.server.services.LocalDateTimeService;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 
 @Service
@@ -27,11 +30,11 @@ public class TransactionService {
     }
 
     public Transaction save(Transaction transaction) {
-        transaction.setCurrency(currencyService.saveIfNotExists(transaction.getCurrency()));
+        transaction.setCurrency(currencyService.save(transaction.getCurrency()));
         return transactionRepository.save(transaction);
     }
 
-    public Transaction getTransaction(
+    public Transaction transactionOf(
         String localDateTime,
         String transactionType,
         String currency,
@@ -43,7 +46,7 @@ public class TransactionService {
         return new Transaction(
                 localDateTimeService.getDateTimeFromString(localDateTime),
                 transactionType.toLowerCase().equals("deposit") ? TransactionType.Deposit : TransactionType.Withdraw,
-                currencyService.getCurrency(currency),
+                new Currency(currency),
                 new BigDecimal(amount.replaceAll(",", ".")),
                 new BigDecimal(commission.replaceAll(",", ".")),
                 transactionStatus.toLowerCase().equals("complete") ?
@@ -52,15 +55,26 @@ public class TransactionService {
         );
     }
 
-    public Transaction getTransaction(TransactionDTO transactionDTO) {
-        return getTransaction(
-                transactionDTO.getDateTime().toString(),
-                transactionDTO.getTransactionType(),
-                transactionDTO.getCurrency(),
-                transactionDTO.getAmount().toString(),
-                transactionDTO.getCommission().toString(),
-                transactionDTO.getTransactionStatus(),
-                transactionDTO.getTransactionValueId()
-        );
+    public Iterable<Transaction> findAll() {
+        return transactionRepository.findAll();
+    }
+
+    public Transaction findById(long id) {
+        return transactionRepository.findById(id).orElseThrow(NotFoundException::new);
+    }
+
+    @Transactional
+    public Transaction updateById(long id, Transaction transaction) {
+        transactionRepository.deleteById(id);
+        assert transaction != null;
+        return transactionRepository.save(transaction);
+    }
+
+    @Transactional
+    public void deleteById(long id) {
+        if (transactionRepository.existsById(id))
+            transactionRepository.deleteById(id);
+        else
+            throw new NotFoundException();
     }
 }

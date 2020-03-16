@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface InstrumentRepository extends CrudRepository<Instrument, Long> {
-    Optional<Instrument> findByFirstCurrencyAndSecondCurrency(Currency firstCurrency, Currency secondCurrency);
+    Optional<Instrument> findByBaseCurrencyAndQuotedCurrency(Currency firstCurrency, Currency secondCurrency);
 }

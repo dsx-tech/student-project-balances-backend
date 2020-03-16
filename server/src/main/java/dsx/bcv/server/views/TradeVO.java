@@ -1,53 +1,42 @@
-package dsx.bcv.server.data.models;
+package dsx.bcv.server.views;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import dsx.bcv.server.data.models.TradeType;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity(name = "trades")
 @Data
-@NoArgsConstructor
-public class Trade {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+public class TradeVO {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime dateTime;
     @JsonSerialize(using = ToStringSerializer.class)
-    @ManyToOne
-    private Instrument instrument;
-    @Enumerated(EnumType.STRING)
+    private InstrumentVO instrument;
     private TradeType tradeType;
     private BigDecimal tradedQuantity;
     @JsonSerialize(using = ToStringSerializer.class)
-    @ManyToOne
-    private Currency tradedQuantityCurrency;
+    private CurrencyVO tradedQuantityCurrency;
     private BigDecimal tradedPrice;
     @JsonSerialize(using = ToStringSerializer.class)
-    @ManyToOne
-    private Currency tradedPriceCurrency;
+    private CurrencyVO tradedPriceCurrency;
     private BigDecimal commission;
     @JsonSerialize(using = ToStringSerializer.class)
-    @ManyToOne
-    private Currency commissionCurrency;
+    private CurrencyVO commissionCurrency;
     private String tradeValueId;
 
-    public Trade(
+    public TradeVO(
             LocalDateTime dateTime,
-            Instrument instrument,
+            InstrumentVO instrument,
             TradeType tradeType,
             BigDecimal tradedQuantity,
-            Currency tradedQuantityCurrency,
+            CurrencyVO tradedQuantityCurrency,
             BigDecimal tradedPrice,
-            Currency tradedPriceCurrency,
+            CurrencyVO tradedPriceCurrency,
             BigDecimal commission,
-            Currency commissionCurrency,
+            CurrencyVO commissionCurrency,
             String tradeValueId
     ) {
         this.dateTime = dateTime;

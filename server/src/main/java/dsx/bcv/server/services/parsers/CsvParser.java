@@ -2,9 +2,9 @@ package dsx.bcv.server.services.parsers;
 
 import dsx.bcv.server.data.models.Trade;
 import dsx.bcv.server.data.models.Transaction;
-import dsx.bcv.server.services.TradeService;
-import dsx.bcv.server.services.TransactionService;
-import dsx.bcv.server.services.parsers.data_formats.IMarketplaceDataFormat;
+import dsx.bcv.server.services.data_services.TradeService;
+import dsx.bcv.server.services.data_services.TransactionService;
+import dsx.bcv.server.services.parsers.data_formats.MarketplaceDataFormat;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,14 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class CsvParser implements IParser {
+public class CsvParser implements Parser {
 
-    private IMarketplaceDataFormat marketplaceDataFormat;
+    private MarketplaceDataFormat marketplaceDataFormat;
     private TradeService tradeService;
     private TransactionService transactionService;
 
     public CsvParser(
-            @Qualifier("dsx_data_format") IMarketplaceDataFormat marketplaceDataFormat,
+            @Qualifier("dsx_data_format") MarketplaceDataFormat marketplaceDataFormat,
             TradeService tradeService,
             TransactionService transactionService
     ) {
@@ -40,7 +40,7 @@ public class CsvParser implements IParser {
 
         List<Trade> trades = new ArrayList<>();
         for (CSVRecord record : records) {
-            var trade = tradeService.getTrade(
+            var trade = tradeService.tradeOf(
                     record.get(tradeFormat.get(TradeField.DateTime)),
                     record.get(tradeFormat.get(TradeField.Instrument)),
                     record.get(tradeFormat.get(TradeField.TradeType)),
@@ -66,7 +66,7 @@ public class CsvParser implements IParser {
 
         List<Transaction> transactions = new ArrayList<>();
         for (CSVRecord record : records) {
-            var transaction = transactionService.getTransaction(
+            var transaction = transactionService.transactionOf(
                     record.get(transactionFormat.get(TransactionField.DateTime)),
                     record.get(transactionFormat.get(TransactionField.TransactionType)),
                     record.get(transactionFormat.get(TransactionField.Currency)),

@@ -1,18 +1,17 @@
 package dsx.bcv.server.data.mocks;
 
 import dsx.bcv.server.data.models.Trade;
-import dsx.bcv.server.services.TradeService;
+import dsx.bcv.server.services.data_services.TradeService;
 import dsx.bcv.server.services.parsers.CsvParser;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class MockTrades {
-
-    private List<Trade> trades;
 
     private MockTrades(CsvParser csvParser, TradeService tradeService) {
 
@@ -21,6 +20,7 @@ public class MockTrades {
         assert inputStream != null;
         var inputStreamReader = new InputStreamReader(inputStream);
 
+        List<Trade> trades = new ArrayList<>();
         try {
             trades = csvParser.parseTrades(
                     inputStreamReader, ';');

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component("dsx_data_format")
-public class DsxDataFormat implements IMarketplaceDataFormat {
+public class DsxDataFormat implements MarketplaceDataFormat {
 
     private final Map<TradeField, Integer> tradeFormat = Map.of(
             TradeField.DateTime, 0,

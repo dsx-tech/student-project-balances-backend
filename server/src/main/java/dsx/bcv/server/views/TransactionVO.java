@@ -1,39 +1,31 @@
-package dsx.bcv.server.data.models;
+package dsx.bcv.server.views;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import dsx.bcv.server.data.models.TransactionStatus;
+import dsx.bcv.server.data.models.TransactionType;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity(name = "transactions")
 @Data
-@NoArgsConstructor
-public class Transaction {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+public class TransactionVO {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime dateTime;
-    @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
     @JsonSerialize(using = ToStringSerializer.class)
-    @ManyToOne
-    private Currency currency;
+    private CurrencyVO currency;
     private BigDecimal amount;
     private BigDecimal commission;
-    @Enumerated(EnumType.STRING)
     private TransactionStatus transactionStatus;
     private String transactionValueId;
 
-    public Transaction(
+    public TransactionVO(
             LocalDateTime dateTime,
             TransactionType transactionType,
-            Currency currency,
+            CurrencyVO currency,
             BigDecimal amount,
             BigDecimal commission,
             TransactionStatus transactionStatus,

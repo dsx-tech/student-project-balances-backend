@@ -1,64 +1,76 @@
 package dsx.bcv.server.controllers;
 
-import dsx.bcv.server.data.dto.TransactionDTO;
 import dsx.bcv.server.data.models.Transaction;
-import dsx.bcv.server.data.repositories.TransactionRepository;
-import dsx.bcv.server.exceptions.NotFoundException;
-import dsx.bcv.server.services.TransactionService;
+import dsx.bcv.server.services.data_services.TransactionService;
+import dsx.bcv.server.views.TransactionVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("transactions")
 @Slf4j
 public class TransactionController {
 
-    private final TransactionRepository transactionRepository;
     private final TransactionService transactionService;
+    private final ConversionService conversionService;
 
-    public TransactionController(TransactionRepository transactionRepository, TransactionService transactionService) {
-        this.transactionRepository = transactionRepository;
+    public TransactionController(
+            TransactionService transactionService,
+            ConversionService conversionService
+    ) {
         this.transactionService = transactionService;
+        this.conversionService = conversionService;
     }
 
     @GetMapping
-    public Iterable<Transaction> getAll() {
+    public Iterable<TransactionVO> getAll() {
         log.info(
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
-        return transactionRepository.findAll();
+        return StreamSupport.stream(transactionService.findAll().spliterator(), false)
+                .map(transaction -> conversionService.convert(transaction, TransactionVO.class))
+                .collect(Collectors.toList());
     }
 
     @GetMapping("{id}")
-    public Transaction getByID(@PathVariable long id) {
+    public TransactionVO getByID(@PathVariable long id) {
         log.info(
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
-        return transactionRepository.findById(id).orElseThrow(NotFoundException::new);
+        var transaction = transactionService.findById(id);
+        return conversionService.convert(transaction, TransactionVO.class);
     }
 
     @PostMapping
-    public Transaction add(@RequestBody TransactionDTO transactionDTO) {
+    public TransactionVO add(@RequestBody TransactionVO transactionVO) {
         log.info(
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
-        var transaction = transactionService.getTransaction(transactionDTO);
-        return transactionService.save(transaction);
+        var transaction = conversionService.convert(transactionVO, Transaction.class);
+        assert transaction != null;
+        return conversionService.convert(
+                transactionService.save(transaction),
+                TransactionVO.class
+        );
     }
 
     @PutMapping("{id}")
-    public Transaction update(@PathVariable long id, @RequestBody TransactionDTO transactionDTO) {
+    public TransactionVO update(@PathVariable long id, @RequestBody TransactionVO transactionVO) {
         log.info(
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
-        transactionRepository.deleteById(id);
-        var transaction = transactionService.getTransaction(transactionDTO);
-        return transactionService.save(transaction);
+        var transaction = conversionService.convert(transactionVO, Transaction.class);
+        var newTransaction = transactionService.updateById(id, transaction);
+        return conversionService.convert(newTransaction, TransactionVO.class);
     }
 
     @DeleteMapping("{id}")
@@ -67,9 +79,6 @@ public class TransactionController {
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
-        if (transactionRepository.existsById(id))
-            transactionRepository.deleteById(id);
-        else
-            throw new NotFoundException();
+        transactionService.deleteById(id);
     }
 }

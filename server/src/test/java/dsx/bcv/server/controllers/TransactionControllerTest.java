@@ -1,7 +1,7 @@
 package dsx.bcv.server.controllers;
 
-import dsx.bcv.server.data.dto.TransactionDTO;
 import dsx.bcv.server.data.repositories.TransactionRepository;
+import dsx.bcv.server.views.TransactionVO;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,12 +42,12 @@ public class TransactionControllerTest {
     }
 
     @Parameter
-    public TransactionDTO transactionDTO;
+    public TransactionVO transactionVO;
 
     @Test
     public void add() {
 
-        var x = transactionController.add(transactionDTO);
+        var x = transactionController.add(transactionVO);
 
         //var y = verify(transactionRepository).save(transaction);
     }
@@ -55,7 +55,7 @@ public class TransactionControllerTest {
     @Test
     public void update() {
 
-        var x = transactionController.update(id, transactionDTO);
+        var x = transactionController.update(id, transactionVO);
 
         //var y = verify(transactionRepository).save(transaction);
     }
