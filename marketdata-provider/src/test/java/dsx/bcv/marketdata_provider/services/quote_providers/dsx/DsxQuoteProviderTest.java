@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
@@ -23,14 +22,5 @@ public class DsxQuoteProviderTest {
         var result = dsxQuoteProvider.getBarsInPeriod("eur-rub", 1579080227, 1579253027);
 
         assertEquals(2, result.size());
-    }
-
-    @Test
-    public void getTicker() {
-
-        var result = dsxQuoteProvider.getTicker("eur-rub");
-        var exchangeRate = result.getExchangeRate().doubleValue();
-
-        assertTrue(exchangeRate > 60 && exchangeRate < 100);
     }
 }
