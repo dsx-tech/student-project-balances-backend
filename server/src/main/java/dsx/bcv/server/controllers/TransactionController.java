@@ -11,6 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@Deprecated
 @RestController
 @RequestMapping("transactions")
 @Slf4j
@@ -27,8 +28,9 @@ public class TransactionController {
         this.conversionService = conversionService;
     }
 
+    @Deprecated
     @GetMapping
-    public Iterable<TransactionVO> getAll() {
+    public Iterable<TransactionVO> findAll() {
         log.info(
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
@@ -38,8 +40,9 @@ public class TransactionController {
                 .collect(Collectors.toList());
     }
 
+    @Deprecated
     @GetMapping("{id}")
-    public TransactionVO getByID(@PathVariable long id) {
+    public TransactionVO findByID(@PathVariable long id) {
         log.info(
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
@@ -48,6 +51,7 @@ public class TransactionController {
         return conversionService.convert(transaction, TransactionVO.class);
     }
 
+    @Deprecated
     @PostMapping
     public TransactionVO add(@RequestBody TransactionVO transactionVO) {
         log.info(
@@ -62,6 +66,7 @@ public class TransactionController {
         );
     }
 
+    @Deprecated
     @PutMapping("{id}")
     public TransactionVO update(@PathVariable long id, @RequestBody TransactionVO transactionVO) {
         log.info(
@@ -73,6 +78,7 @@ public class TransactionController {
         return conversionService.convert(newTransaction, TransactionVO.class);
     }
 
+    @Deprecated
     @DeleteMapping("{id}")
     public void delete(@PathVariable long id) {
         log.info(

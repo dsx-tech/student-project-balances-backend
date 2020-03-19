@@ -25,7 +25,7 @@ public class TransactionControllerTest {
     @Test
     public void getAll() {
 
-        var x = transactionController.getAll();
+        var x = transactionController.findAll();
 
         var y = verify(transactionRepository).findAll();
     }
@@ -36,7 +36,7 @@ public class TransactionControllerTest {
     @Test
     public void getByID() {
 
-        var x = transactionController.getByID(id);
+        var x = transactionController.findByID(id);
 
         var y = verify(transactionRepository).findById(id);
     }

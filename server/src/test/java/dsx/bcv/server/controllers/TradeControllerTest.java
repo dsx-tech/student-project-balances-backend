@@ -29,7 +29,7 @@ public class TradeControllerTest {
     @Test
     public void getAll() {
 
-        var x = tradeController.getAll();
+        var x = tradeController.findAll();
 
         var y = verify(tradeRepository).findAll();
     }
@@ -40,7 +40,7 @@ public class TradeControllerTest {
     @Test
     public void getByID() {
 
-        var x = tradeController.getByID(id);
+        var x = tradeController.findByID(id);
 
         var y = verify(tradeRepository).findById(id);
     }

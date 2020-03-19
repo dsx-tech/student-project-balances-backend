@@ -11,6 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@Deprecated
 @RestController
 @RequestMapping("trades")
 @Slf4j
@@ -27,8 +28,9 @@ public class TradeController {
         this.conversionService = conversionService;
     }
 
+    @Deprecated
     @GetMapping
-    public Iterable<TradeVO> getAll() {
+    public Iterable<TradeVO> findAll() {
         log.info(
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
@@ -38,8 +40,9 @@ public class TradeController {
                 .collect(Collectors.toList());
     }
 
+    @Deprecated
     @GetMapping("{id}")
-    public TradeVO getByID(@PathVariable long id) {
+    public TradeVO findByID(@PathVariable long id) {
         log.info(
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
@@ -48,6 +51,7 @@ public class TradeController {
         return conversionService.convert(trade, TradeVO.class);
     }
 
+    @Deprecated
     @PostMapping
     public TradeVO add(@RequestBody TradeVO tradeVO) {
         log.info(
@@ -62,6 +66,7 @@ public class TradeController {
         );
     }
 
+    @Deprecated
     @PutMapping("{id}")
     public TradeVO update(@PathVariable long id, @RequestBody TradeVO tradeVO) {
         log.info(
@@ -74,6 +79,7 @@ public class TradeController {
 
     }
 
+    @Deprecated
     @DeleteMapping("{id}")
     public void delete(@PathVariable long id) {
         log.info(

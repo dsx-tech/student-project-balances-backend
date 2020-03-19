@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class TransactionVO {
+    private long id;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime dateTime;
     private TransactionType transactionType;
@@ -23,6 +24,7 @@ public class TransactionVO {
     private String transactionValueId;
 
     public TransactionVO(
+            long id,
             LocalDateTime dateTime,
             TransactionType transactionType,
             CurrencyVO currency,
@@ -31,6 +33,7 @@ public class TransactionVO {
             TransactionStatus transactionStatus,
             String transactionValueId
     ) {
+        this.id = id;
         this.dateTime = dateTime;
         this.transactionType = transactionType;
         this.currency = currency;

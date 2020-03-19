@@ -8,6 +8,7 @@ public class TransactionToTransactionVOConverter implements Converter<Transactio
     @Override
     public TransactionVO convert(Transaction source) {
         return new TransactionVO(
+                source.getId(),
                 source.getDateTime(),
                 source.getTransactionType(),
                 new CurrencyToCurrencyVOConverter().convert(source.getCurrency()),

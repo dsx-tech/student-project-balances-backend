@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class TradeVO {
+    private long id;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime dateTime;
     @JsonSerialize(using = ToStringSerializer.class)
@@ -28,6 +29,7 @@ public class TradeVO {
     private String tradeValueId;
 
     public TradeVO(
+            long id,
             LocalDateTime dateTime,
             InstrumentVO instrument,
             TradeType tradeType,
@@ -39,6 +41,7 @@ public class TradeVO {
             CurrencyVO commissionCurrency,
             String tradeValueId
     ) {
+        this.id = id;
         this.dateTime = dateTime;
         this.instrument = instrument;
         this.tradeType = tradeType;

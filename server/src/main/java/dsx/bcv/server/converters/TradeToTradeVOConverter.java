@@ -8,6 +8,7 @@ public class TradeToTradeVOConverter implements Converter<Trade, TradeVO> {
     @Override
     public TradeVO convert(Trade source) {
         return new TradeVO(
+                source.getId(),
                 source.getDateTime(),
                 new InstrumentToInstrumentVOConverter().convert(source.getInstrument()),
                 source.getTradeType(),
