@@ -14,7 +14,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 apply plugin: "application"
-mainClassName = 'dsx.bcv.app.Application'
+mainClassName = 'dsx.bcv.server.Application'
 
 bootJar {
 }
@@ -34,4 +34,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
     compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'mysql:mysql-connector-java'
 }
