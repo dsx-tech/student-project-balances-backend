@@ -52,4 +52,8 @@ public class PortfolioService {
     public void deleteById(long id) {
         portfolioRepository.deleteById(id);
     }
+
+    public long count() {
+        return portfolioRepository.count();
+    }
 }

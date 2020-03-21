@@ -26,6 +26,9 @@ public class MockPortfolios {
         portfolio.getTransactions().addAll(StreamSupport.stream(
                 transactionService.findAll().spliterator(), false).collect(Collectors.toSet())
         );
-        portfolioService.save(portfolio);
+
+        if (portfolioService.count() == 0) {
+            portfolioService.save(portfolio);
+        }
     }
 }

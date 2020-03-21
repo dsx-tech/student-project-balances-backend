@@ -88,4 +88,8 @@ public class TradeService {
         assert trade != null;
         return tradeRepository.save(trade);
     }
+
+    public long count() {
+        return tradeRepository.count();
+    }
 }

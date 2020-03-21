@@ -77,4 +77,8 @@ public class TransactionService {
         else
             throw new NotFoundException();
     }
+
+    public long count() {
+        return transactionRepository.count();
+    }
 }

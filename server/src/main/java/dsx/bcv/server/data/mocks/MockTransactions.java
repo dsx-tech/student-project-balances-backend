@@ -28,8 +28,10 @@ public class MockTransactions {
             e.printStackTrace();
         }
 
-        for (var transaction : transactions) {
-            transactionService.save(transaction);
+        if (transactionService.count() == 0) {
+            for (var transaction : transactions) {
+                transactionService.save(transaction);
+            }
         }
     }
 }

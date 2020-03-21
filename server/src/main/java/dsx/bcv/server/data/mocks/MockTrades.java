@@ -28,8 +28,10 @@ public class MockTrades {
             e.printStackTrace();
         }
 
-        for (var trade : trades) {
-            tradeService.save(trade);
+        if (tradeService.count() == 0) {
+            for (var trade : trades) {
+                tradeService.save(trade);
+            }
         }
     }
 }
