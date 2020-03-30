@@ -48,15 +48,15 @@ public class PortfolioController {
         return conversionService.convert(portfolio, PortfolioVO.class);
     }
 
-    @GetMapping("{name}")
-    public PortfolioVO findByName(@PathVariable String name) {
-        log.info(
-                "Request received. Url: {}",
-                ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
-        );
-        var portfolio = portfolioService.findByName(name);
-        return conversionService.convert(portfolio, PortfolioVO.class);
-    }
+//    @GetMapping("{name}")
+//    public PortfolioVO findByName(@PathVariable String name) {
+//        log.info(
+//                "Request received. Url: {}",
+//                ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
+//        );
+//        var portfolio = portfolioService.findByName(name);
+//        return conversionService.convert(portfolio, PortfolioVO.class);
+//    }
 
     @PostMapping
     public PortfolioVO add(@RequestBody PortfolioVO portfolioVO) {

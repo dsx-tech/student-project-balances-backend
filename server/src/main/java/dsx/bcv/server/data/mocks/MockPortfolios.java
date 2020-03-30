@@ -19,16 +19,33 @@ public class MockPortfolios {
             TradeService tradeService,
             TransactionService transactionService
     ) {
-        var portfolio = new Portfolio("my_portfolio");
-        portfolio.getTrades().addAll(StreamSupport.stream(
-                tradeService.findAll().spliterator(), false).collect(Collectors.toSet())
+        var portfolio1 = new Portfolio("my_portfolio1");
+        portfolio1.getTrades().addAll(StreamSupport.stream(
+                tradeService.findAll().spliterator(), false)
+                .limit(2)
+                .collect(Collectors.toSet())
         );
-        portfolio.getTransactions().addAll(StreamSupport.stream(
-                transactionService.findAll().spliterator(), false).collect(Collectors.toSet())
+        portfolio1.getTransactions().addAll(StreamSupport.stream(
+                transactionService.findAll().spliterator(), false)
+                .limit(2)
+                .collect(Collectors.toSet())
+        );
+
+        var portfolio2 = new Portfolio("my_portfolio2");
+        portfolio2.getTrades().addAll(StreamSupport.stream(
+                tradeService.findAll().spliterator(), false)
+                .skip(2)
+                .collect(Collectors.toSet())
+        );
+        portfolio2.getTransactions().addAll(StreamSupport.stream(
+                transactionService.findAll().spliterator(), false)
+                .skip(2)
+                .collect(Collectors.toSet())
         );
 
         if (portfolioService.count() == 0) {
-            portfolioService.save(portfolio);
+            portfolioService.save(portfolio1);
+            portfolioService.save(portfolio2);
         }
     }
 }

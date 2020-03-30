@@ -4,6 +4,7 @@ import dsx.bcv.server.data.models.User;
 import dsx.bcv.server.security.JwtTokenProvider;
 import dsx.bcv.server.services.data_services.UserService;
 import dsx.bcv.server.views.AuthenticationRequestVO;
+import dsx.bcv.server.views.AuthenticationResponseVO;
 import dsx.bcv.server.views.UserVO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.core.convert.ConversionService;
@@ -38,14 +39,18 @@ public class AuthenticationController {
 
     @ApiOperation("Authenticate user. Returns token.")
     @PostMapping("login")
-    public String login(@RequestBody AuthenticationRequestVO authenticationRequestVO) {
+    public AuthenticationResponseVO login(@RequestBody AuthenticationRequestVO authenticationRequestVO) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     authenticationRequestVO.getUsername(),
                     authenticationRequestVO.getPassword()
             ));
             var user = userService.findByUsername(authenticationRequestVO.getUsername());
-            return jwtTokenProvider.createToken(user);
+            var token = jwtTokenProvider.createToken(user);
+            return new AuthenticationResponseVO(
+                    user.getUsername(),
+                    token
+            );
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid username or password", e);
         }
@@ -53,7 +58,7 @@ public class AuthenticationController {
 
     @ApiOperation("Register user. Returns token.")
     @PostMapping("register")
-    public String register(@RequestBody UserVO userVO) {
+    public AuthenticationResponseVO register(@RequestBody UserVO userVO) {
         var user = conversionService.convert(userVO, User.class);
         assert user != null;
         userService.register(user);
