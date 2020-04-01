@@ -16,6 +16,8 @@ public class User {
     private String username;
     private String password;
     private String email;
+    @OneToMany(fetch = FetchType.EAGER)
+    private Set<Portfolio> portfolios;
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
@@ -23,5 +25,14 @@ public class User {
         this.username = username;
         this.password = password;
         this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }

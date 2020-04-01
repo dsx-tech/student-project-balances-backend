@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class TransactionService {
@@ -32,6 +33,11 @@ public class TransactionService {
     public Transaction save(Transaction transaction) {
         transaction.setCurrency(currencyService.save(transaction.getCurrency()));
         return transactionRepository.save(transaction);
+    }
+
+    public List<Transaction> saveAll(List<Transaction> transactions) {
+        transactions.forEach(this::save);
+        return transactions;
     }
 
     public Transaction transactionOf(

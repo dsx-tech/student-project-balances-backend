@@ -16,7 +16,7 @@ public class MockTrades {
     private MockTrades(CsvParser csvParser, TradeService tradeService) {
 
         var classLoader = this.getClass().getClassLoader();
-        var inputStream = classLoader.getResourceAsStream("dsx_trades.csv");
+        var inputStream = classLoader.getResourceAsStream("dsx_trades_dev.csv");
         assert inputStream != null;
         var inputStreamReader = new InputStreamReader(inputStream);
 

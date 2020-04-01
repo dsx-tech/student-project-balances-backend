@@ -16,12 +16,20 @@ public class Portfolio {
     private long id;
     @Column(nullable = false)
     private String name;
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     private Set<Trade> trades = new HashSet<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     private Set<Transaction> transactions = new HashSet<>();
 
     public Portfolio(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Portfolio{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

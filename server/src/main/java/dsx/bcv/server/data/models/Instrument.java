@@ -16,10 +16,8 @@ public class Instrument {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     @ManyToOne
-    //@Column(name = "base_currency")
     private Currency baseCurrency;
     @ManyToOne
-    //@Column(name = "quoted_currency")
     private Currency quotedCurrency;
 
     public Instrument(Currency baseCurrency, Currency quotedCurrency) {
@@ -29,18 +27,15 @@ public class Instrument {
 
     public Instrument(String instrument) {
 
-//        var currencyPair = Lists.newArrayList(Splitter.on("-").split(instrument));
-//        if (currencyPair.size() != 2) {
-//            throw new NotFoundException("Invalid instrument");
-//        }
-//
-//        var baseCurrency = new Currency(currencyPair.get(0));
-//        var quotedCurrency = new Currency(currencyPair.get(1));
-
         var baseCurrency = new Currency(instrument.substring(0, 3));
         var quotedCurrency = new Currency(instrument.substring(3, 6));
 
         this.baseCurrency = baseCurrency;
         this.quotedCurrency = quotedCurrency;
+    }
+
+    @Override
+    public String toString() {
+        return baseCurrency + "-" + quotedCurrency;
     }
 }

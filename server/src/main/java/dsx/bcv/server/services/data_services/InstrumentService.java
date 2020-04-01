@@ -25,6 +25,8 @@ public class InstrumentService {
                 baseCurrency,
                 quotedCurrency
         );
-        return instrumentOptional.orElseGet(() -> instrumentRepository.save(new Instrument(baseCurrency, quotedCurrency)));
+        return instrumentOptional.orElseGet(
+                () -> instrumentRepository.save(new Instrument(baseCurrency, quotedCurrency))
+        );
     }
 }
