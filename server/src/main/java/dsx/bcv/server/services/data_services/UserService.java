@@ -3,7 +3,6 @@ package dsx.bcv.server.services.data_services;
 import dsx.bcv.server.data.models.Portfolio;
 import dsx.bcv.server.data.models.Role;
 import dsx.bcv.server.data.models.User;
-import dsx.bcv.server.data.repositories.PortfolioRepository;
 import dsx.bcv.server.data.repositories.UserRepository;
 import dsx.bcv.server.exceptions.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -22,16 +21,17 @@ import java.util.stream.StreamSupport;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PortfolioRepository portfolioRepository;
+    private final PortfolioService portfolioService;
     private final RoleService roleService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public UserService(
             UserRepository userRepository,
-            PortfolioRepository portfolioRepository,
-            RoleService roleService) {
+            PortfolioService portfolioService,
+            RoleService roleService
+    ) {
         this.userRepository = userRepository;
-        this.portfolioRepository = portfolioRepository;
+        this.portfolioService = portfolioService;
         this.roleService = roleService;
     }
 
@@ -42,6 +42,10 @@ public class UserService {
         User registeredUser = userRepository.save(user);
         log.info("register: User {} saved", registeredUser);
         return registeredUser;
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
     }
 
     public List<User> findAll() {
@@ -72,7 +76,7 @@ public class UserService {
 
     public Portfolio addPortfolioByUsername(String username, Portfolio portfolio) {
         var user = findByUsername(username);
-        var savedPortfolio = portfolioRepository.save(portfolio);
+        var savedPortfolio = portfolioService.save(portfolio);
         user.getPortfolios().add(savedPortfolio);
         userRepository.save(user);
         log.debug("addPortfolioByUsername: Portfolio {} added to user {}", savedPortfolio, user);
@@ -126,6 +130,8 @@ public class UserService {
     public void deletePortfolioByUsernameAndPortfolioId(String username, long portfolioId) {
         var user = findByUsername(username);
         user.getPortfolios().removeIf(portfolio -> portfolio.getId() == portfolioId);
+        save(user);
+        portfolioService.deleteById(portfolioId);
         log.info("delete: Portfolio with id {} successfully deleted", portfolioId);
     }
 
