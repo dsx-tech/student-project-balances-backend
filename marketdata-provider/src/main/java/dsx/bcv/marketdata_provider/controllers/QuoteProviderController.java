@@ -47,8 +47,8 @@ public class QuoteProviderController {
     @ApiOperation("Get bars for every day from startTime to endTime.\n" +
             "StartTime & endTime are Unix Timestamps in seconds (https://www.epochconverter.com).\n" +
             instrumentExample)
-    @GetMapping("bars/{instruments}/{startTime}/{endTime}")
-    public Map<String, List<BarVO>> getBarsInPeriod(
+    @GetMapping("dailyBars/{instruments}/{startTime}/{endTime}")
+    public Map<String, List<BarVO>> getDailyBarsInPeriod(
             @PathVariable String instruments,
             @PathVariable long startTime,
             @PathVariable long endTime
@@ -57,12 +57,35 @@ public class QuoteProviderController {
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
-        var barsMap = quoteProviderService.getBarsInPeriodForSeveralInstruments(instruments, startTime, endTime);
+        var barsMap = quoteProviderService.getDailyBarsInPeriodForSeveralInstruments(instruments, startTime, endTime);
         var convertedBarsMap = new HashMap<String, List<BarVO>>();
         for (var key : barsMap.keySet()) {
             convertedBarsMap.put(key, barsMap.get(key).stream()
                             .map(bar -> conversionService.convert(bar, BarVO.class))
                             .collect(Collectors.toList()));
+        }
+        return convertedBarsMap;
+    }
+
+    @ApiOperation("Get bars for every month from startTime to endTime.\n" +
+            "StartTime & endTime are Unix Timestamps in seconds (https://www.epochconverter.com).\n" +
+            instrumentExample)
+    @GetMapping("monthlyBars/{instruments}/{startTime}/{endTime}")
+    public Map<String, List<BarVO>> getMonthlyBarsInPeriod(
+            @PathVariable String instruments,
+            @PathVariable long startTime,
+            @PathVariable long endTime
+    ) {
+        log.info(
+                "Request received. Url: {}",
+                ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
+        );
+        var barsMap = quoteProviderService.getMonthlyBarsInPeriodForSeveralInstruments(instruments, startTime, endTime);
+        var convertedBarsMap = new HashMap<String, List<BarVO>>();
+        for (var key : barsMap.keySet()) {
+            convertedBarsMap.put(key, barsMap.get(key).stream()
+                    .map(bar -> conversionService.convert(bar, BarVO.class))
+                    .collect(Collectors.toList()));
         }
         return convertedBarsMap;
     }

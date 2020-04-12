@@ -15,6 +15,9 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +68,7 @@ public class QuoteProviderService {
                 .collect(Collectors.toList());
     }
 
-    public List<Bar> getBarsInPeriod(String instrument, long startTime, long endTime) {
+    public List<Bar> getDailyBarsInPeriod(String instrument, long startTime, long endTime) {
 
         final var currencyPair = getCurrencyPairFromInstrumentString(instrument);
         final var baseCurrency = currencyPair.getFirst();
@@ -111,7 +114,21 @@ public class QuoteProviderService {
         return resultBars;
     }
 
-    public Map<String, List<Bar>> getBarsInPeriodForSeveralInstruments(
+    public List<Bar> getMonthlyBarsInPeriod(String instrument, long startTime, long endTime) {
+
+        var dailyBars = getDailyBarsInPeriod(instrument, startTime, endTime);
+
+        return dailyBars.stream()
+                .filter(
+                        bar ->
+                        LocalDateTime.ofEpochSecond(bar.getTimestamp(), 0, ZoneOffset.UTC)
+                                .equals(LocalDateTime.ofEpochSecond(bar.getTimestamp(), 0, ZoneOffset.UTC)
+                                        .with(TemporalAdjusters.lastDayOfMonth()))
+                )
+                .collect(Collectors.toList());
+    }
+
+    public Map<String, List<Bar>> getDailyBarsInPeriodForSeveralInstruments(
             String instruments,
             long startTime,
             long endTime
@@ -119,7 +136,21 @@ public class QuoteProviderService {
         var instrumentList = instruments.split(",");
         var result = new HashMap<String, List<Bar>>();
         for (var instrument : instrumentList) {
-            var bars = getBarsInPeriod(instrument, startTime, endTime);
+            var bars = getDailyBarsInPeriod(instrument, startTime, endTime);
+            result.put(instrument, bars);
+        }
+        return result;
+    }
+
+    public Map<String, List<Bar>> getMonthlyBarsInPeriodForSeveralInstruments(
+            String instruments,
+            long startTime,
+            long endTime
+    ) {
+        var instrumentList = instruments.split(",");
+        var result = new HashMap<String, List<Bar>>();
+        for (var instrument : instrumentList) {
+            var bars = getMonthlyBarsInPeriod(instrument, startTime, endTime);
             result.put(instrument, bars);
         }
         return result;
