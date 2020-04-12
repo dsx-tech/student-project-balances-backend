@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,16 +66,14 @@ public class DsxQuoteProvider {
             String responseBody;
             responseBody = requestService.doGetRequest(
                     String.format(
-                            "https://dsx.uk/mapi/periodBars/%s/d/%d/%d",
+                            "https://api.dsxglobal.com/api/2/public/candles/%s?period=D1&from=%s&till=%s&limit=1000",
                             dsxInstrumentEdge.toString(),
-                            startTime,
-                            endTime
+                            LocalDateTime.ofEpochSecond(startTime, 0, ZoneOffset.UTC),
+                            LocalDateTime.ofEpochSecond(endTime, 0, ZoneOffset.UTC)
                     ));
-            var jsonObject = new JSONObject(responseBody);
-            var barsString = String.valueOf(jsonObject.get(fixBchProblem(dsxInstrumentEdge.toString())));
             List<DsxBar> tmp;
             try {
-                tmp = objectMapper.readValue(barsString, new TypeReference<List<DsxBar>>() {});
+                tmp = objectMapper.readValue(responseBody, new TypeReference<List<DsxBar>>() {});
             } catch (IOException e) {
                 log.warn(e.getMessage(), e);
                 throw new RuntimeException(e);
@@ -92,23 +92,19 @@ public class DsxQuoteProvider {
         for (int i = 0; i < barsList.get(0).size(); i++) {
             var exchangeRate = new BigDecimal("1");
             for (int j = 0; j < barsList.size(); j++) {
-                if (instrumentList.get(j).isReversed()) {
-                    exchangeRate = exchangeRate.divide(
-                            barsList.get(j).get(i).getClose(),
-                            10,
-                            RoundingMode.HALF_UP
-                    );
-                } else {
-                    exchangeRate = exchangeRate.multiply(barsList.get(j).get(i).getClose());
-                }
+                    if (instrumentList.get(j).isReversed()) {
+                        exchangeRate = exchangeRate.divide(
+                                barsList.get(j).get(i).getClose(),
+                                10,
+                                RoundingMode.HALF_UP
+                        );
+                    } else {
+                        exchangeRate = exchangeRate.multiply(barsList.get(j).get(i).getClose());
+                    }
             }
             resultList.add(new DsxBar(
-                    new BigDecimal("0"),
-                    new BigDecimal("0"),
-                    new BigDecimal("0"),
-                    exchangeRate,
-                    new BigDecimal("0"),
-                    barsList.get(0).get(i).getTimestamp()
+                    barsList.get(0).get(i).getTimestamp(),
+                    exchangeRate
             ));
         }
 
@@ -128,7 +124,7 @@ public class DsxQuoteProvider {
             String responseBody;
             responseBody = requestService.doGetRequest(
                     String.format(
-                            "https://dsx.uk/mapi/ticker/%s",
+                            "https://api.dsxglobal.com/api/2/public/ticker/%s",
                             instrumentEdge.toString()
                     ));
             var jsonObject = new JSONObject(responseBody);

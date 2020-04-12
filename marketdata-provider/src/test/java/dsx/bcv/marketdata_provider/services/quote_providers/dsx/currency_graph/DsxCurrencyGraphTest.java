@@ -55,14 +55,14 @@ public class DsxCurrencyGraphTest {
         assertArrayEquals(
                 List.of(
                         new DsxInstrumentEdge(
-                                new DsxCurrencyVertex("btc"),
+                                new DsxCurrencyVertex("usd"),
                                 new DsxCurrencyVertex("rub"),
                                 true
                         ),
                         new DsxInstrumentEdge(
-                                new DsxCurrencyVertex("btc"),
                                 new DsxCurrencyVertex("eur"),
-                                false
+                                new DsxCurrencyVertex("usd"),
+                                true
                         )
                 ).toArray(),
                 shortestPath.toArray()

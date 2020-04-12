@@ -19,7 +19,7 @@ public class DsxQuoteProviderTest {
     @Test
     public void getBarsInPeriod() {
 
-        var result = dsxQuoteProvider.getBarsInPeriod("eur-rub", 1579080227, 1579253027);
+        var result = dsxQuoteProvider.getBarsInPeriod("eur-rub", 1586118131, 1586290931);
 
         assertEquals(2, result.size());
     }
