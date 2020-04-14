@@ -3,7 +3,10 @@ package dsx.bcv.marketdata_provider.services;
 import dsx.bcv.marketdata_provider.data.models.Asset;
 import dsx.bcv.marketdata_provider.data.models.Ticker;
 import dsx.bcv.marketdata_provider.data.repositories.TickerRepository;
+import dsx.bcv.marketdata_provider.exceptions.NotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 @Service
 public class TickerService {
@@ -23,7 +26,18 @@ public class TickerService {
     }
 
     public Ticker findByBaseAsset(Asset baseAsset) {
-        return tickerRepository.findByBaseAsset(baseAsset);
+        return tickerRepository.findByBaseAsset(baseAsset).orElseThrow(NotFoundException::new);
+    }
+
+    public boolean existsByBaseAsset(Asset baseAsset) {
+        return tickerRepository.findByBaseAsset(baseAsset).isPresent();
+    }
+
+    public void updateExchangeRateAndTimestampByBaseAsset(BigDecimal exchangeRate, long timestamp, Asset baseAsset) {
+        var ticker = findByBaseAsset(baseAsset);
+        ticker.setExchangeRate(exchangeRate);
+        ticker.setTimestamp(timestamp);
+        save(ticker);
     }
 
     public void deleteAll() {
