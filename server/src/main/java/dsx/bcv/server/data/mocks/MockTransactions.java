@@ -1,30 +1,26 @@
 package dsx.bcv.server.data.mocks;
 
 import dsx.bcv.server.data.models.Transaction;
-import dsx.bcv.server.services.TransactionService;
+import dsx.bcv.server.services.data_services.TransactionService;
 import dsx.bcv.server.services.parsers.CsvParser;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class MockTransactions {
 
-    public List<Transaction> getAll() {
-        return transactions;
-    }
-
-    private List<Transaction> transactions;
-
     private MockTransactions(CsvParser csvParser, TransactionService transactionService) {
 
         var classLoader = this.getClass().getClassLoader();
-        var inputStream = classLoader.getResourceAsStream("dsx_transactions.csv");
+        var inputStream = classLoader.getResourceAsStream("dsx_transactions_dev.csv");
         assert inputStream != null;
         var inputStreamReader = new InputStreamReader(inputStream);
 
+        List<Transaction> transactions = new ArrayList<>();
         try {
             transactions = csvParser.parseTransactions(
                     inputStreamReader, ';');
@@ -32,8 +28,10 @@ public class MockTransactions {
             e.printStackTrace();
         }
 
-        for (var transaction : transactions) {
-            transactionService.save(transaction);
+        if (transactionService.count() == 0) {
+            for (var transaction : transactions) {
+                transactionService.save(transaction);
+            }
         }
     }
 }

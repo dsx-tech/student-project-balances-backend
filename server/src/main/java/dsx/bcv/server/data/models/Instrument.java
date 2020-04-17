@@ -2,29 +2,40 @@ package dsx.bcv.server.data.models;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity(name = "instruments")
+@Table(uniqueConstraints = {
+        //@UniqueConstraint(columnNames = {"base_currency", "quoted_currency"})
+})
 @Data
-@RequiredArgsConstructor
 @NoArgsConstructor
-//@EqualsAndHashCode(exclude = "id")
 public class Instrument {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    @NonNull
-    @ManyToOne(fetch = FetchType.EAGER)
-    private Currency firstCurrency;
-    @NonNull
-    @ManyToOne(fetch = FetchType.EAGER)
-    private Currency secondCurrency;
+    @ManyToOne
+    private Currency baseCurrency;
+    @ManyToOne
+    private Currency quotedCurrency;
+
+    public Instrument(Currency baseCurrency, Currency quotedCurrency) {
+        this.baseCurrency = baseCurrency;
+        this.quotedCurrency = quotedCurrency;
+    }
+
+    public Instrument(String instrument) {
+
+        var baseCurrency = new Currency(instrument.substring(0, 3));
+        var quotedCurrency = new Currency(instrument.substring(3, 6));
+
+        this.baseCurrency = baseCurrency;
+        this.quotedCurrency = quotedCurrency;
+    }
 
     @Override
     public String toString() {
-        return firstCurrency.toString() + secondCurrency.toString();
+        return baseCurrency + "-" + quotedCurrency;
     }
 }

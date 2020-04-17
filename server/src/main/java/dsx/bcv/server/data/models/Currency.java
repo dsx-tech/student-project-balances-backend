@@ -1,26 +1,33 @@
 package dsx.bcv.server.data.models;
 
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity(name = "currencies")
 @Data
-@RequiredArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "name")
 public class Currency {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    @NonNull
+    @Column(unique = true)
+    private String code;
+    //@Column(unique = true)
     private String name;
+
+    public Currency(String code) {
+        this(code, "unknown");
+    }
+
+    public Currency(String code, String name) {
+        this.code = code.toLowerCase();
+        this.name = name;
+    }
 
     @Override
     public String toString() {
-        return name;
+        return code;
     }
 }

@@ -1,8 +1,8 @@
 package dsx.bcv.server.controllers;
 
-import dsx.bcv.server.data.dto.TradeDTO;
 import dsx.bcv.server.data.repositories.TradeRepository;
-import dsx.bcv.server.services.TradeService;
+import dsx.bcv.server.services.data_services.TradeService;
+import dsx.bcv.server.views.TradeVO;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +29,7 @@ public class TradeControllerTest {
     @Test
     public void getAll() {
 
-        var x = tradeController.getAll();
+        var x = tradeController.findAll();
 
         var y = verify(tradeRepository).findAll();
     }
@@ -40,18 +40,18 @@ public class TradeControllerTest {
     @Test
     public void getByID() {
 
-        var x = tradeController.getByID(id);
+        var x = tradeController.findByID(id);
 
         var y = verify(tradeRepository).findById(id);
     }
 
     @Parameter
-    public TradeDTO trade;
+    public TradeVO tradeVO;
 
     @Test
     public void add() {
 
-        var x = tradeController.add(trade);
+        var x = tradeController.add(tradeVO);
 
         //var y = verify(tradeRepository).save(trade);
     }
@@ -59,7 +59,7 @@ public class TradeControllerTest {
     @Test
     public void update() {
 
-        var x = tradeController.update(id, trade);
+        var x = tradeController.update(id, tradeVO);
 
         //var y = verify(tradeRepository).save(trade);
     }

@@ -1,5 +1,6 @@
 package dsx.bcv.marketdata_provider.services.quote_providers.dsx;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dsx.bcv.marketdata_provider.services.RequestService;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx.currency_graph.DsxInstrumentEdge;
@@ -7,11 +8,12 @@ import dsx.bcv.marketdata_provider.services.quote_providers.dsx.models.DsxInstru
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -41,20 +43,17 @@ public class DsxSupportedInstruments {
     @SneakyThrows
     private Set<DsxInstrumentEdge> initSupportedInstruments() {
 
-        var dsxUrlInfo = "https://dsx.uk/mapi/info";
+        var dsxUrlInfo = "https://api.dsxglobal.com/api/2/public/symbol";
         var responseBody = requestService.doGetRequest(dsxUrlInfo);
 
-        var responseBodyJsonObject = new JSONObject(responseBody);
-        var instrumentList = String.valueOf(responseBodyJsonObject.get("pairs"));
-        var instrumentListJsonObject = new JSONObject(instrumentList);
+        List<DsxInstrument> instruments = objectMapper.readValue(responseBody, new TypeReference<List<DsxInstrument>>() {});
 
-        var instruments = new HashSet<DsxInstrumentEdge>();
-        for (var key : instrumentListJsonObject.keySet()) {
-            var instrumentString = String.valueOf(instrumentListJsonObject.get(key));
-            var instrument = objectMapper.readValue(instrumentString, DsxInstrument.class);
-            instruments.add(new DsxInstrumentEdge(instrument));
-        }
-
-        return instruments;
+        return instruments.stream()
+                .map(dsxInstrument -> new DsxInstrumentEdge(
+                        dsxInstrument.getBaseCurrency(),
+                        dsxInstrument.getQuotedCurrency(),
+                        false)
+                )
+                .collect(Collectors.toSet());
     }
 }

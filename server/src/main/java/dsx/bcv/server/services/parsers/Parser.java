@@ -9,8 +9,7 @@ import java.io.Reader;
 import java.util.List;
 
 @Component
-public interface IParser {
-
+public interface Parser {
     List<Trade> parseTrades(Reader inputReader, char separator) throws IOException;
     List<Transaction> parseTransactions(Reader inputReader, char separator) throws IOException;
 }
