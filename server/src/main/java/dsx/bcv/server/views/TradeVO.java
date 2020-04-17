@@ -1,5 +1,7 @@
 package dsx.bcv.server.views;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -27,6 +29,32 @@ public class TradeVO {
     @JsonSerialize(using = ToStringSerializer.class)
     private CurrencyVO commissionCurrency;
     private String tradeValueId;
+
+    @JsonCreator
+    public TradeVO(
+            @JsonProperty("dateTime") LocalDateTime dateTime,
+            @JsonProperty("instrument") String instrument,
+            @JsonProperty("tradeType") TradeType tradeType,
+            @JsonProperty("tradedQuantity") BigDecimal tradedQuantity,
+            @JsonProperty("tradedQuantityCurrency") String tradedQuantityCurrency,
+            @JsonProperty("tradedPrice") BigDecimal tradedPrice,
+            @JsonProperty("tradedPriceCurrency") String tradedPriceCurrency,
+            @JsonProperty("commission") BigDecimal commission,
+            @JsonProperty("commissionCurrency") String commissionCurrency,
+            @JsonProperty("tradeValueId") String tradeValueId
+    ) {
+        this.id = 0;
+        this.dateTime = dateTime;
+        this.instrument = new InstrumentVO(instrument);
+        this.tradeType = tradeType;
+        this.tradedQuantity = tradedQuantity;
+        this.tradedQuantityCurrency = new CurrencyVO(tradedQuantityCurrency);
+        this.tradedPrice = tradedPrice;
+        this.tradedPriceCurrency = new CurrencyVO(tradedPriceCurrency);
+        this.commission = commission;
+        this.commissionCurrency = new CurrencyVO(commissionCurrency);
+        this.tradeValueId = tradeValueId;
+    }
 
     public TradeVO(
             long id,

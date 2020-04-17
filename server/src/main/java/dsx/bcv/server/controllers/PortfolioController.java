@@ -4,6 +4,7 @@ import dsx.bcv.server.data.models.Portfolio;
 import dsx.bcv.server.security.JwtTokenProvider;
 import dsx.bcv.server.services.data_services.PortfolioService;
 import dsx.bcv.server.services.data_services.UserService;
+import dsx.bcv.server.services.parsers.data_formats.CsvFileFormat;
 import dsx.bcv.server.views.PortfolioVO;
 import dsx.bcv.server.views.TradeVO;
 import dsx.bcv.server.views.TransactionVO;
@@ -44,7 +45,9 @@ public class PortfolioController {
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
-        return userService.findAllPortfoliosByUsername(getUsernameFromToken(getToken(authorization))).stream()
+        return userService
+                .findAllPortfoliosByUsername(getUsernameFromToken(removePrefixFromToken(authorization)))
+                .stream()
                 .map(portfolio -> conversionService.convert(portfolio, PortfolioVO.class))
                 .collect(Collectors.toList());
     }
@@ -59,7 +62,7 @@ public class PortfolioController {
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
         var portfolio = userService.findPortfolioByUsernameAndPortfolioId(
-                getUsernameFromToken(getToken(authorization)),
+                getUsernameFromToken(removePrefixFromToken(authorization)),
                 id
         );
         return conversionService.convert(portfolio, PortfolioVO.class);
@@ -75,7 +78,7 @@ public class PortfolioController {
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
         var portfolio = userService.findPortfolioByUsernameAndPortfolioName(
-                getUsernameFromToken(getToken(authorization)),
+                getUsernameFromToken(removePrefixFromToken(authorization)),
                 name);
         return conversionService.convert(portfolio, PortfolioVO.class);
     }
@@ -93,7 +96,7 @@ public class PortfolioController {
         assert portfolio != null;
         return conversionService.convert(
                 userService.addPortfolioByUsername(
-                        getUsernameFromToken(getToken(authorization)),
+                        getUsernameFromToken(removePrefixFromToken(authorization)),
                         portfolio
                 ),
                 PortfolioVO.class
@@ -112,7 +115,7 @@ public class PortfolioController {
         );
         var portfolio = conversionService.convert(portfolioVO, Portfolio.class);
         var newPortfolio = userService.updatePortfolioByUsernameAndPortfolioId(
-                getUsernameFromToken(getToken(authorization)),
+                getUsernameFromToken(removePrefixFromToken(authorization)),
                 id,
                 portfolio
         );
@@ -129,9 +132,13 @@ public class PortfolioController {
                 "Request received. Url: {}",
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
-        userService.deletePortfolioByUsernameAndPortfolioId(getUsernameFromToken(getToken(authorization)), id);
+        userService.deletePortfolioByUsernameAndPortfolioId(
+                getUsernameFromToken(removePrefixFromToken(authorization)),
+                id
+        );
     }
 
+    @Deprecated
     @GetMapping("{id}/trades")
     public List<TradeVO> getTradesByPortfolioId(
             @PathVariable long id,
@@ -142,15 +149,16 @@ public class PortfolioController {
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
         userService.ThrowNotFoundIfUserDoesntHavePortfolioWithId(
-                getUsernameFromToken(getToken(authorization)),
+                getUsernameFromToken(removePrefixFromToken(authorization)),
                 id
         );
-        var trades = portfolioService.getTradesByPortfolioId(id);
+        var trades = portfolioService.getTrades(id);
         return trades.stream()
                 .map(trade -> conversionService.convert(trade, TradeVO.class))
                 .collect(Collectors.toList());
     }
 
+    @Deprecated
     @GetMapping("{id}/transactions")
     public List<TransactionVO> getTransactionsByPortfolioId(
             @PathVariable long id,
@@ -161,15 +169,16 @@ public class PortfolioController {
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
         );
         userService.ThrowNotFoundIfUserDoesntHavePortfolioWithId(
-                getUsernameFromToken(getToken(authorization)),
+                getUsernameFromToken(removePrefixFromToken(authorization)),
                 id
         );
-        var transactions = portfolioService.getTransactionsByPortfolioId(id);
+        var transactions = portfolioService.getTransactions(id);
         return transactions.stream()
                 .map(transaction -> conversionService.convert(transaction, TransactionVO.class))
                 .collect(Collectors.toList());
     }
 
+    @Deprecated
     @PostMapping("{id}/trades/upload")
     public void uploadTradeFileByPortfolioId(
             @PathVariable long id,
@@ -177,12 +186,13 @@ public class PortfolioController {
             @RequestParam("file") MultipartFile file
     ) {
         userService.ThrowNotFoundIfUserDoesntHavePortfolioWithId(
-                getUsernameFromToken(getToken(authorization)),
+                getUsernameFromToken(removePrefixFromToken(authorization)),
                 id
         );
-        portfolioService.uploadTradeFileByPortfolioId(file, id);
+        portfolioService.uploadTradeFile(file, CsvFileFormat.Dsx, id);
     }
 
+    @Deprecated
     @PostMapping("{id}/transactions/upload")
     public void uploadTransactionFileByPortfolioId(
             @PathVariable long id,
@@ -190,14 +200,14 @@ public class PortfolioController {
             @RequestParam("file") MultipartFile file
     ) {
         userService.ThrowNotFoundIfUserDoesntHavePortfolioWithId(
-                getUsernameFromToken(getToken(authorization)),
+                getUsernameFromToken(removePrefixFromToken(authorization)),
                 id
         );
-        portfolioService.uploadTransactionFileByPortfolioId(file, id);
+        portfolioService.uploadTransactionFile(file, CsvFileFormat.Dsx, id);
     }
 
-    private String getToken(String authorization) {
-        return authorization.substring("Token_".length());
+    private String removePrefixFromToken(String authorization) {
+        return jwtTokenProvider.removePrefixFromToken(authorization);
     }
 
     private String getUsernameFromToken(String token) {

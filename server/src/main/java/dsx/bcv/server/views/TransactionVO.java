@@ -1,5 +1,7 @@
 package dsx.bcv.server.views;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -22,6 +24,25 @@ public class TransactionVO {
     private BigDecimal commission;
     private TransactionStatus transactionStatus;
     private String transactionValueId;
+
+    @JsonCreator
+    public TransactionVO(
+            @JsonProperty("dateTime") LocalDateTime dateTime,
+            @JsonProperty("transactionType") TransactionType transactionType,
+            @JsonProperty("currency") String currency,
+            @JsonProperty("amount") BigDecimal amount,
+            @JsonProperty("commission") BigDecimal commission,
+            @JsonProperty("transactionStatus") TransactionStatus transactionStatus,
+            @JsonProperty("transactionValueId") String transactionValueId
+    ) {
+        this.dateTime = dateTime;
+        this.transactionType = transactionType;
+        this.currency = new CurrencyVO(currency);
+        this.amount = amount;
+        this.commission = commission;
+        this.transactionStatus = transactionStatus;
+        this.transactionValueId = transactionValueId;
+    }
 
     public TransactionVO(
             long id,

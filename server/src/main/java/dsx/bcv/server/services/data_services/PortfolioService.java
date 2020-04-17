@@ -6,6 +6,7 @@ import dsx.bcv.server.data.models.Transaction;
 import dsx.bcv.server.data.repositories.PortfolioRepository;
 import dsx.bcv.server.exceptions.NotFoundException;
 import dsx.bcv.server.services.parsers.CsvParser;
+import dsx.bcv.server.services.parsers.data_formats.CsvFileFormat;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -54,17 +55,17 @@ public class PortfolioService {
         return portfolio;
     }
 
-    public List<Trade> getTradesByPortfolioId(long id) {
-        var portfolio = findById(id);
+    public List<Trade> getTrades(long portfolioId) {
+        var portfolio = findById(portfolioId);
         var trades = new ArrayList<>(portfolio.getTrades());
-        log.debug("getTradesByPortfolioId: Trades {}... found", trades.stream().limit(2));
+        log.debug("getTrades: Trades {}... found", trades.stream().limit(2));
         return trades;
     }
 
-    public List<Transaction> getTransactionsByPortfolioId(long id) {
-        var portfolio = findById(id);
+    public List<Transaction> getTransactions(long portfolioId) {
+        var portfolio = findById(portfolioId);
         var transactions = new ArrayList<>(portfolio.getTransactions());
-        log.debug("getTransactionsByPortfolioId: Transactions {}... found", transactions.stream().limit(2));
+        log.debug("getTransactions: Transactions {}... found", transactions.stream().limit(2));
         return transactions;
     }
 
@@ -79,43 +80,43 @@ public class PortfolioService {
     }
 
     @SneakyThrows
-    public void uploadTradeFileByPortfolioId(MultipartFile file, long portfolioId) {
+    public void uploadTradeFile(MultipartFile file, CsvFileFormat csvFileFormat, long portfolioId) {
         log.debug(
-                "uploadTradeFileByPortfolioId: File with filename {}({}) uploaded",
+                "uploadTradeFile: File with filename {}({}) uploaded",
                 file.getName(),
                 file.getOriginalFilename()
         );
         var trades = csvParser.parseTrades(new InputStreamReader(file.getInputStream()), ';');
-        log.debug("uploadTradeFileByPortfolioId: Trades {}... parsed", trades.stream().limit(2));
-        addTradesByPortfolioId(trades, portfolioId);
+        log.debug("uploadTradeFile: Trades {}... parsed", trades.stream().limit(2));
+        addTrades(trades, portfolioId);
     }
 
     @SneakyThrows
-    public void uploadTransactionFileByPortfolioId(MultipartFile file, long portfolioId) {
+    public void uploadTransactionFile(MultipartFile file, CsvFileFormat csvFileFormat, long portfolioId) {
         log.debug(
-                "uploadTransactionFileByPortfolioId: File with filename {}({}) uploaded",
+                "uploadTransactionFile: File with filename {}({}) uploaded",
                 file.getName(),
                 file.getOriginalFilename()
         );
         var transactions = csvParser.parseTransactions(new InputStreamReader(file.getInputStream()), ';');
-        log.debug("uploadTransactionFileByPortfolioId: Transactions {}... parsed", transactions.stream().limit(2));
-        addTransactionsByPortfolioId(transactions, portfolioId);
+        log.debug("uploadTransactionFile: Transactions {}... parsed", transactions.stream().limit(2));
+        addTransactions(transactions, portfolioId);
     }
 
-    public void addTradesByPortfolioId(List<Trade> trades, long portfolioId) {
+    public void addTrades(List<Trade> trades, long portfolioId) {
         var savedTrades = tradeService.saveAll(trades);
         var portfolio = findById(portfolioId);
         portfolio.getTrades().addAll(savedTrades);
         save(portfolio);
-        log.debug("addTradesByPortfolioId: Trades added");
+        log.debug("addTrades: Trades added");
     }
 
-    public void addTransactionsByPortfolioId(List<Transaction> transactions, long portfolioId) {
+    public void addTransactions(List<Transaction> transactions, long portfolioId) {
         var savedTransactions = transactionService.saveAll(transactions);
         var portfolio = findById(portfolioId);
         portfolio.getTransactions().addAll(savedTransactions);
         save(portfolio);
-        log.debug("addTransactionsByPortfolioId: Transactions added");
+        log.debug("addTransactions: Transactions added");
     }
 
     public void deleteById(long id) {
@@ -126,5 +127,57 @@ public class PortfolioService {
     public long count() {
         log.debug("count: Called");
         return portfolioRepository.count();
+    }
+
+    public Trade findTradeById(long tradeId, long portfolioId) {
+        var portfolio = findById(portfolioId);
+        var trades = new ArrayList<>(portfolio.getTrades());
+        return trades.stream()
+                .filter(trade -> trade.getId() == tradeId)
+                .findFirst()
+                .orElseThrow(NotFoundException::new);
+    }
+
+    public Trade addTrade(Trade trade, long portfolioId) {
+        var savedTrade = tradeService.save(trade);
+        var portfolio = findById(portfolioId);
+        portfolio.getTrades().add(savedTrade);
+        save(portfolio);
+        log.debug("addTrade: Trade with id {} successfully added", savedTrade.getId());
+        return savedTrade;
+    }
+
+    public void deleteTradeById(long tradeId, long portfolioId) {
+        var portfolio = findById(portfolioId);
+        var trades = portfolio.getTrades();
+        trades.removeIf(trade -> trade.getId() == tradeId);
+        save(portfolio);
+        log.debug("deleteTradeById: Trade with id {} successfully deleted", tradeId);
+    }
+
+    public Transaction findTransactionById(long transactionId, long portfolioId) {
+        var portfolio = findById(portfolioId);
+        var trades = new ArrayList<>(portfolio.getTransactions());
+        return trades.stream()
+                .filter(transaction -> transaction.getId() == transactionId)
+                .findFirst()
+                .orElseThrow(NotFoundException::new);
+    }
+
+    public Transaction addTransaction(Transaction transaction, long portfolioId) {
+        var savedTransaction = transactionService.save(transaction);
+        var portfolio = findById(portfolioId);
+        portfolio.getTransactions().add(savedTransaction);
+        save(portfolio);
+        log.debug("addTransaction: Transaction with id {} successfully added", savedTransaction.getId());
+        return savedTransaction;
+    }
+
+    public void deleteTransactionById(long transactionId, long portfolioId) {
+        var portfolio = findById(portfolioId);
+        var trades = portfolio.getTransactions();
+        trades.removeIf(transaction -> transaction.getId() == transactionId);
+        save(portfolio);
+        log.debug("deleteTransactionById: Transaction with id {} successfully deleted", transactionId);
     }
 }
