@@ -11,7 +11,7 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    private static void init(){
+    private static void init() {
         System.setProperty("server.servlet.context-path", "/bcv");
         System.getProperties().put("server.port", 8888);
     }
