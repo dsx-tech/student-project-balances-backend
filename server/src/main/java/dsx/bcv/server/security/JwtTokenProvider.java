@@ -93,4 +93,8 @@ public class JwtTokenProvider {
                 .map(Role::getName)
                 .collect(Collectors.toList());
     }
+
+    public String removePrefixFromToken(String authorization) {
+        return authorization.substring("Token_".length());
+    }
 }
