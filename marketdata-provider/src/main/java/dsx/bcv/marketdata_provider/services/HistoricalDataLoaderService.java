@@ -6,11 +6,12 @@ import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.AlphaV
 import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.models.AlphaVantageAsset;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-//@Service
+@Service
 @Slf4j
 public class HistoricalDataLoaderService {
 
@@ -35,6 +36,10 @@ public class HistoricalDataLoaderService {
         this.alphaVantageSupportedAssets = alphaVantageSupportedAssets;
         this.barService = barService;
         this.actualDataLoaderService = actualDataLoaderService;
+
+//        ExecutorService executorService = Executors.newSingleThreadExecutor();
+//        executorService.execute(this::loadData);
+//        executorService.shutdown();
 
         new Thread(this::loadData).start();
     }

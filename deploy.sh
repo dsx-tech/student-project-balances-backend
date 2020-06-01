@@ -12,6 +12,7 @@ echo "Deploy module $1"
 echo "Build project"
 
 gradle "$1":clean --warning-mode=all
+# shellcheck disable=SC2181
 if [ $? != 0 ]
 then
   echo "Clean failed! Exit..."
@@ -19,6 +20,7 @@ then
 fi
 
 gradle "$1":build --warning-mode=all
+# shellcheck disable=SC2181
 if [ $? != 0 ]
 then
   echo "Build failed! Exit..."
@@ -29,16 +31,25 @@ fi
 
 echo "Copy files"
 
-ssh -i key.pem ubuntu@3.248.170.197 << EOF
+ssh lv_reg_all@35.217.7.122 << EOF
 
-mkdir /home/ubuntu/"$1"
+mkdir /home/lv_reg_all/"$1"
 
 EOF
 
-scp -i key.pem "$1"/build/libs/"$1".jar ubuntu@3.248.170.197:/home/ubuntu/"$1"/
+scp "$1"/build/libs/"$1".jar lv_reg_all@35.217.7.122:/home/lv_reg_all/"$1"/
+# shellcheck disable=SC2181
 if [ $? != 0 ]
 then
   echo "Copy failed! Exit..."
+  exit 1
+fi
+
+scp starter.sh lv_reg_all@35.217.7.122:/home/lv_reg_all/"$1"/
+# shellcheck disable=SC2181
+if [ $? != 0 ]
+then
+  echo "Copy failed! (starter.sh) Exit..."
   exit 1
 fi
 
@@ -46,19 +57,11 @@ fi
 
 echo "Restart application"
 
-ssh -i key.pem ubuntu@3.248.170.197 << EOF
+ssh lv_reg_all@35.217.7.122 << EOF
 
-cd /home/ubuntu/"$1"
-pgrep -f "$1"
-if [ $? != 0 ]
-then
-  echo "No process with name "$1" found"
-else
-  echo "Kill running process"
-  kill -9 $(pgrep -f "$1")
-fi
-rm *log*
-nohup java -jar -XX:+PrintGCDetails -Xloggc:gc.log -Xms128m -Xmx256m "$1".jar > "$1".log &
+cd "$1"
+chmod +x starter.sh
+./starter.sh "$1"
 
 EOF
 
