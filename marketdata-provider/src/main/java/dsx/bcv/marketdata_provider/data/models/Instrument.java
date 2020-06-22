@@ -7,7 +7,14 @@ import lombok.Data;
 @AllArgsConstructor
 public class Instrument {
 
+    /**
+     * Обмениваемый актив
+     */
     public Asset baseAsset;
+
+    /**
+     * Запрашиваемый актив
+     */
     public Asset quotedAsset;
 
     @Override

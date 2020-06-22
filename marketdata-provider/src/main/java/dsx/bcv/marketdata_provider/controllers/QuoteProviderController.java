@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Предоставляет api для загрузки данных о котировках активов
+ */
 @RestController
 @RequestMapping("quotes")
 @Slf4j

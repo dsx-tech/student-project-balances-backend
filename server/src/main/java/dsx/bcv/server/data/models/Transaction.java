@@ -14,20 +14,49 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class Transaction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    /**
+     * Дата транзакции
+     */
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime dateTime;
+
+    /**
+     * Тип транзакции
+     */
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
+
+    /**
+     * Валюта транзакции
+     */
     @JsonSerialize(using = ToStringSerializer.class)
     @ManyToOne
     private Currency currency;
+
+    /**
+     * Объем транзакции
+     */
     private BigDecimal amount;
+
+    /**
+     * Объем комиссии за транзакцию
+     */
     private BigDecimal commission;
+
+    /**
+     * Статус транзакции
+     */
     @Enumerated(EnumType.STRING)
     private TransactionStatus transactionStatus;
+
+    /**
+     * Уникальный идентификатор транзакции, предоставляемый торговой площадкой
+     */
     private String transactionValueId;
 
     public Transaction(

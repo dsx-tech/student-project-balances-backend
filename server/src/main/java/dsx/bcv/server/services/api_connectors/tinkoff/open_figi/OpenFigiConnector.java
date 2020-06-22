@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Коннектор к сервису Open Figi, на данный момент не используется
+ */
 @Service
 public class OpenFigiConnector {
 

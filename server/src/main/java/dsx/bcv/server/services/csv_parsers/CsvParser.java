@@ -15,6 +15,9 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Парсит данные о сделках и транзакциях из Reader в типизированные списки
+ */
 @Component
 public class CsvParser implements Parser {
 

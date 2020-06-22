@@ -5,6 +5,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+/**
+ * Используется для преобразования даты из строки, предоставляемой Dsx Global,
+ * в строку, которую способен распарсить LocalDateTime
+ */
 @Service
 public class LocalDateTimeService {
 

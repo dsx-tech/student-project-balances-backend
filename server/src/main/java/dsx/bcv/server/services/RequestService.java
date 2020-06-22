@@ -8,12 +8,21 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Предоставляет возможность делать HTTP запросы
+ */
 @Service
 @Slf4j
 public class RequestService {
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
+    /**
+     * Предоставляет возможность сделать POST запрос по указанному url
+     * @param url url запроса
+     * @param requestString тело запроса
+     * @return текст, полученный в ответе на запрос
+     */
     public String doPostRequest(String url, String requestString) {
         log.trace("doGetRequest called. Url: {}", url);
 

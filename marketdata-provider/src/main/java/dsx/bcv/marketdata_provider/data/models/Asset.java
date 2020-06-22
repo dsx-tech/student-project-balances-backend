@@ -9,11 +9,20 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 public class Asset {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    /**
+     * Тикер
+     */
     @Column(unique = true)
     private String code;
+
+    /**
+     * Полное имя
+     */
     @Column(unique = true)
     private String name;
 

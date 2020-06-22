@@ -8,6 +8,9 @@ import dsx.bcv.server.services.data_services.UserService;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
+/**
+ * Добавляет mock пользователей для ручного тестирования
+ */
 @Component
 @DependsOn({"mockPortfolios"})
 public class MockUsers {

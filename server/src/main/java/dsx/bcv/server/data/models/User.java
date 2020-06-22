@@ -10,14 +10,36 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    /**
+     * Уникальное имя пользователя
+     */
+    @Column(unique = true)
     private String username;
+
+    /**
+     * Зашифрованный пароль пользователя
+     */
     private String password;
+
+    /**
+     * Email пользователя
+     */
     private String email;
+
+    /**
+     * Список портфелей пользователя
+     */
     @OneToMany(fetch = FetchType.EAGER)
     private Set<Portfolio> portfolios;
+
+    /**
+     * Список ролей пользователя
+     */
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
 

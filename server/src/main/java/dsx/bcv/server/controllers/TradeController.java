@@ -5,7 +5,6 @@ import dsx.bcv.server.security.JwtTokenProvider;
 import dsx.bcv.server.services.api_connectors.ApiConnectorName;
 import dsx.bcv.server.services.csv_parsers.data_formats.CsvFileFormat;
 import dsx.bcv.server.services.data_services.PortfolioService;
-import dsx.bcv.server.services.data_services.TradeService;
 import dsx.bcv.server.services.data_services.UserService;
 import dsx.bcv.server.views.TradeVO;
 import lombok.extern.slf4j.Slf4j;
@@ -17,25 +16,25 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Предоставляет api для CRUD операций со сделками пользователей
+ */
 @RestController
 @RequestMapping("trades")
 @Slf4j
 public class TradeController {
 
-    private final TradeService tradeService;
     private final UserService userService;
     private final PortfolioService portfolioService;
     private final JwtTokenProvider jwtTokenProvider;
     private final ConversionService conversionService;
 
     public TradeController(
-            TradeService tradeService,
             UserService userService,
             PortfolioService portfolioService,
             JwtTokenProvider jwtTokenProvider,
             ConversionService conversionService
     ) {
-        this.tradeService = tradeService;
         this.userService = userService;
         this.portfolioService = portfolioService;
         this.jwtTokenProvider = jwtTokenProvider;

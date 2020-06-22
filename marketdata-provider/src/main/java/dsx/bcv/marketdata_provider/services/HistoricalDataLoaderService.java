@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Один раз при запуске программы загружает исторические данные о котировках активов, загруженных в таблицу asset
+ */
 @Service
 @Slf4j
 public class HistoricalDataLoaderService {
@@ -56,6 +59,9 @@ public class HistoricalDataLoaderService {
         actualDataLoaderService.loadDataFromLastBars();
     }
 
+    /**
+     * Загружает активы, поддерживаемые Alpha Vantage, в таблицу assets
+     */
     void saveSupportedAssetsToDb() {
 
         log.info("saveSupportedAssetsToDb method called");
@@ -90,6 +96,9 @@ public class HistoricalDataLoaderService {
         log.info("Stocks saved. List: {}", stocks);
     }
 
+    /**
+     * Загружает историю котировок физических валют в таблицу bars
+     */
     private void loadPhysicalCurrencies() {
 
         final var physicalCurrencies = alphaVantageSupportedAssets.getPhysicalCurrencies()
@@ -119,6 +128,9 @@ public class HistoricalDataLoaderService {
         log.info("Physical currencies history saved");
     }
 
+    /**
+     * Загружает историю котировок криптовалют в таблицу bars
+     */
     private void loadDigitalCurrencies() {
 
         final var digitalCurrencies = alphaVantageSupportedAssets.getDigitalCurrencies()
@@ -147,6 +159,9 @@ public class HistoricalDataLoaderService {
         log.info("Digital currencies history saved");
     }
 
+    /**
+     * Загружает историю котировок акций в таблицу bars
+     */
     private void loadStocks() {
 
         final var stocks = alphaVantageSupportedAssets.getStocks()

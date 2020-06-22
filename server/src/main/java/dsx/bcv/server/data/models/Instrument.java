@@ -12,11 +12,20 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 public class Instrument {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    /**
+     * Обмениваемый актив
+     */
     @ManyToOne
     private Currency baseCurrency;
+
+    /**
+     * Запрашиваемый актив
+     */
     @ManyToOne
     private Currency quotedCurrency;
 

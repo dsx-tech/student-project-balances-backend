@@ -10,10 +10,18 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Предоставляет возможность делать HTTP запросы
+ */
 @Service
 @Slf4j
 public class RequestService {
 
+    /**
+     * Предоставляет возможность сделать GET запрос по указанному url
+     * @param url url запроса
+     * @return текст, полученный в ответе на запрос
+     */
     public String doGetRequest(String url) {
         log.trace("doGetRequest called. Url: {}", url);
         OkHttpClient client = new OkHttpClient.Builder()

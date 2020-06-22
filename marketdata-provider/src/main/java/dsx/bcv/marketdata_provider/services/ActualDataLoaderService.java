@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+/**
+ * Обновляет данные о текущих курсах активов в таблице tickers
+ */
 @Service
 @Slf4j
 public class ActualDataLoaderService {
@@ -23,6 +26,9 @@ public class ActualDataLoaderService {
         this.assetService = assetService;
     }
 
+    /**
+     * Раз в день в 03:00 обновляет поле exchangeRate в элементах таблицы tickers
+     */
     @Scheduled(cron = "0 0 3 * * *")
     public void loadDataFromLastBars() {
 

@@ -10,6 +10,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Добавляет mock транзакции пользователя в портфели для ручного тестирования
+ */
 @Component
 public class MockTransactions {
 

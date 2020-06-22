@@ -8,7 +8,6 @@ import dsx.bcv.marketdata_provider.data.models.Ticker;
 import dsx.bcv.marketdata_provider.exceptions.NotFoundException;
 import dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage.AlphaVantageSupportedAssets;
 import dsx.bcv.marketdata_provider.services.quote_providers.dsx.DsxQuoteProvider;
-import dsx.bcv.marketdata_provider.views.InstrumentVO;
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
@@ -51,6 +50,9 @@ public class QuoteProviderService {
         this.assetService = assetService;
     }
 
+    /**
+     * @return список поддерживаемых активов
+     */
     public List<Asset> getAssets() {
         var assets = alphaVantageSupportedAssets.getPhysicalCurrencies();
         assets.addAll(alphaVantageSupportedAssets.getDigitalCurrencies());
@@ -62,12 +64,12 @@ public class QuoteProviderService {
                 .collect(Collectors.toList());
     }
 
-    public List<InstrumentVO> getInstruments() {
-        return dsxQuoteProvider.getInstruments().stream()
-                .map(instrument -> conversionService.convert(instrument, InstrumentVO.class))
-                .collect(Collectors.toList());
-    }
-
+    /**
+     * @param instrument пара тикеров, разделенных дефисом
+     * @param startTime unit timestamp начала интервала
+     * @param endTime unit timestamp конца интервала
+     * @return ежедневные котировки по инструменту instrument в интервале между startTime и endTime
+     */
     public List<Bar> getDailyBarsInPeriod(String instrument, long startTime, long endTime) {
 
         final var currencyPair = getCurrencyPairFromInstrumentString(instrument);
@@ -114,6 +116,13 @@ public class QuoteProviderService {
         return resultBars;
     }
 
+    /**
+     * @param instrument пара тикеров, разделенных дефисом
+     * @param startTime unit timestamp начала интервала
+     * @param endTime unit timestamp конца интервала
+     * @return ежемесячные котировки по инструменту instrument в интервале между startTime и endTime,
+     * в качестве котировки за месяц берется котировка за последний день этого месяца
+     */
     public List<Bar> getMonthlyBarsInPeriod(String instrument, long startTime, long endTime) {
 
         var dailyBars = getDailyBarsInPeriod(instrument, startTime, endTime);
@@ -128,6 +137,13 @@ public class QuoteProviderService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * @param instruments список инструментов, разделенных запятой,
+     *                    instrument --- пара тикеров, разделенных дефисом
+     * @param startTime unit timestamp начала интервала
+     * @param endTime unit timestamp конца интервала
+     * @return ежедневные котировки по инструментам в instruments в интервале между startTime и endTime
+     */
     public Map<String, List<Bar>> getDailyBarsInPeriodForSeveralInstruments(
             String instruments,
             long startTime,
@@ -142,6 +158,13 @@ public class QuoteProviderService {
         return result;
     }
 
+    /**
+     * @param instruments список инструментов, разделенных запятой,
+     *                    instrument --- пара тикеров, разделенных дефисом
+     * @param startTime unit timestamp начала интервала
+     * @param endTime unit timestamp конца интервала
+     * @return ежемесячные котировки по инструментам в instruments в интервале между startTime и endTime
+     */
     public Map<String, List<Bar>> getMonthlyBarsInPeriodForSeveralInstruments(
             String instruments,
             long startTime,
@@ -156,6 +179,10 @@ public class QuoteProviderService {
         return result;
     }
 
+    /**
+     * @param instrument строка, содержащая тикеры 2 активов, разделенных дефисом
+     * @return пара активов
+     */
     private Pair<Asset, Asset> getCurrencyPairFromInstrumentString(String instrument) {
 
         var currencyPair = Lists.newArrayList(Splitter.on("-").split(instrument));
@@ -185,6 +212,10 @@ public class QuoteProviderService {
         return new Pair<>(baseCurrency, quotedCurrency);
     }
 
+    /**
+     * @param instrument пара тикеров, разделенных дефисом
+     * @return текущий курс по инструменту instrument, хранящийся в базе данных
+     */
     public Ticker getTicker(String instrument) {
 
         final var currencyPair = getCurrencyPairFromInstrumentString(instrument);
@@ -205,6 +236,11 @@ public class QuoteProviderService {
         );
     }
 
+    /**
+     * @param instruments список инструментов, разделенных запятой,
+     *                    instrument --- пара тикеров, разделенных дефисом
+     * @return текущий курс по инструменту instrument, хранящийся в базе данных
+     */
     public Map<String, Ticker> getTickers(String instruments) {
 
         var instrumentList = instruments.split(",");

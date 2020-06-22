@@ -8,13 +8,18 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+/**
+ * Роль пользователя в системе (требуется для Spring Security)
+ */
 @Entity(name = "roles")
 @Data
 @NoArgsConstructor
 public class Role {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
     private String name;
 
     public Role(String name) {

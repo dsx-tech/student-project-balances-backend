@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * Формат (последовательность полей) csv файлов Dsx Global для сделок и транзакций
+ */
 @Component("dsx_data_format")
 public class DsxDataFormat implements MarketplaceDataFormat {
 

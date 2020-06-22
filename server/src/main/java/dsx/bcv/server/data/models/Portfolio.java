@@ -11,13 +11,26 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 public class Portfolio {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    /**
+     * Имя портфеля
+     */
     @Column(nullable = false)
     private String name;
+
+    /**
+     * Список сделок в портфеле
+     */
     @OneToMany(fetch = FetchType.EAGER)
     private Set<Trade> trades = new HashSet<>();
+
+    /**
+     * Список транзакций в портфеле
+     */
     @OneToMany(fetch = FetchType.EAGER)
     private Set<Transaction> transactions = new HashSet<>();
 

@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * Формат (последовательность полей) csv файлов данного проекта для сделок и транзакций
+ */
 @Component
 public class ProjectDataFormat implements MarketplaceDataFormat {
 
