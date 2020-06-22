@@ -1,10 +1,10 @@
-package dsx.bcv.server.services.parsers;
+package dsx.bcv.server.services.csv_parsers;
 
 import dsx.bcv.server.data.models.Trade;
 import dsx.bcv.server.data.models.Transaction;
+import dsx.bcv.server.services.csv_parsers.data_formats.MarketplaceDataFormat;
 import dsx.bcv.server.services.data_services.TradeService;
 import dsx.bcv.server.services.data_services.TransactionService;
-import dsx.bcv.server.services.parsers.data_formats.MarketplaceDataFormat;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Qualifier;

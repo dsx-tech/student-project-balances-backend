@@ -36,7 +36,12 @@ public class ActualDataLoaderService {
                     lastBar.getExchangeRate(),
                     lastBar.getTimestamp()
             );
-            tickerService.save(ticker);
+            if (!tickerService.existsByBaseAsset(ticker.getBaseAsset())) {
+                tickerService.save(ticker);
+            }
+            else {
+                tickerService.updateExchangeRateByBaseAsset(ticker.getExchangeRate(), ticker.getBaseAsset());
+            }
             log.debug(
                     "Ticker for {} saved. Rate: {}. Timestamp: {}",
                     asset,

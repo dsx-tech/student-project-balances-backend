@@ -2,9 +2,9 @@ package dsx.bcv.server.controllers;
 
 import dsx.bcv.server.data.models.Portfolio;
 import dsx.bcv.server.security.JwtTokenProvider;
+import dsx.bcv.server.services.csv_parsers.data_formats.CsvFileFormat;
 import dsx.bcv.server.services.data_services.PortfolioService;
 import dsx.bcv.server.services.data_services.UserService;
-import dsx.bcv.server.services.parsers.data_formats.CsvFileFormat;
 import dsx.bcv.server.views.PortfolioVO;
 import dsx.bcv.server.views.TradeVO;
 import dsx.bcv.server.views.TransactionVO;

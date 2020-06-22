@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 pgrep -f "$1".jar
 
 # shellcheck disable=SC2181

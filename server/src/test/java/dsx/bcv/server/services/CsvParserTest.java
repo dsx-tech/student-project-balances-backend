@@ -2,7 +2,7 @@ package dsx.bcv.server.services;
 
 import dsx.bcv.server.Application;
 import dsx.bcv.server.data.models.*;
-import dsx.bcv.server.services.parsers.CsvParser;
+import dsx.bcv.server.services.csv_parsers.CsvParser;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -5,8 +5,10 @@ import dsx.bcv.server.data.models.Trade;
 import dsx.bcv.server.data.models.Transaction;
 import dsx.bcv.server.data.repositories.PortfolioRepository;
 import dsx.bcv.server.exceptions.NotFoundException;
-import dsx.bcv.server.services.parsers.CsvParser;
-import dsx.bcv.server.services.parsers.data_formats.CsvFileFormat;
+import dsx.bcv.server.services.api_connectors.ApiConnectorName;
+import dsx.bcv.server.services.api_connectors.ApiConnectorRepository;
+import dsx.bcv.server.services.csv_parsers.CsvParser;
+import dsx.bcv.server.services.csv_parsers.data_formats.CsvFileFormat;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,17 +26,19 @@ public class PortfolioService {
     private final TradeService tradeService;
     private final TransactionService transactionService;
     private final CsvParser csvParser;
+    private final ApiConnectorRepository apiConnectorRepository;
 
     public PortfolioService(
             PortfolioRepository portfolioRepository,
             TradeService tradeService,
             TransactionService transactionService,
-            CsvParser csvParser
-    ) {
+            CsvParser csvParser,
+            ApiConnectorRepository apiConnectorRepository) {
         this.portfolioRepository = portfolioRepository;
         this.tradeService = tradeService;
         this.transactionService = transactionService;
         this.csvParser = csvParser;
+        this.apiConnectorRepository = apiConnectorRepository;
     }
 
     public Portfolio save(Portfolio portfolio) {
@@ -100,6 +104,20 @@ public class PortfolioService {
         );
         var transactions = csvParser.parseTransactions(new InputStreamReader(file.getInputStream()), ';');
         log.debug("uploadTransactionFile: Transactions {}... parsed", transactions.stream().limit(2));
+        addTransactions(transactions, portfolioId);
+    }
+
+    public void uploadTradesUsingApi(ApiConnectorName apiConnectorName, String token, long portfolioId) {
+        log.debug("uploadTradesUsingApi: called");
+        var apiConnector = apiConnectorRepository.getApiConnectorByName(apiConnectorName);
+        var trades = apiConnector.getAllTrades(token);
+        addTrades(trades, portfolioId);
+    }
+
+    public void uploadTransactionsUsingApi(ApiConnectorName apiConnectorName, String token, long portfolioId) {
+        log.debug("uploadTransactionsUsingApi: called");
+        var apiConnector = apiConnectorRepository.getApiConnectorByName(apiConnectorName);
+        var transactions = apiConnector.getAllTransactions(token);
         addTransactions(transactions, portfolioId);
     }
 
