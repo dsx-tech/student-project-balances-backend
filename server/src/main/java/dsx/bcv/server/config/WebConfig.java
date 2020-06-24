@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Предназначен для инициализации конвертеров, которыми можно пользоваться через ConversionService
+ */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Override

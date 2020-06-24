@@ -2,10 +2,10 @@ package dsx.bcv.server.controllers;
 
 import dsx.bcv.server.data.models.Transaction;
 import dsx.bcv.server.security.JwtTokenProvider;
+import dsx.bcv.server.services.api_connectors.ApiConnectorName;
+import dsx.bcv.server.services.csv_parsers.data_formats.CsvFileFormat;
 import dsx.bcv.server.services.data_services.PortfolioService;
-import dsx.bcv.server.services.data_services.TransactionService;
 import dsx.bcv.server.services.data_services.UserService;
-import dsx.bcv.server.services.parsers.data_formats.CsvFileFormat;
 import dsx.bcv.server.views.TransactionVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
@@ -16,25 +16,25 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Предоставляет api для CRUD операций с транзакциями пользователей
+ */
 @RestController
 @RequestMapping("transactions")
 @Slf4j
 public class TransactionController {
 
-    private final TransactionService transactionService;
     private final UserService userService;
     private final PortfolioService portfolioService;
     private final JwtTokenProvider jwtTokenProvider;
     private final ConversionService conversionService;
 
     public TransactionController(
-            TransactionService transactionService,
             UserService userService,
             PortfolioService portfolioService,
             JwtTokenProvider jwtTokenProvider,
             ConversionService conversionService
     ) {
-        this.transactionService = transactionService;
         this.userService = userService;
         this.portfolioService = portfolioService;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -76,6 +76,24 @@ public class TransactionController {
                 portfolioId
         );
         portfolioService.uploadTransactionFile(file, csvFileFormat, portfolioId);
+    }
+
+    @PostMapping("uploadUsingApi")
+    public void uploadUsingApi(
+            @RequestParam long portfolioId,
+            @RequestParam("connector") ApiConnectorName apiConnectorName,
+            @RequestParam("token") String token,
+            @RequestHeader("Authorization") String authorization
+    ) {
+        log.info(
+                "Request received. Url: {}",
+                ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
+        );
+        userService.ThrowNotFoundIfUserDoesntHavePortfolioWithId(
+                getUsernameFromToken(removePrefixFromToken(authorization)),
+                portfolioId
+        );
+        portfolioService.uploadTransactionsUsingApi(apiConnectorName, token, portfolioId);
     }
 
     @GetMapping("{id}")

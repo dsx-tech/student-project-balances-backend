@@ -5,8 +5,10 @@ import dsx.bcv.server.data.models.Trade;
 import dsx.bcv.server.data.models.Transaction;
 import dsx.bcv.server.data.repositories.PortfolioRepository;
 import dsx.bcv.server.exceptions.NotFoundException;
-import dsx.bcv.server.services.parsers.CsvParser;
-import dsx.bcv.server.services.parsers.data_formats.CsvFileFormat;
+import dsx.bcv.server.services.api_connectors.ApiConnectorName;
+import dsx.bcv.server.services.api_connectors.ApiConnectorRepository;
+import dsx.bcv.server.services.csv_parsers.CsvParser;
+import dsx.bcv.server.services.csv_parsers.data_formats.CsvFileFormat;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Позволяет делать CRUD операции с портфелями пользователей и хранящимися в них сделками и транзакциями.
+ */
 @Service
 @Slf4j
 public class PortfolioService {
@@ -24,17 +29,19 @@ public class PortfolioService {
     private final TradeService tradeService;
     private final TransactionService transactionService;
     private final CsvParser csvParser;
+    private final ApiConnectorRepository apiConnectorRepository;
 
     public PortfolioService(
             PortfolioRepository portfolioRepository,
             TradeService tradeService,
             TransactionService transactionService,
-            CsvParser csvParser
-    ) {
+            CsvParser csvParser,
+            ApiConnectorRepository apiConnectorRepository) {
         this.portfolioRepository = portfolioRepository;
         this.tradeService = tradeService;
         this.transactionService = transactionService;
         this.csvParser = csvParser;
+        this.apiConnectorRepository = apiConnectorRepository;
     }
 
     public Portfolio save(Portfolio portfolio) {
@@ -55,6 +62,10 @@ public class PortfolioService {
         return portfolio;
     }
 
+    /**
+     * @param portfolioId id портфеля
+     * @return список сделок в портфеле
+     */
     public List<Trade> getTrades(long portfolioId) {
         var portfolio = findById(portfolioId);
         var trades = new ArrayList<>(portfolio.getTrades());
@@ -62,6 +73,10 @@ public class PortfolioService {
         return trades;
     }
 
+    /**
+     * @param portfolioId id портфеля
+     * @return список транзакций в портфеле
+     */
     public List<Transaction> getTransactions(long portfolioId) {
         var portfolio = findById(portfolioId);
         var transactions = new ArrayList<>(portfolio.getTransactions());
@@ -79,6 +94,12 @@ public class PortfolioService {
         throw new RuntimeException("Portfolio updating is not implemented");
     }
 
+    /**
+     * Загружает данные о сделках пользователя из csv файла в портфель
+     * @param file файл с данными
+     * @param csvFileFormat имя торговой площадки, которая задает формат данных
+     * @param portfolioId id портфеля, куда загружать данные
+     */
     @SneakyThrows
     public void uploadTradeFile(MultipartFile file, CsvFileFormat csvFileFormat, long portfolioId) {
         log.debug(
@@ -91,6 +112,12 @@ public class PortfolioService {
         addTrades(trades, portfolioId);
     }
 
+    /**
+     * Загружает данные о транзакциях пользователя из csv файла в портфель
+     * @param file файл с данными
+     * @param csvFileFormat имя торговой площадки, которая задает формат данных
+     * @param portfolioId id портфеля, куда загружать данные
+     */
     @SneakyThrows
     public void uploadTransactionFile(MultipartFile file, CsvFileFormat csvFileFormat, long portfolioId) {
         log.debug(
@@ -103,6 +130,37 @@ public class PortfolioService {
         addTransactions(transactions, portfolioId);
     }
 
+    /**
+     * Загружает данные о сделках пользователя из внешнего аккаунта в портфель
+     * @param apiConnectorName имя торговой площадки, откуда загружать данные
+     * @param token токен пользователя от аккаунта, откуда загружать данные
+     * @param portfolioId id портфеля, в который загружать данные
+     */
+    public void uploadTradesUsingApi(ApiConnectorName apiConnectorName, String token, long portfolioId) {
+        log.debug("uploadTradesUsingApi: called");
+        var apiConnector = apiConnectorRepository.getApiConnectorByName(apiConnectorName);
+        var trades = apiConnector.getAllTrades(token);
+        addTrades(trades, portfolioId);
+    }
+
+    /**
+     * Загружает данные о транзакциях пользователя из внешнего аккаунта в портфель
+     * @param apiConnectorName имя торговой площадки, откуда загружать данные
+     * @param token токен пользователя от аккаунта, откуда загружать данные
+     * @param portfolioId id портфеля, в который загружать данные
+     */
+    public void uploadTransactionsUsingApi(ApiConnectorName apiConnectorName, String token, long portfolioId) {
+        log.debug("uploadTransactionsUsingApi: called");
+        var apiConnector = apiConnectorRepository.getApiConnectorByName(apiConnectorName);
+        var transactions = apiConnector.getAllTransactions(token);
+        addTransactions(transactions, portfolioId);
+    }
+
+    /**
+     * Добавляет сделки в портфель пользователя
+     * @param trades список сделок для добавления
+     * @param portfolioId id портфеля, куда загружать сделки
+     */
     public void addTrades(List<Trade> trades, long portfolioId) {
         var savedTrades = tradeService.saveAll(trades);
         var portfolio = findById(portfolioId);
@@ -111,6 +169,11 @@ public class PortfolioService {
         log.debug("addTrades: Trades added");
     }
 
+    /**
+     * Добавляет транзакции в портфель пользователя
+     * @param transactions список транзакций для добавления
+     * @param portfolioId id портфеля, куда загружать транзакции
+     */
     public void addTransactions(List<Transaction> transactions, long portfolioId) {
         var savedTransactions = transactionService.saveAll(transactions);
         var portfolio = findById(portfolioId);

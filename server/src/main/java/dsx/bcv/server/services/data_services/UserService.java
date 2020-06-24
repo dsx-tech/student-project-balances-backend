@@ -16,6 +16,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+/**
+ * Позволяет делать CRUD операции с пользователями и их портфелями
+ */
 @Service
 @Slf4j
 public class UserService {

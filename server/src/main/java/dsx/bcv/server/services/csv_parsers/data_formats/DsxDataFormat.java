@@ -1,13 +1,16 @@
-package dsx.bcv.server.services.parsers.data_formats;
+package dsx.bcv.server.services.csv_parsers.data_formats;
 
-import dsx.bcv.server.services.parsers.TradeField;
-import dsx.bcv.server.services.parsers.TransactionField;
+import dsx.bcv.server.services.csv_parsers.TradeField;
+import dsx.bcv.server.services.csv_parsers.TransactionField;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-@Component
-public class ProjectDataFormat implements MarketplaceDataFormat {
+/**
+ * Формат (последовательность полей) csv файлов Dsx Global для сделок и транзакций
+ */
+@Component("dsx_data_format")
+public class DsxDataFormat implements MarketplaceDataFormat {
 
     private final Map<TradeField, Integer> tradeFormat = Map.of(
             TradeField.DateTime, 0,
@@ -17,9 +20,9 @@ public class ProjectDataFormat implements MarketplaceDataFormat {
             TradeField.TradedQuantityCurrency, 4,
             TradeField.TradedPrice, 5,
             TradeField.TradedPriceCurrency, 6,
-            TradeField.Commission, 7,
-            TradeField.CommissionCurrency, 8,
-            TradeField.TradeValueId, 9
+            TradeField.Commission, 9,
+            TradeField.CommissionCurrency, 10,
+            TradeField.TradeValueId, 12
     );
 
     private final Map<TransactionField, Integer> transactionFormat = Map.of(
@@ -28,8 +31,8 @@ public class ProjectDataFormat implements MarketplaceDataFormat {
             TransactionField.Currency, 2,
             TransactionField.Amount, 3,
             TransactionField.Commission, 4,
-            TransactionField.TransactionStatus, 5,
-            TransactionField.TransactionValueId, 6
+            TransactionField.TransactionStatus, 7,
+            TransactionField.TransactionValueId, 9
     );
 
     @Override

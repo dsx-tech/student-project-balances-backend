@@ -1,48 +1,43 @@
 package dsx.bcv.marketdata_provider.services.quote_providers.alpha_vantage;
 
+import dsx.bcv.marketdata_provider.Application;
 import dsx.bcv.marketdata_provider.data.models.Asset;
 import dsx.bcv.marketdata_provider.services.RequestService;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.IOException;
 import java.util.stream.Collectors;
 
-//@Service
-@Slf4j
-public class AlphaVantageApiChecker {
+@Ignore
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = Application.class)
+public class AlphaVantageApiCheckerTest {
 
-    private final AlphaVantageSupportedAssets alphaVantageSupportedCurrencies;
-    private final ConversionService conversionService;
-    private final RequestService requestService;
-    private final AlphaVantageApiKeyProvider alphaVantageApiKeyProvider;
-    private final AlphaVantageRateLimiterService rateLimiterService;
+    @Autowired
+    private AlphaVantageSupportedAssets alphaVantageSupportedCurrencies;
+    @Autowired
+    private ConversionService conversionService;
+    @Autowired
+    private RequestService requestService;
+    @Autowired
+    private AlphaVantageApiKeyProvider alphaVantageApiKeyProvider;
+    @Autowired
+    private AlphaVantageRateLimiterService rateLimiterService;
 
-    public AlphaVantageApiChecker(
-            AlphaVantageSupportedAssets alphaVantageSupportedCurrencies,
-            ConversionService conversionService,
-            RequestService requestService,
-            AlphaVantageApiKeyProvider alphaVantageApiKeyProvider,
-            AlphaVantageRateLimiterService rateLimiterService) {
-        this.alphaVantageSupportedCurrencies = alphaVantageSupportedCurrencies;
-        this.conversionService = conversionService;
-        this.requestService = requestService;
-        this.alphaVantageApiKeyProvider = alphaVantageApiKeyProvider;
-        this.rateLimiterService = rateLimiterService;
-
-        new Thread(this::checkAll).start();
-    }
-
-    private void checkAll() {
+    @Test
+    public void checkAll() {
         checkPhysicalCurrencies();
         checkDigitalCurrencies();
     }
 
-    @SneakyThrows
     private void checkPhysicalCurrencies() {
 
-        log.info("Checking supported physical currencies");
+        System.out.println("Checking supported physical currencies");
 
         final var physicalCurrencies = this.alphaVantageSupportedCurrencies.getPhysicalCurrencies()
                 .stream()
@@ -50,7 +45,6 @@ public class AlphaVantageApiChecker {
                 .collect(Collectors.toList());
 
         for (var currency : physicalCurrencies) {
-            log.info("Request history for {}", currency);
             var requestUrl =
                     "https://www.alphavantage.co/query" +
                             "?function=FX_DAILY" +
@@ -61,10 +55,9 @@ public class AlphaVantageApiChecker {
         }
     }
 
-    @SneakyThrows
     private void checkDigitalCurrencies() {
 
-        log.info("Checking supported digital currencies");
+        System.out.println("Checking supported digital currencies");
 
         final var digitalCurrencies = this.alphaVantageSupportedCurrencies.getDigitalCurrencies()
                 .stream()
@@ -73,7 +66,6 @@ public class AlphaVantageApiChecker {
 
         var i = 1;
         for (var currency : digitalCurrencies) {
-            log.info("{}. Request history for {}", i++, currency);
             var requestUrl =
                     "https://www.alphavantage.co/query" +
                             "?function=DIGITAL_CURRENCY_DAILY" +
@@ -84,16 +76,14 @@ public class AlphaVantageApiChecker {
         }
     }
 
-    private void sendRequest(Asset asset, String requestUrl) throws IOException {
-        log.trace("Send request to Alpha Vantage, url: {}", requestUrl);
+    private void sendRequest(Asset asset, String requestUrl) {
         rateLimiterService.getRateLimiter().acquire();
         var responseBody = requestService.doGetRequest(requestUrl);
-        log.trace("Response body: {}", responseBody);
         if (responseBody.contains("Error Message")) {
-            log.info("{} is not supported", asset);
+            System.out.println(asset);
         }
         if (responseBody.contains("Our standard API call frequency is 5 calls per minute and 500 calls per day")) {
-            log.info("ERROR. High API call frequency");
+            System.out.println("ERROR. High API call frequency");
         }
     }
 }

@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AlphaVantageRateLimiterService {
-    private final double callsPerMinute = 5 - 0.1;
+
+    private final double callsPerMinute = 5 - 1;
     private final int secondsInMinute = 60;
     @Getter
     private final RateLimiter rateLimiter = RateLimiter.create(callsPerMinute / secondsInMinute);

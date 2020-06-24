@@ -1,4 +1,4 @@
-package dsx.bcv.server.services.parsers;
+package dsx.bcv.server.services.csv_parsers;
 
 public enum TradeField {
     DateTime,

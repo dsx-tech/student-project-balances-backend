@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+/**
+ * Предоставляет возможность сохранить актив в базу данных
+ */
 @Service
 @Slf4j
 public class CurrencyService {

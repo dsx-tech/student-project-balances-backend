@@ -2,38 +2,33 @@ package dsx.bcv.server.controllers;
 
 import dsx.bcv.server.data.models.Portfolio;
 import dsx.bcv.server.security.JwtTokenProvider;
-import dsx.bcv.server.services.data_services.PortfolioService;
 import dsx.bcv.server.services.data_services.UserService;
-import dsx.bcv.server.services.parsers.data_formats.CsvFileFormat;
 import dsx.bcv.server.views.PortfolioVO;
-import dsx.bcv.server.views.TradeVO;
-import dsx.bcv.server.views.TransactionVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Предоставляет api для CRUD операций с портфелями пользователей
+ */
 @RestController
 @RequestMapping("portfolios")
 @Slf4j
 public class PortfolioController {
 
-    private final PortfolioService portfolioService;
     private final UserService userService;
     private final ConversionService conversionService;
     private final JwtTokenProvider jwtTokenProvider;
 
     public PortfolioController(
-            PortfolioService portfolioService,
             UserService userService,
             ConversionService conversionService,
             JwtTokenProvider jwtTokenProvider
     ) {
-        this.portfolioService = portfolioService;
         this.userService = userService;
         this.conversionService = conversionService;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -136,74 +131,6 @@ public class PortfolioController {
                 getUsernameFromToken(removePrefixFromToken(authorization)),
                 id
         );
-    }
-
-    @Deprecated
-    @GetMapping("{id}/trades")
-    public List<TradeVO> getTradesByPortfolioId(
-            @PathVariable long id,
-            @RequestHeader("Authorization") String authorization
-    ) {
-        log.info(
-                "Request received. Url: {}",
-                ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
-        );
-        userService.ThrowNotFoundIfUserDoesntHavePortfolioWithId(
-                getUsernameFromToken(removePrefixFromToken(authorization)),
-                id
-        );
-        var trades = portfolioService.getTrades(id);
-        return trades.stream()
-                .map(trade -> conversionService.convert(trade, TradeVO.class))
-                .collect(Collectors.toList());
-    }
-
-    @Deprecated
-    @GetMapping("{id}/transactions")
-    public List<TransactionVO> getTransactionsByPortfolioId(
-            @PathVariable long id,
-            @RequestHeader("Authorization") String authorization
-    ) {
-        log.info(
-                "Request received. Url: {}",
-                ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
-        );
-        userService.ThrowNotFoundIfUserDoesntHavePortfolioWithId(
-                getUsernameFromToken(removePrefixFromToken(authorization)),
-                id
-        );
-        var transactions = portfolioService.getTransactions(id);
-        return transactions.stream()
-                .map(transaction -> conversionService.convert(transaction, TransactionVO.class))
-                .collect(Collectors.toList());
-    }
-
-    @Deprecated
-    @PostMapping("{id}/trades/upload")
-    public void uploadTradeFileByPortfolioId(
-            @PathVariable long id,
-            @RequestHeader("Authorization") String authorization,
-            @RequestParam("file") MultipartFile file
-    ) {
-        userService.ThrowNotFoundIfUserDoesntHavePortfolioWithId(
-                getUsernameFromToken(removePrefixFromToken(authorization)),
-                id
-        );
-        portfolioService.uploadTradeFile(file, CsvFileFormat.Dsx, id);
-    }
-
-    @Deprecated
-    @PostMapping("{id}/transactions/upload")
-    public void uploadTransactionFileByPortfolioId(
-            @PathVariable long id,
-            @RequestHeader("Authorization") String authorization,
-            @RequestParam("file") MultipartFile file
-    ) {
-        userService.ThrowNotFoundIfUserDoesntHavePortfolioWithId(
-                getUsernameFromToken(removePrefixFromToken(authorization)),
-                id
-        );
-        portfolioService.uploadTransactionFile(file, CsvFileFormat.Dsx, id);
     }
 
     private String removePrefixFromToken(String authorization) {

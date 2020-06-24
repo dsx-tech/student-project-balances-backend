@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+/**
+ * Предоставляет возможность сохранить инструмент в базу данных
+ */
 @Service
 public class InstrumentService {
 

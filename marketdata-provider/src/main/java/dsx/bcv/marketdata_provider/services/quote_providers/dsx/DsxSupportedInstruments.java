@@ -43,8 +43,8 @@ public class DsxSupportedInstruments {
     @SneakyThrows
     private Set<DsxInstrumentEdge> initSupportedInstruments() {
 
-        var dsxUrlInfo = "https://api.dsxglobal.com/api/2/public/symbol";
-        var responseBody = requestService.doGetRequest(dsxUrlInfo);
+        var dsxUrlInfo = "https://dsxglobal.com/mapi/v2/info";
+        var responseBody = "[]";//requestService.doGetRequest(dsxUrlInfo);
 
         List<DsxInstrument> instruments = objectMapper.readValue(responseBody, new TypeReference<List<DsxInstrument>>() {});
 

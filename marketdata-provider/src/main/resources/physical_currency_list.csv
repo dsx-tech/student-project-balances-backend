@@ -7,8 +7,6 @@ AOA,Angolan Kwanza
 ARS,Argentine Peso
 AUD,Australian Dollar
 AWG,Aruban Florin
-AZN,Azerbaijani Manat
-BAM,Bosnia-Herzegovina Convertible Mark
 BBD,Barbadian Dollar
 BDT,Bangladeshi Taka
 BGN,Bulgarian Lev
@@ -23,7 +21,6 @@ BTN,Bhutanese Ngultrum
 BWP,Botswanan Pula
 BZD,Belize Dollar
 CAD,Canadian Dollar
-CDF,Congolese Franc
 CHF,Swiss Franc
 CLF,Chilean Unit of Account UF
 CLP,Chilean Peso
@@ -44,7 +41,6 @@ EUR,Euro
 FJD,Fijian Dollar
 FKP,Falkland Islands Pound
 GBP,British Pound Sterling
-GEL,Georgian Lari
 GHS,Ghanaian Cedi
 GIP,Gibraltar Pound
 GMD,Gambian Dalasi
@@ -66,10 +62,8 @@ JMD,Jamaican Dollar
 JOD,Jordanian Dinar
 JPY,Japanese Yen
 KES,Kenyan Shilling
-KGS,Kyrgystani Som
 KHR,Cambodian Riel
 KMF,Comorian Franc
-KPW,North Korean Won
 KRW,South Korean Won
 KWD,Kuwaiti Dinar
 KYD,Cayman Islands Dollar
@@ -79,17 +73,13 @@ LBP,Lebanese Pound
 LKR,Sri Lankan Rupee
 LRD,Liberian Dollar
 LSL,Lesotho Loti
-LYD,Libyan Dinar
 MAD,Moroccan Dirham
-MDL,Moldovan Leu
 MGA,Malagasy Ariary
-MKD,Macedonian Denar
 MMK,Myanma Kyat
 MNT,Mongolian Tugrik
 MOP,Macanese Pataca
 MRU,Mauritanian Ouguiya
 MUR,Mauritian Rupee
-MVR,Maldivian Rufiyaa
 MWK,Malawian Kwacha
 MXN,Mexican Peso
 MYR,Malaysian Ringgit
@@ -114,18 +104,13 @@ RUB,Russian Ruble
 RWF,Rwandan Franc
 SAR,Saudi Riyal
 SCR,Seychellois Rupee
-SDG,Sudanese Pound
 SEK,Swedish Krona
 SGD,Singapore Dollar
-SHP,Saint Helena Pound
 SLL,Sierra Leonean Leone
 SOS,Somali Shilling
-SRD,Surinamese Dollar
 SYP,Syrian Pound
 SZL,Swazi Lilangeni
 THB,Thai Baht
-TJS,Tajikistani Somoni
-TMT,Turkmenistani Manat
 TND,Tunisian Dinar
 TOP,Tongan Pa'anga
 TRY,Turkish Lira
@@ -136,15 +121,11 @@ UAH,Ukrainian Hryvnia
 UGX,Ugandan Shilling
 USD,United States Dollar
 UYU,Uruguayan Peso
-UZS,Uzbekistan Som
 VND,Vietnamese Dong
 VUV,Vanuatu Vatu
 WST,Samoan Tala
 XAF,CFA Franc BEAC
-XCD,East Caribbean Dollar
 XDR,Special Drawing Rights
 XOF,CFA Franc BCEAO
-XPF,CFP Franc
-YER,Yemeni Rial
 ZAR,South African Rand
 ZMW,Zambian Kwacha
